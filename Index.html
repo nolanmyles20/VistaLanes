@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Bowling Center - Home</title>
+  <title>Vista Lanes - Home</title>
   <style>
     :root{
       --bg:#000;
@@ -27,15 +27,43 @@
     }
     .wrap{max-width:880px;margin:0 auto;padding:14px 14px 60px}
 
-    /* LOGO (WEB) */
-    .brandbar{
+    /* TOP BRAND AREA */
+    .brandArea{
+      position:relative;
       display:flex;
-      justify-content:center;
+      flex-direction:column;
       align-items:center;
-      padding:10px 0 8px;
+      gap:10px;
+      padding:14px 0 10px;
     }
-    .brandbar img{
-      width:min(320px, 80vw);
+    .brandMain{
+      width:min(560px, 92vw); /* large centered */
+      height:auto;
+      display:block;
+      filter: drop-shadow(0 14px 28px rgba(0,0,0,.60));
+      opacity:.99;
+    }
+
+    /* Powered By block hugging right side */
+    .poweredByWrap{
+      width:100%;
+      display:flex;
+      justify-content:flex-end;
+      align-items:center;
+      gap:10px;
+      padding-right:6px;
+      margin-top:-4px;
+    }
+    .poweredByText{
+      color:var(--muted);
+      font-size:12px;
+      letter-spacing:.25px;
+      font-weight:800;
+      text-transform:uppercase;
+      white-space:nowrap;
+    }
+    .poweredByLogo{
+      width:min(140px, 34vw); /* about 1/4-ish of main logo depending on screen */
       height:auto;
       display:block;
       filter: drop-shadow(0 10px 22px rgba(0,0,0,.55));
@@ -56,7 +84,6 @@
     }
     .hd h1{margin:0;font-size:20px;letter-spacing:.3px;font-weight:900;}
     .hd .sub{margin-top:6px;color:var(--muted);font-size:13px;line-height:1.4}
-
     .bd{padding:16px}
 
     .homeBtns{
@@ -111,48 +138,49 @@
     @media (max-width: 420px){
       .homeBtn{font-size:16px;padding:14px 16px}
       .chev{width:32px;height:32px}
+      .poweredByLogo{width:min(120px, 38vw)}
     }
   </style>
 </head>
 <body>
   <div class="wrap">
 
-    <!-- LOGO TOP CENTERED -->
-    <div class="brandbar">
-      <img src="assets/68D8CA4C-741E-41E1-ABBC-8B57D7FD0A57.png" alt="Logo" />
+    <!-- NOTE: Use LOCAL FILE PATHS in your repo.
+         Put these two files inside /assets/ :
+           assets/9AB9725D-AD71-4DDC-BE9B-03328F663643.png
+           assets/68D8CA4C-741E-41E1-ABBC-8B57D7FD0A57.png
+    -->
+    <div class="brandArea">
+      <img
+        class="brandMain"
+        src="assets/9AB9725D-AD71-4DDC-BE9B-03328F663643.png"
+        alt="Vista Lanes"
+      />
+
+      <div class="poweredByWrap">
+        <div class="poweredByText">Powered By</div>
+        <img
+          class="poweredByLogo"
+          src="assets/68D8CA4C-741E-41E1-ABBC-8B57D7FD0A57.png"
+          alt="Powered By"
+        />
+      </div>
     </div>
 
     <div class="panel">
       <div class="hd">
-        <h1>Bowling Center</h1>
-        <div class="sub">Quick shortcuts to everything. Tap a button to open that page.</div>
+        <h1>Home</h1>
+        <div class="sub">Tap a button to open that page.</div>
       </div>
 
       <div class="bd">
         <div class="homeBtns">
-          <a class="homeBtn" href="bowlers.html">
-            <span>Bowlers</span><span class="chev">›</span>
-          </a>
-
-          <a class="homeBtn" href="leagues.html">
-            <span>Leagues</span><span class="chev">›</span>
-          </a>
-
-          <a class="homeBtn" href="teams.html">
-            <span>Teams</span><span class="chev">›</span>
-          </a>
-
-          <a class="homeBtn" href="lanes.html">
-            <span>Lanes</span><span class="chev">›</span>
-          </a>
-
-          <a class="homeBtn" href="tournaments.html">
-            <span>Tournaments</span><span class="chev">›</span>
-          </a>
-
-          <a class="homeBtn" href="brackets.html">
-            <span>Brackets</span><span class="chev">›</span>
-          </a>
+          <a class="homeBtn" href="bowlers.html"><span>Bowlers</span><span class="chev">›</span></a>
+          <a class="homeBtn" href="leagues.html"><span>Leagues</span><span class="chev">›</span></a>
+          <a class="homeBtn" href="teams.html"><span>Teams</span><span class="chev">›</span></a>
+          <a class="homeBtn" href="lanes.html"><span>Lanes</span><span class="chev">›</span></a>
+          <a class="homeBtn" href="tournaments.html"><span>Tournaments</span><span class="chev">›</span></a>
+          <a class="homeBtn" href="brackets.html"><span>Brackets</span><span class="chev">›</span></a>
         </div>
 
         <div class="footerHint">
