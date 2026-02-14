@@ -1011,127 +1011,127 @@
         </div>
         <div class="amt">${money(p2)}</div>
       </div>`;
+    }
+
+    function saveBracketToPDF(brId){
+    const el = document.getElementById(`bracket_${brId}`);
+    if(!el) return;
+
+    const clone = el.cloneNode(true);
+
+    // Remove Save/Delete button
+    clone.querySelectorAll("[data-save-del]").forEach(b => b.remove());
+
+    const html = `
+    <!doctype html>
+    <html>
+    <head>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width,initial-scale=1" />
+      <title>Bracket #${brId}</title>
+
+      <style>
+        *{box-sizing:border-box}
+
+        body{
+          margin:0;
+          padding:24px;
+          background:#ffffff !important;
+          color:#000 !important;
+          font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+        }
+
+        /* Logo */
+        .exportHeader{
+          display:flex;
+          justify-content:center;
+          align-items:center;
+          margin-bottom:20px;
+        }
+
+        .exportLogo{
+          width:260px;
+          max-width:80%;
+          height:auto;
+        }
+
+        /* Preserve bracket layout */
+        .bracket{
+          border:1px solid #d0d0d0 !important;
+          background:#ffffff !important;
+          border-radius:18px;
+          overflow:hidden;
+        }
+
+        .top{
+          background:#ffffff !important;
+          border-bottom:1px solid #d0d0d0 !important;
+        }
+
+        .tree{
+          background:#ffffff !important;
+        }
+
+        .match{
+          background:#ffffff !important;
+          border:1px solid #d0d0d0 !important;
+        }
+
+        .slot{
+          background:#ffffff !important;
+          border:1px solid #e0e0e0 !important;
+        }
+
+        .tree::before{
+          opacity:.6 !important;
+        }
+
+        /* Text colors for print */
+        .nm.winner{ color:#0a8a3a !important; }
+        .nm.loser{ color:#c20000 !important; }
+
+        .pill, .badge{
+          background:#f4f4f4 !important;
+          border:1px solid #cccccc !important;
+          color:#000 !important;
+        }
+
+        .winnerline{
+          background:#ffffff !important;
+          border:1px solid #d0d0d0 !important;
+        }
+
+        .muted, .small, .sc, .hint, .tag{
+          color:#333 !important;
+        }
+
+        @media print{
+          body{padding:0}
+        }
+      </style>
+    </head>
+    <body>
+
+      <div class="exportHeader">
+        <img class="exportLogo" src="${LOGO_PATH}" />
+      </div>
+
+      ${clone.outerHTML}
+
+      <script>
+        setTimeout(function(){ window.print(); }, 300);
+      <\/script>
+
+    </body>
+    </html>
+    `;
+
+    const w = window.open("", "_blank");
+    if(!w) return;
+    w.document.open();
+    w.document.write(html);
+    w.document.close();
   }
-
-  function saveBracketToPDF(brId){
-  const el = document.getElementById(`bracket_${brId}`);
-  if(!el) return;
-
-  const clone = el.cloneNode(true);
-
-  // Remove Save/Delete button
-  clone.querySelectorAll("[data-save-del]").forEach(b => b.remove());
-
-  const html = `
-  <!doctype html>
-  <html>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Bracket #${brId}</title>
-
-    <style>
-      *{box-sizing:border-box}
-
-      body{
-        margin:0;
-        padding:24px;
-        background:#ffffff !important;
-        color:#000 !important;
-        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-      }
-
-      /* Logo */
-      .exportHeader{
-        display:flex;
-        justify-content:center;
-        align-items:center;
-        margin-bottom:20px;
-      }
-
-      .exportLogo{
-        width:260px;
-        max-width:80%;
-        height:auto;
-      }
-
-      /* Preserve bracket layout */
-      .bracket{
-        border:1px solid #d0d0d0 !important;
-        background:#ffffff !important;
-        border-radius:18px;
-        overflow:hidden;
-      }
-
-      .top{
-        background:#ffffff !important;
-        border-bottom:1px solid #d0d0d0 !important;
-      }
-
-      .tree{
-        background:#ffffff !important;
-      }
-
-      .match{
-        background:#ffffff !important;
-        border:1px solid #d0d0d0 !important;
-      }
-
-      .slot{
-        background:#ffffff !important;
-        border:1px solid #e0e0e0 !important;
-      }
-
-      .tree::before{
-        opacity:.6 !important;
-      }
-
-      /* Text colors for print */
-      .nm.winner{ color:#0a8a3a !important; }
-      .nm.loser{ color:#c20000 !important; }
-
-      .pill, .badge{
-        background:#f4f4f4 !important;
-        border:1px solid #cccccc !important;
-        color:#000 !important;
-      }
-
-      .winnerline{
-        background:#ffffff !important;
-        border:1px solid #d0d0d0 !important;
-      }
-
-      .muted, .small, .sc, .hint, .tag{
-        color:#333 !important;
-      }
-
-      @media print{
-        body{padding:0}
-      }
-    </style>
-  </head>
-  <body>
-
-    <div class="exportHeader">
-      <img class="exportLogo" src="${LOGO_PATH}" />
-    </div>
-
-    ${clone.outerHTML}
-
-    <script>
-      setTimeout(function(){ window.print(); }, 300);
-    <\/script>
-
-  </body>
-  </html>
-  `;
-
-  const w = window.open("", "_blank");
-  if(!w) return;
-  w.document.open();
-  w.document.write(html);
-  w.document.close();
-}
 
   function deleteBracketById(brId){
     state.brackets = state.brackets.filter(b=>b.id!==brId);
