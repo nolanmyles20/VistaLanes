@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Vista Lanes - Home</title>
+  <style>
+    :root{
+      --bg:#000;
+      --border:rgba(255,255,255,.08);
+      --text:#d8e1ee;
+      --muted:#8ea0b5;
+      --shadow: 0 10px 30px rgba(0,0,0,.45);
+      --radius: 18px;
+
+      --btnBg:#d9d9d9;   /* home buttons = grey */
+      --btnText:#000;    /* black text */
+      --btnBorder:rgba(0,0,0,.18);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      background: var(--bg);
+      color:var(--text);
+      min-height:100vh;
+    }
+    .wrap{max-width:880px;margin:0 auto;padding:14px 14px 60px}
+
+    /* TOP BRAND AREA */
+    .brandArea{
+      position:relative;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:10px;
+      padding:14px 0 10px;
+    }
+    .brandMain{
+      width:min(560px, 92vw); /* large centered */
+      height:auto;
+      display:block;
+      filter: drop-shadow(0 14px 28px rgba(0,0,0,.60));
+      opacity:.99;
+    }
+
+    /* Powered By block hugging right side */
+    .poweredByWrap{
+      width:100%;
+      display:flex;
+      justify-content:flex-end;
+      align-items:center;
+      gap:10px;
+      padding-right:6px;
+      margin-top:-4px;
+    }
+    .poweredByText{
+      color:var(--muted);
+      font-size:12px;
+      letter-spacing:.25px;
+      font-weight:800;
+      text-transform:uppercase;
+      white-space:nowrap;
+    }
+    .poweredByLogo{
+      width:min(140px, 34vw); /* about 1/4-ish of main logo depending on screen */
+      height:auto;
+      display:block;
+      filter: drop-shadow(0 10px 22px rgba(0,0,0,.55));
+      opacity:.98;
+    }
+
+    .panel{
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .hd{
+      padding:16px 16px 12px;
+      border-bottom:1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,.03), transparent);
+    }
+    .hd h1{margin:0;font-size:20px;letter-spacing:.3px;font-weight:900;}
+    .hd .sub{margin-top:6px;color:var(--muted);font-size:13px;line-height:1.4}
+    .bd{padding:16px}
+
+    .homeBtns{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .homeBtn{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:16px 18px;
+      border-radius:999px;
+      background: var(--btnBg);
+      color: var(--btnText);
+      border:1px solid var(--btnBorder);
+      font-weight:900;
+      font-size:18px;
+      letter-spacing:.2px;
+      text-decoration:none;
+      user-select:none;
+      box-shadow: 0 10px 22px rgba(0,0,0,.35);
+      transition:.15s ease;
+    }
+    .homeBtn:hover{
+      background:#ffffff;
+      transform: translateY(-1px);
+      box-shadow: 0 14px 30px rgba(0,0,0,.45);
+    }
+    .homeBtn:active{ transform: translateY(0px); }
+
+    .chev{
+      width:34px;height:34px;
+      border-radius:999px;
+      display:flex;align-items:center;justify-content:center;
+      border:1px solid rgba(0,0,0,.20);
+      background: rgba(255,255,255,.45);
+      font-size:18px;
+      line-height:1;
+    }
+
+    .footerHint{
+      margin-top:14px;
+      font-size:12px;
+      color:var(--muted);
+      text-align:center;
+      line-height:1.45;
+    }
+
+    @media (max-width: 420px){
+      .homeBtn{font-size:16px;padding:14px 16px}
+      .chev{width:32px;height:32px}
+      .poweredByLogo{width:min(120px, 38vw)}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <!-- NOTE: Use LOCAL FILE PATHS in your repo.
+         Put these two files inside /assets/ :
+           assets/9AB9725D-AD71-4DDC-BE9B-03328F663643.png
+           assets/68D8CA4C-741E-41E1-ABBC-8B57D7FD0A57.png
+    -->
+    <div class="brandArea">
+      <img
+        class="brandMain"
+        src="assets/9AB9725D-AD71-4DDC-BE9B-03328F663643.png"
+        alt="Vista Lanes"
+      />
+
+      <div class="poweredByWrap">
+        <div class="poweredByText">Powered By</div>
+        <img
+          class="poweredByLogo"
+          src="assets/68D8CA4C-741E-41E1-ABBC-8B57D7FD0A57.png"
+          alt="Powered By"
+        />
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="hd">
+        <h1>Home</h1>
+        <div class="sub">Tap a button to open that page.</div>
+      </div>
+
+      <div class="bd">
+        <div class="homeBtns">
+          <a class="homeBtn" href="bowlers.html"><span>Bowlers</span><span class="chev">›</span></a>
+          <a class="homeBtn" href="leagues.html"><span>Leagues</span><span class="chev">›</span></a>
+          <a class="homeBtn" href="teams.html"><span>Teams</span><span class="chev">›</span></a>
+          <a class="homeBtn" href="lanes.html"><span>Lanes</span><span class="chev">›</span></a>
+          <a class="homeBtn" href="tournaments.html"><span>Tournaments</span><span class="chev">›</span></a>
+          <a class="homeBtn" href="brackets.html"><span>Brackets</span><span class="chev">›</span></a>
+        </div>
+
+        <div class="footerHint">
+          Tip: rotate landscape for a roomier layout on bracket views.
+        </div>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>
