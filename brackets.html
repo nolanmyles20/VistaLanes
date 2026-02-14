@@ -36,6 +36,44 @@
     }
     .wrap{max-width:1200px;margin:0 auto;padding:14px 14px 60px}
 
+    /* FOOTER (WEB) */
+    .siteFooter{
+      margin-top:18px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:12px;
+      padding:10px 0 6px;
+    }
+    .siteFooter .label{
+      font-weight:900;
+      letter-spacing:.35px;
+      color:var(--muted);
+      font-size:14px;
+    }
+    .siteFooter img{
+      width:130px;
+      height:auto;
+      display:block;
+      filter: drop-shadow(0 10px 22px rgba(0,0,0,.55));
+      opacity:.98;
+    }
+    
+    .siteFooter .copyright{
+      width:100%;
+      text-align:center;
+      font-size:13px;
+      color:#888;
+      margin-top:6px;
+      font-weight:600;
+      letter-spacing:.2px;
+    }
+@media (max-width:520px){
+      .siteFooter{margin-top:14px;padding:8px 0 4px}
+      .siteFooter img{width:120px}
+      .siteFooter .label{font-size:13px}
+    }
+
     /* LOGO (WEB) */
     .brandbar{
       display:flex;
@@ -355,7 +393,7 @@
 
     <!-- LOGO TOP CENTERED (WEB) -->
     <div class="brandbar">
-      <img src="assets/68D8CA4C-741E-41E1-ABBC-8B57D7FD0A57.png" alt="Logo" />
+      <img src="assets/9AB9725D-AD71-4DDC-BE9B-03328F663643.png" alt="Vista Lanes" />
     </div>
 
     <header>
@@ -466,6 +504,13 @@
         </div>
       </div>
     </div>
+    <!-- FOOTER (WEB) -->
+    <div class="siteFooter">
+      <div class="label">Powered By</div>
+      <img src="assets/68D8CA4C-741E-41E1-ABBC-8B57D7FD0A57.png" alt="Myles Bowling Systems" />
+      <div class="copyright">&copy; <span id="copyrightYear"></span> Myles Bowling Systems</div>
+    </div>
+
   </div>
 
   <div class="modalBackdrop" id="pickerBackdrop" aria-hidden="true">
@@ -511,6 +556,12 @@
   const EXPORT_MAIN_LOGO    = "assets/9AB9725D-AD71-4DDC-BE9B-03328F663643.png";// Vista Lanes
   const EXPORT_POWERED_LOGO =  "assets/68D8CA4C-741E-41E1-ABBC-8B57D7FD0A57.png";   // Myles Bowling Systems
 
+
+  // Auto year in footer (WEB)
+  try{
+    const y = document.getElementById("copyrightYear");
+    if(y) y.textContent = new Date().getFullYear();
+  }catch(e){}
   const state = { bowlers: new Map(), brackets: [], roster: [], rosterLoaded:false, selectedRoster:null };
   const BRACKET_SIZE = 8;
 
@@ -1005,31 +1056,21 @@
         color:#111;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
-        page-break-inside: avoid;
       }
 
-      @page{ margin: 12mm; }
-
-      .page{height:100vh; padding:8px 12px 8px; display:flex; flex-direction:column; overflow:hidden}
-      html,body{height:100%; overflow:hidden}
-      .content{flex:1 1 auto; overflow:hidden; display:flex; align-items:stretch; justify-content:center}
-      .fit{width:100%; transform-origin: top center;}
-
+      .page{padding:18px 16px 14px}
       .header{
         display:flex;
         flex-direction:column;
         align-items:center;
-        gap:6px;
-        padding:0;
-        margin:0 0 6px;
+        gap:10px;
+        padding:6px 0 10px;
       }
 
       /* MAIN LOGO centered */
       .mainLogo{
-        width:min(360px, 90vw);
-        max-height:120px;
+        width:min(420px, 92vw);
         height:auto;
-        object-fit:contain;
         display:block;
         margin:0 auto;
       }
@@ -1043,8 +1084,7 @@
 
       /* POWERED BY bigger + shifted up */
       .powered{
-        margin-top:6px;
-        flex:0 0 auto;
+        margin-top:8px;
         display:flex;
         align-items:center;
         justify-content:center;
@@ -1056,7 +1096,7 @@
         color:#111;
       }
       .powered img{
-        width:105px;
+        width:120px; /* ~2x */
         height:auto;
         display:block;
         transform: translateY(-6px); /* shift up */
@@ -1073,13 +1113,6 @@
         border-bottom:1px solid var(--border);
         display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;
         background:#fff;
-      }
-
-      /* Fit-to-page tweaks for narrow print/preview (iPhone etc.) */
-      @media (max-width: 680px){
-        :root{--matchH: 124px; --matchGap: 10px; --treePadX: 10px; --treeGap: 10px;}
-        .slot .nm{font-size: 13px;}
-        .slot .sc{font-size: 11px;}
       }
       .bracket .top .meta{display:flex;flex-direction:column;gap:4px;}
       .bracket .top .meta .name{font-weight:900;letter-spacing:.2px;color:#111}
@@ -1108,7 +1141,7 @@
         padding:12px var(--treePadX) 14px;
         border-radius: 18px;
         width:100%;
-        min-width: 0; /* fit page width (no overflow) */
+        min-width: 920px; /* keep original export look */
         background:#fff;
       }
 
@@ -1182,7 +1215,7 @@
 
       .foot{
         border-top:1px solid var(--border);
-        padding:8px;
+        padding:12px;
         display:grid;
         gap:10px;
         background:#fff;
@@ -1214,7 +1247,7 @@
             <h1 class="brTitle">Bracket #${brId}</h1>
           </div>
 
-          <div class="content"><div class="fit">${clone.outerHTML}</div></div>
+          ${clone.outerHTML}
 
           <div class="powered">
             <div class="label">Powered By</div>
@@ -1224,33 +1257,11 @@
 
         <script>
           (function(){
-            function fitToViewport(){
-              var content = document.querySelector('.content');
-              var fit = document.querySelector('.fit');
-              if(!content || !fit) return;
-              // reset
-              fit.style.transform = 'scale(1)';
-              fit.style.width = '100%';
-              // measure
-              var cw = content.clientWidth;
-              var ch = content.clientHeight;
-              var sw = fit.scrollWidth;
-              var sh = fit.scrollHeight;
-              if(!cw || !ch || !sw || !sh) return;
-              var scale = Math.min(1, cw / sw, ch / sh);
-              // apply scale and expand width so it stays centered and sharp
-              fit.style.transform = 'scale(' + scale + ')';
-              fit.style.width = (100/scale) + '%';
-            }
-
             function doPrint(){
-              fitToViewport();
               setTimeout(function(){ window.focus(); window.print(); }, 150);
             }
             var imgs = Array.prototype.slice.call(document.images||[]);
             var left = imgs.length;
-            fitToViewport();
-            window.addEventListener('resize', fitToViewport);
             if(!left) return doPrint();
             imgs.forEach(function(img){
               if(img.complete){ left--; if(left<=0) doPrint(); }
