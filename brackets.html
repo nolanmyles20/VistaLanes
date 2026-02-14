@@ -579,31 +579,67 @@
   let _persistT = null;
 
   function persistSnapshot(){
-    return { brackets: state.brackets };
+    return {
+      brackets: state.brackets,
+      bowlers: Array.from(state.bowlers.values())
+    };
   }
 
   function persistRestore(obj){
-    if(!obj || !Array.isArray(obj.brackets)) return false;
-    // basic shape restore
+    if(!obj) return false;
+
+    // Restore bowlers (scores + hcp) first
+    try{
+      state.bowlers = new Map();
+      if(Array.isArray(obj.bowlers)){
+        for(const b of obj.bowlers){
+          if(!b || !b.name) continue;
+          if(!b.scores || typeof b.scores!=="object") b.scores = {};
+          if(!Number.isFinite(Number(b.hcp))) b.hcp = Number(b.hcp||0);
+          state.bowlers.set(String(b.name), b);
+        }
+      }
+    }catch(e){
+      state.bowlers = new Map();
+    }
+
+    if(!Array.isArray(obj.brackets)) return false;
+
     state.brackets = obj.brackets.map((b,i)=>{
-      // ensure id exists and is numeric
+      if(!b) b = makeBracket(i+1, "scratch");
       b.id = Number(b.id || (i+1));
-      // ensure arrays exist
       if(!Array.isArray(b.slots)) b.slots = Array(BRACKET_SIZE).fill(null);
-      if(!Array.isArray(b.r1) || !Array.isArray(b.r2) || !Array.isArray(b.r3)){
-        // rebuild matches if missing
+
+      // Ensure match arrays exist; if missing, rebuild from slots.
+      if(!Array.isArray(b.r1) || b.r1.length!==4 ||
+         !Array.isArray(b.r2) || b.r2.length!==2 ||
+         !Array.isArray(b.r3) || b.r3.length!==1){
         b.r1 = Array.from({length:4}, makeMatch);
         b.r2 = Array.from({length:2}, makeMatch);
         b.r3 = Array.from({length:1}, makeMatch);
+        rebuildMatchesFromSlots(b);
       }
+
       if(typeof b.payout1!=="number") b.payout1 = Number(b.payout1||0);
       if(typeof b.payout2!=="number") b.payout2 = Number(b.payout2||0);
-      // rebuild matches from slots to be safe
-      rebuildMatchesFromSlots(b);
+
+      // Ensure any slotted names exist in bowlers map so scores can be entered after refresh
+      for(const nm of (b.slots||[])){
+        if(!nm) continue;
+        const key = String(nm);
+        if(!state.bowlers.has(key)){
+          // try roster lookup for hcp
+          let hcp = 0;
+          const r = (state.roster||[]).find(x=>x && x.name===key);
+          if(r && r.hcp!==undefined) hcp = Number(r.hcp||0);
+          state.bowlers.set(key, {name:key, hcp:hcp, scores:{}});
+        }
+      }
+
       return b;
     });
 
-    // normalize ids sequential (keeps your existing behavior)
+    // normalize ids sequential
     state.brackets.forEach((b,i)=>b.id=i+1);
     return true;
   }
@@ -1096,7 +1132,7 @@
 
   --radius: 18px;
 
-  --matchH: 128px;
+  --matchH: 136px;
   --matchGap: 14px;
   --conn: rgba(0,0,0,.18);
 
@@ -1207,7 +1243,7 @@ body{
   border:1px solid var(--border);
   border-radius:16px;
   background:#fff;
-  padding:8px;
+  padding:7px;
   position:relative;
   overflow:hidden;
   min-width:0;
@@ -1215,10 +1251,10 @@ body{
 
 .slot{
   display:flex;justify-content:space-between;align-items:center;
-  padding:7px 10px;border-radius: 12px;
+  padding:6px 9px;border-radius: 12px;
   background:#fff;
   border:1px solid rgba(0,0,0,.10);
-  margin-bottom:8px;gap:8px;min-width:0;
+  margin-bottom:6px;gap:8px;min-width:0;
 }
 .slot:last-child{margin-bottom:0}
 .slot .left{display:flex;flex-direction:column;gap:4px;min-width:0;}
@@ -1232,7 +1268,7 @@ body{
 
 .slot .nm.winner{color: var(--success)}
 .slot .nm.loser{color: var(--danger)}
-.slot .sc{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.12;}
+.slot .sc{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.05;}
 .slot .right{font-size:12px;color:var(--muted);display:flex;gap:8px;align-items:center;white-space:nowrap;flex:0 0 auto;}
 
 .foot{
