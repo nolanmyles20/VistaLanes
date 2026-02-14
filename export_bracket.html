@@ -4,79 +4,323 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Bracket Export</title>
+
   <style>
+    :root{
+      --border:#d9d9d9;
+      --text:#111;
+      --muted:#444;
+
+      /* Keep the same geometry as brackets tree */
+      --matchH: 128px;
+      --matchGap: 14px;
+      --conn: rgba(0,0,0,.18);
+
+      --treePadX: 14px;
+      --treeGap: 12px;
+      --radius: 18px;
+    }
+
     *{box-sizing:border-box}
     body{
       margin:0;
-      padding:24px;
-      background:#ffffff !important;
-      color:#000 !important;
+      padding:10px 14px 14px;  /* SHIFT UP: reduced top padding */
+      background:#fff;
+      color:var(--text);
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
     }
 
-    /* ===== Export header (index-style) ===== */
-    .exportHeader{width:100%;margin:0 0 18px;}
-    .exportHeader .mainLogoWrap{display:flex;justify-content:center;align-items:center;}
-    .exportHeader .mainLogo{width:min(520px, 90vw);height:auto;display:block;}
-    .exportHeader .poweredRow{margin-top:10px;display:flex;justify-content:flex-end;align-items:center;gap:10px;}
-    .exportHeader .poweredText{font-size:14px;font-weight:700;color:#111;letter-spacing:.2px;white-space:nowrap;}
-    .exportHeader .poweredLogo{width:140px;max-width:35vw;height:auto;display:block;}
+    /* ===== Export header (Vista logo centered + Powered By on right) ===== */
+    .exportTop{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:6px;               /* tighter */
+      margin:0 0 8px;        /* SHIFT UP: reduce margin */
+    }
+    .exportTop .vistaLogo{
+      width:min(520px, 86vw);
+      height:auto;
+      display:block;
+    }
 
-    /* ===== Force light export theme while keeping layout ===== */
-    .bracket{border:1px solid #d0d0d0 !important;background:#fff !important;border-radius:18px;overflow:hidden;}
-    .top{background:#fff !important;border-bottom:1px solid #d0d0d0 !important;}
-    .tree{background:#fff !important;}
-    .match{background:#fff !important;border:1px solid #d0d0d0 !important;}
-    .slot{background:#fff !important;border:1px solid #e0e0e0 !important;}
-    .tree::before{opacity:.6 !important;}
+    .poweredRow{
+      width:min(980px, 100%);
+      display:flex;
+      justify-content:flex-end;
+      align-items:center;
+      gap:10px;
+      margin:0;              /* no extra dead space */
+      padding:0;
+    }
+    .poweredRow .poweredTxt{
+      font-size:16px;
+      font-weight:800;
+      color:#111;
+      letter-spacing:.2px;
+      white-space:nowrap;
+    }
+    .poweredRow .mbsLogo{
+      width:min(170px, 28vw);  /* ~1/4-ish size relative feel */
+      height:auto;
+      display:block;
+    }
+
+    /* ===== Wrapper ===== */
+    .page{
+      width:min(980px, 100%);
+      margin:0 auto;
+    }
+
+    /* ===== Bracket card (light theme) ===== */
+    .bracket{
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      overflow:hidden;
+      background:#fff;
+    }
+    .bracket .top{
+      padding:12px 12px 10px;
+      border-bottom:1px solid var(--border);
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
+      background:#fff;
+    }
+    .bracket .top .meta{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+    }
+    .bracket .top .meta .name{
+      font-weight:900;
+      letter-spacing:.2px;
+      font-size:18px;
+    }
+    .bracket .top .meta .small{
+      font-size:13px;
+      color:#333;
+    }
+
+    /* Hide tools in export (type select, payouts, buttons) */
+    .bracket .top .tools{ display:none !important; }
+
+    .treeHead{
+      display:grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap:var(--treeGap);
+      padding: 0 var(--treePadX) 10px;
+    }
+    .treeHead h3{
+      margin:0;
+      font-size:13px;
+      color:#333;
+      letter-spacing:.25px;
+      text-transform:uppercase;
+      font-weight:900;
+    }
+
+    .treeScroll{overflow:hidden;}
+    .tree{
+      position:relative;
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap:var(--treeGap);
+      padding:12px var(--treePadX) 14px;
+      overflow:hidden;
+      border-radius: 18px;
+      width:100%;
+      background:#fff;
+    }
+    .col{display:flex;flex-direction:column;gap: var(--matchGap);min-width:0;}
+    .col.r2{padding-top: calc((var(--matchH) + var(--matchGap)) / 2);}
+    .r2Spacer{height: var(--matchH);}
+    .col.final{justify-content:center;}
+
+    .match{
+      width:100%;
+      height: var(--matchH);
+      border:1px solid var(--border);
+      border-radius:16px;
+      background:#fff;
+      padding:8px;
+      position:relative;
+      overflow:hidden;
+      min-width:0;
+    }
+
+    /* Connector lines */
+    .tree::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:
+        linear-gradient(var(--conn), var(--conn)) calc(33.333% + 2px) calc(12px + var(--matchH) * 0.5) / 18px 1px no-repeat,
+        linear-gradient(var(--conn), var(--conn)) calc(33.333% + 2px) calc(12px + (var(--matchH) + var(--matchGap)) + var(--matchH) * 0.5) / 18px 1px no-repeat,
+        linear-gradient(var(--conn), var(--conn)) calc(33.333% + 2px) calc(12px + 2*(var(--matchH) + var(--matchGap)) + var(--matchH) * 0.5) / 18px 1px no-repeat,
+        linear-gradient(var(--conn), var(--conn)) calc(33.333% + 2px) calc(12px + 3*(var(--matchH) + var(--matchGap)) + var(--matchH) * 0.5) / 18px 1px no-repeat,
+        linear-gradient(var(--conn), var(--conn)) calc(66.666% + 2px) calc(12px + (var(--matchH) + var(--matchGap))/2 + var(--matchH) * 0.5) / 18px 1px no-repeat,
+        linear-gradient(var(--conn), var(--conn)) calc(66.666% + 2px) calc(12px + (var(--matchH) + var(--matchGap))/2 + var(--matchH) + var(--matchH) + var(--matchGap) + var(--matchH) * 0.5) / 18px 1px no-repeat;
+      opacity:1;
+    }
+
+    .slot{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:7px 10px;
+      border-radius: 12px;
+      background:#fff;
+      border:1px solid var(--border);
+      margin-bottom:8px;
+      gap:8px;
+      min-width:0;
+    }
+    .slot:last-child{margin-bottom:0}
+    .slot .left{display:flex;flex-direction:column;gap:4px;min-width:0;}
+    .slot .nm{
+      font-weight:900;
+      line-height:1.05;
+      white-space:normal;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      display:-webkit-box;
+      -webkit-line-clamp:2;
+      -webkit-box-orient:vertical;
+      word-break:break-word;
+      font-size: 15px;
+      color:#111;
+    }
+    .slot .nm .nm1,.slot .nm .nm2{display:block;overflow:hidden;text-overflow:ellipsis;}
+    .slot .sc{
+      font-size:12px;
+      color:#333;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      line-height:1.12;
+    }
+    .slot .right{
+      font-size:12px;
+      color:#333;
+      display:flex;
+      gap:8px;
+      align-items:center;
+      white-space:nowrap;
+      flex:0 0 auto;
+    }
+
+    /* winner/loser colors (print-safe) */
     .nm.winner{color:#0a8a3a !important;}
     .nm.loser{color:#c20000 !important;}
-    .pill,.badge{background:#f4f4f4 !important;border:1px solid #ccc !important;color:#000 !important;}
-    .winnerline{background:#fff !important;border:1px solid #d0d0d0 !important;}
-    .muted,.small,.sc,.hint,.tag{color:#333 !important;}
 
-    @media print{ body{padding:0} }
+    .pill{
+      padding:4px 8px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:#f2f2f2;
+      font-size:12px;
+      color:#111;
+    }
+    .badge{
+      width:18px;height:18px;border-radius:6px;
+      display:inline-flex;align-items:center;justify-content:center;
+      font-size:11px;font-weight:900;line-height:1;
+      border:1px solid var(--border);
+      background:#f2f2f2;
+    }
+    .badge.gold{background:#fff3cf; border-color:#e5c86e;}
+    .badge.silver{background:#efefef; border-color:#cfcfcf;}
+
+    .foot{
+      border-top:1px solid var(--border);
+      padding:12px;
+      display:grid;
+      gap:10px;
+      background:#fff;
+    }
+    .winnerline{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      border:1px solid var(--border);
+      background:#fff;
+      padding:10px 12px;
+      border-radius: 16px;
+    }
+    .winnerline .who{display:flex;gap:10px;align-items:center;min-width:0}
+    .winnerline .who .nm{font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .winnerline .amt{font-weight:900}
+
+    /* Hide any elements you might add later */
+    [data-save-del]{display:none !important;}
+
+    /* Print tweaks */
+    @media print{
+      body{padding:0}
+      .exportTop{margin:0 0 6px;}
+      .page{width:100%; margin:0; padding:0 10px;}
+    }
   </style>
 </head>
 
 <body>
-  <div class="exportHeader">
-    <div class="mainLogoWrap">
-      <img class="mainLogo" id="mainLogo" alt="Main Logo" />
-    </div>
+  <div class="exportTop">
+    <!-- Vista Lanes logo (centered, large) -->
+    <img class="vistaLogo" src="assets/9AB9725D-AD71-4DDC-BE9B-03328F663643.png" alt="Vista Lanes" />
+    <!-- Powered By row on right -->
     <div class="poweredRow">
-      <div class="poweredText">Powered By</div>
-      <img class="poweredLogo" id="poweredLogo" alt="Powered By Logo" />
+      <div class="poweredTxt">Powered By</div>
+      <img class="mbsLogo" src="assets/68D8CA4C-741E-41E1-ABBC-8B57D7FD0A57.png" alt="Myles Bowling Systems" />
     </div>
   </div>
 
-  <div id="exportMount"></div>
+  <div class="page">
+    <div id="content"></div>
+  </div>
 
   <script>
     (function(){
-      function params(){
-        try{
-          const u = new URL(window.location.href);
-          return {
-            brId: u.searchParams.get("br") || "",
-            main: u.searchParams.get("main") || "",
-            powered: u.searchParams.get("powered") || ""
-          };
-        }catch(e){ return {brId:"",main:"",powered:""}; }
+      function waitForImages(root){
+        const imgs = Array.from(root.querySelectorAll("img"));
+        if(!imgs.length) return Promise.resolve();
+        return Promise.all(imgs.map(img=>{
+          if(img.complete) return Promise.resolve();
+          return new Promise(res=>{
+            img.addEventListener("load", res, {once:true});
+            img.addEventListener("error", res, {once:true});
+          });
+        }));
       }
 
-      const p = params();
-      if(p.main) document.getElementById("mainLogo").src = p.main;
-      if(p.powered) document.getElementById("poweredLogo").src = p.powered;
+      function doPrintSoon(){
+        const root = document.getElementById("content");
+        waitForImages(document).then(()=>{
+          setTimeout(()=>window.print(), 200);
+        });
+      }
 
-      let html = "";
-      try{
-        html = localStorage.getItem("EXPORT_BRACKET_HTML") || "";
-      }catch(e){}
+      // Receive bracket HTML from brackets.html
+      window.addEventListener("message", (ev)=>{
+        const data = ev.data || {};
+        if(data.type !== "EXPORT_BRACKET") return;
 
-      document.getElementById("exportMount").innerHTML = html;
+        const wrap = document.getElementById("content");
+        wrap.innerHTML = data.html || "";
 
-      setTimeout(function(){ window.print(); }, 300);
+        // Safety: remove any tool rows if they sneak in
+        wrap.querySelectorAll(".tools, [data-save-del]").forEach(n=>n.remove());
+
+        doPrintSoon();
+      });
+
+      // If opened directly, show a hint
+      document.getElementById("content").innerHTML =
+        "<div style='color:#444;font-size:14px;padding:12px 0'>Waiting for bracket export…</div>";
     })();
   </script>
 </body>
