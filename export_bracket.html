@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Bracket Export</title>
+  <style>
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      padding:24px;
+      background:#ffffff !important;
+      color:#000 !important;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+
+    /* ===== Export header (index-style) ===== */
+    .exportHeader{width:100%;margin:0 0 18px;}
+    .exportHeader .mainLogoWrap{display:flex;justify-content:center;align-items:center;}
+    .exportHeader .mainLogo{width:min(520px, 90vw);height:auto;display:block;}
+    .exportHeader .poweredRow{margin-top:10px;display:flex;justify-content:flex-end;align-items:center;gap:10px;}
+    .exportHeader .poweredText{font-size:14px;font-weight:700;color:#111;letter-spacing:.2px;white-space:nowrap;}
+    .exportHeader .poweredLogo{width:140px;max-width:35vw;height:auto;display:block;}
+
+    /* ===== Force light export theme while keeping layout ===== */
+    .bracket{border:1px solid #d0d0d0 !important;background:#fff !important;border-radius:18px;overflow:hidden;}
+    .top{background:#fff !important;border-bottom:1px solid #d0d0d0 !important;}
+    .tree{background:#fff !important;}
+    .match{background:#fff !important;border:1px solid #d0d0d0 !important;}
+    .slot{background:#fff !important;border:1px solid #e0e0e0 !important;}
+    .tree::before{opacity:.6 !important;}
+    .nm.winner{color:#0a8a3a !important;}
+    .nm.loser{color:#c20000 !important;}
+    .pill,.badge{background:#f4f4f4 !important;border:1px solid #ccc !important;color:#000 !important;}
+    .winnerline{background:#fff !important;border:1px solid #d0d0d0 !important;}
+    .muted,.small,.sc,.hint,.tag{color:#333 !important;}
+
+    @media print{ body{padding:0} }
+  </style>
+</head>
+
+<body>
+  <div class="exportHeader">
+    <div class="mainLogoWrap">
+      <img class="mainLogo" id="mainLogo" alt="Main Logo" />
+    </div>
+    <div class="poweredRow">
+      <div class="poweredText">Powered By</div>
+      <img class="poweredLogo" id="poweredLogo" alt="Powered By Logo" />
+    </div>
+  </div>
+
+  <div id="exportMount"></div>
+
+  <script>
+    (function(){
+      function params(){
+        try{
+          const u = new URL(window.location.href);
+          return {
+            brId: u.searchParams.get("br") || "",
+            main: u.searchParams.get("main") || "",
+            powered: u.searchParams.get("powered") || ""
+          };
+        }catch(e){ return {brId:"",main:"",powered:""}; }
+      }
+
+      const p = params();
+      if(p.main) document.getElementById("mainLogo").src = p.main;
+      if(p.powered) document.getElementById("poweredLogo").src = p.powered;
+
+      let html = "";
+      try{
+        html = localStorage.getItem("EXPORT_BRACKET_HTML") || "";
+      }catch(e){}
+
+      document.getElementById("exportMount").innerHTML = html;
+
+      setTimeout(function(){ window.print(); }, 300);
+    })();
+  </script>
+</body>
+</html>
