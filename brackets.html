@@ -51,46 +51,6 @@
       opacity:.98;
     }
 
-    /* ===== NAV BAR ===== */
-    .navbar{
-      display:flex;
-      justify-content:center;
-      gap:10px;
-      flex-wrap:wrap;
-      padding:10px 0 18px;
-    }
-    .navbar a{ text-decoration:none; }
-    .navbtn{
-      padding:10px 18px;
-      border-radius:999px;
-      background:#d9d9d9;
-      color:#000;
-      font-weight:800;
-      font-size:14px;
-      border:1px solid rgba(0,0,0,.18);
-      transition:.15s ease;
-      display:inline-block;
-      box-shadow: 0 8px 18px rgba(0,0,0,.28);
-      user-select:none;
-    }
-    .navbtn:hover{
-      background:#ffffff;
-      transform:translateY(-1px);
-      box-shadow:0 10px 22px rgba(0,0,0,.38);
-    }
-    .navbtn:active{ transform:translateY(0); }
-
-    /* Active = sunken */
-    .navbtn.active{
-      background:#bfbfbf;
-      border-color: rgba(0,0,0,.24);
-      box-shadow:
-        inset 0 3px 8px rgba(0,0,0,.45),
-        inset 0 -2px 6px rgba(255,255,255,.35);
-      transform:none !important;
-      cursor:default;
-    }
-
     header{display:flex;gap:12px;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;margin-bottom:14px;}
     .title{display:flex;flex-direction:column;gap:6px;}
     .title h1{margin:0;font-size:22px;letter-spacing:.3px;font-weight:800;}
@@ -342,7 +302,6 @@
       .slot{padding:7px 9px;border-radius:11px}
       .slot .sc{font-size:11px}
       .slot .nm{font-size: clamp(12px, 3.2vw, 14px);}
-      .navbtn{padding:9px 14px;font-size:13px}
     }
     @media (orientation: landscape){
       :root{--treePadX: 18px;--treeGap: 14px;--matchH: 138px;}
@@ -388,7 +347,6 @@
     .rowPick .hc{color:var(--muted); font-size:12px}
     .pillSm{font-size:12px;padding:4px 8px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background: rgba(255,255,255,.03);color:var(--muted);white-space:nowrap;}
     form{margin:0}
-    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;}
   </style>
 </head>
 
@@ -398,16 +356,6 @@
     <!-- LOGO TOP CENTERED (WEB) -->
     <div class="brandbar">
       <img src="assets/68D8CA4C-741E-41E1-ABBC-8B57D7FD0A57.png" alt="Logo" />
-    </div>
-
-    <!-- MENU BAR (grey rounded buttons, black text, active is sunken) -->
-    <div class="navbar" id="navbar">
-      <a href="home.html"><span class="navbtn" data-page="home.html index.html">Home</span></a>
-      <a href="bowlers.html"><span class="navbtn" data-page="bowlers.html">Bowlers</span></a>
-      <a href="leagues.html"><span class="navbtn" data-page="leagues.html">Leagues</span></a>
-      <a href="teams.html"><span class="navbtn" data-page="teams.html">Teams</span></a>
-      <a href="lanes.html"><span class="navbtn" data-page="lanes.html">Lanes</span></a>
-      <a href="tournaments.html"><span class="navbtn" data-page="tournaments.html">Tournaments</span></a>
     </div>
 
     <header>
@@ -570,16 +518,6 @@
   const escapeHtml = (s)=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const escapeAttr = (s)=>escapeHtml(s).replace(/"/g,'&quot;');
 
-  // Sunken active menu button based on current filename
-  function setActiveNav(){
-    const file = (location.pathname.split("/").pop() || "home.html").toLowerCase();
-    document.querySelectorAll("#navbar .navbtn").forEach(btn=>{
-      const pages = (btn.getAttribute("data-page") || "").toLowerCase().split(/\s+/).filter(Boolean);
-      const active = pages.includes(file) || (file==="" && pages.includes("home.html"));
-      btn.classList.toggle("active", active);
-    });
-  }
-
   function makeMatch(){ return {a:null,b:null,winner:null,loser:null,tie:false,tieNeedsRound:null,finalSplit:false,splitEach:0,splitWith:[]}; }
   function makeBracket(id, type="scratch"){
     return { id, type, payout1:0, payout2:0, slots:Array(BRACKET_SIZE).fill(null),
@@ -626,6 +564,7 @@
     if(!anyOpen) addBracket(type);
   }
 
+  // place into one bracket (same type) where not already present
   function placeBowlerOncePerBracket(name, type){
     name = normalizeName(name);
     if(!name) return {ok:false,msg:"Name is blank"};
@@ -655,6 +594,7 @@
     return {ok:true,msg:""};
   }
 
+  // ---- scoring / advancement ----
   function scoreForMatch(br, bowlerName, game){
     if(!bowlerName) return null;
     const bowler = state.bowlers.get(bowlerName);
@@ -796,6 +736,7 @@
     return totals;
   }
 
+  // ---- UI rendering ----
   function showEntryWarn(msg){
     const el=$("entryWarn");
     if(!msg){ el.style.display="none"; el.textContent=""; return; }
@@ -1011,126 +952,41 @@
         </div>
         <div class="amt">${money(p2)}</div>
       </div>`;
-    }
+  }
 
-    function saveBracketToPDF(brId){
+  /* ===========================
+     EXPORT (CALL export_bracket.html)
+     =========================== */
+  function saveBracketToPDF(brId){
+    const MAIN_LOGO = "assets/9AB9725D-AD71-4DDC-BE9B-03328F663643.png";
+    const POWERED_LOGO = "assets/68D8CA4C-741E-41E1-ABBC-8B57D7FD0A57.png";
+
     const el = document.getElementById(`bracket_${brId}`);
     if(!el) return;
 
     const clone = el.cloneNode(true);
 
-    // Remove Save/Delete button
+    // remove buttons from export
     clone.querySelectorAll("[data-save-del]").forEach(b => b.remove());
 
-    const html = `
-    <!doctype html>
-    <html>
-    <head>
-      <meta charset="utf-8" />
-      <meta name="viewport" content="width=device-width,initial-scale=1" />
-      <title>Bracket #${brId}</title>
+    // remove payout inputs/selects in header
+    clone.querySelectorAll("select, input").forEach(node=>{
+      if(node.closest(".top")) node.remove();
+    });
 
-      <style>
-        *{box-sizing:border-box}
+    try{
+      localStorage.setItem("EXPORT_BRACKET_HTML", clone.outerHTML);
+    }catch(e){
+      alert("Export failed. Storage unavailable.");
+      return;
+    }
 
-        body{
-          margin:0;
-          padding:24px;
-          background:#ffffff !important;
-          color:#000 !important;
-          font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-        }
+    const url =
+      `export_bracket.html?br=${encodeURIComponent(brId)}` +
+      `&main=${encodeURIComponent(MAIN_LOGO)}` +
+      `&powered=${encodeURIComponent(POWERED_LOGO)}`;
 
-        /* Logo */
-        .exportHeader{
-          display:flex;
-          justify-content:center;
-          align-items:center;
-          margin-bottom:20px;
-        }
-
-        .exportLogo{
-          width:260px;
-          max-width:80%;
-          height:auto;
-        }
-
-        /* Preserve bracket layout */
-        .bracket{
-          border:1px solid #d0d0d0 !important;
-          background:#ffffff !important;
-          border-radius:18px;
-          overflow:hidden;
-        }
-
-        .top{
-          background:#ffffff !important;
-          border-bottom:1px solid #d0d0d0 !important;
-        }
-
-        .tree{
-          background:#ffffff !important;
-        }
-
-        .match{
-          background:#ffffff !important;
-          border:1px solid #d0d0d0 !important;
-        }
-
-        .slot{
-          background:#ffffff !important;
-          border:1px solid #e0e0e0 !important;
-        }
-
-        .tree::before{
-          opacity:.6 !important;
-        }
-
-        /* Text colors for print */
-        .nm.winner{ color:#0a8a3a !important; }
-        .nm.loser{ color:#c20000 !important; }
-
-        .pill, .badge{
-          background:#f4f4f4 !important;
-          border:1px solid #cccccc !important;
-          color:#000 !important;
-        }
-
-        .winnerline{
-          background:#ffffff !important;
-          border:1px solid #d0d0d0 !important;
-        }
-
-        .muted, .small, .sc, .hint, .tag{
-          color:#333 !important;
-        }
-
-        @media print{
-          body{padding:0}
-        }
-      </style>
-    </head>
-    <body>
-
-      <div class="exportHeader">
-        <img class="exportLogo" src="${LOGO_PATH}" />
-      </div>
-
-      ${clone.outerHTML}
-
-      <script>
-        setTimeout(function(){ window.print(); }, 300);
-      <\/script>
-
-    </body>
-    </html>
-    `;
-
-    const w = window.open("", "_blank");
-    if(!w) return;
-    w.document.open();
-    w.document.write(html);
-    w.document.close();
+    window.open(url, "_blank");
   }
 
   function deleteBracketById(brId){
@@ -1493,6 +1349,7 @@
     setTimeout(()=>{ $("entryQty").focus(); }, 0);
   });
 
+  // ---- render ----
   function renderAll(){
     state.brackets.forEach(br=>advanceBracketIfReady(br));
     renderKPIs();
@@ -1504,7 +1361,6 @@
   }
 
   async function init(){
-    setActiveNav();
     updateHcpVisibility();
     updateManualHint();
     await loadRoster();
