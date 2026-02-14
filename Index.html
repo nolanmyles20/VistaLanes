@@ -1,49 +1,166 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Front Desk – Bowling Center</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="icon" type="image/x-icon" href="images/bowling_pin.ico">
-  <link rel="stylesheet" href="css/styles.css" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Bowling Center - Home</title>
+  <style>
+    :root{
+      --bg:#000;
+      --border:rgba(255,255,255,.08);
+      --text:#d8e1ee;
+      --muted:#8ea0b5;
+      --shadow: 0 10px 30px rgba(0,0,0,.45);
+      --radius: 18px;
+
+      --btnBg:#d9d9d9;   /* home buttons = grey */
+      --btnText:#000;    /* black text */
+      --btnBorder:rgba(0,0,0,.18);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      background: var(--bg);
+      color:var(--text);
+      min-height:100vh;
+    }
+    .wrap{max-width:880px;margin:0 auto;padding:14px 14px 60px}
+
+    /* LOGO (WEB) */
+    .brandbar{
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      padding:10px 0 8px;
+    }
+    .brandbar img{
+      width:min(320px, 80vw);
+      height:auto;
+      display:block;
+      filter: drop-shadow(0 10px 22px rgba(0,0,0,.55));
+      opacity:.98;
+    }
+
+    .panel{
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .hd{
+      padding:16px 16px 12px;
+      border-bottom:1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,.03), transparent);
+    }
+    .hd h1{margin:0;font-size:20px;letter-spacing:.3px;font-weight:900;}
+    .hd .sub{margin-top:6px;color:var(--muted);font-size:13px;line-height:1.4}
+
+    .bd{padding:16px}
+
+    .homeBtns{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .homeBtn{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:16px 18px;
+      border-radius:999px;
+      background: var(--btnBg);
+      color: var(--btnText);
+      border:1px solid var(--btnBorder);
+      font-weight:900;
+      font-size:18px;
+      letter-spacing:.2px;
+      text-decoration:none;
+      user-select:none;
+      box-shadow: 0 10px 22px rgba(0,0,0,.35);
+      transition:.15s ease;
+    }
+    .homeBtn:hover{
+      background:#ffffff;
+      transform: translateY(-1px);
+      box-shadow: 0 14px 30px rgba(0,0,0,.45);
+    }
+    .homeBtn:active{ transform: translateY(0px); }
+
+    .chev{
+      width:34px;height:34px;
+      border-radius:999px;
+      display:flex;align-items:center;justify-content:center;
+      border:1px solid rgba(0,0,0,.20);
+      background: rgba(255,255,255,.45);
+      font-size:18px;
+      line-height:1;
+    }
+
+    .footerHint{
+      margin-top:14px;
+      font-size:12px;
+      color:var(--muted);
+      text-align:center;
+      line-height:1.45;
+    }
+
+    @media (max-width: 420px){
+      .homeBtn{font-size:16px;padding:14px 16px}
+      .chev{width:32px;height:32px}
+    }
+  </style>
 </head>
 <body>
-  <header class="top-bar">
-    <h1>Front Desk</h1>
-    <nav class="top-nav">
-      <a href="index.html">Front Desk</a>
-      <a href="bowlers.html">Bowlers</a>
-      <a href="leagues.html">Leagues</a>
-      <a href="teams.html">Teams</a>
-       
-    </nav>
-  </header>
+  <div class="wrap">
 
-  <main>
-    <section class="panel">
-      <h2>Lane Control</h2>
-      <p style="font-size:0.85rem;color:#9ca3af;margin-top:0.25rem;">
-        Set league, mode, and team for each lane. Tap a row or press “Open” to view that lane.
-      </p>
+    <!-- LOGO TOP CENTERED -->
+    <div class="brandbar">
+      <img src="assets/68D8CA4C-741E-41E1-ABBC-8B57D7FD0A57.png" alt="Logo" />
+    </div>
 
-      <table class="lanes-table">
-        <thead>
-          <tr>
-            <th>Lane</th>
-            <th>Status</th>
-            <th>League</th>
-            <th>Mode</th>
-            <th>Team</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody id="lanes-table-body">
-          <!-- Filled by JS -->
-        </tbody>
-      </table>
-    </section>
-  </main>
+    <div class="panel">
+      <div class="hd">
+        <h1>Bowling Center</h1>
+        <div class="sub">Quick shortcuts to everything. Tap a button to open that page.</div>
+      </div>
 
-  <script type="module" src="js/frontdesk.js"></script>
+      <div class="bd">
+        <div class="homeBtns">
+          <a class="homeBtn" href="bowlers.html">
+            <span>Bowlers</span><span class="chev">›</span>
+          </a>
+
+          <a class="homeBtn" href="leagues.html">
+            <span>Leagues</span><span class="chev">›</span>
+          </a>
+
+          <a class="homeBtn" href="teams.html">
+            <span>Teams</span><span class="chev">›</span>
+          </a>
+
+          <a class="homeBtn" href="lanes.html">
+            <span>Lanes</span><span class="chev">›</span>
+          </a>
+
+          <a class="homeBtn" href="tournaments.html">
+            <span>Tournaments</span><span class="chev">›</span>
+          </a>
+
+          <a class="homeBtn" href="brackets.html">
+            <span>Brackets</span><span class="chev">›</span>
+          </a>
+        </div>
+
+        <div class="footerHint">
+          Tip: rotate landscape for a roomier layout on bracket views.
+        </div>
+      </div>
+    </div>
+
+  </div>
 </body>
 </html>
