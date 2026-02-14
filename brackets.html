@@ -573,6 +573,65 @@
   const escapeHtml = (s)=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const escapeAttr = (s)=>escapeHtml(s).replace(/"/g,'&quot;');
 
+  // ---- Local save (persists brackets across refresh on this device/browser) ----
+  const LS_KEY = "mbs_brackets_state_v1";
+  let _persistReady = false;
+  let _persistT = null;
+
+  function persistSnapshot(){
+    return { brackets: state.brackets };
+  }
+
+  function persistRestore(obj){
+    if(!obj || !Array.isArray(obj.brackets)) return false;
+    // basic shape restore
+    state.brackets = obj.brackets.map((b,i)=>{
+      // ensure id exists and is numeric
+      b.id = Number(b.id || (i+1));
+      // ensure arrays exist
+      if(!Array.isArray(b.slots)) b.slots = Array(BRACKET_SIZE).fill(null);
+      if(!Array.isArray(b.r1) || !Array.isArray(b.r2) || !Array.isArray(b.r3)){
+        // rebuild matches if missing
+        b.r1 = Array.from({length:4}, makeMatch);
+        b.r2 = Array.from({length:2}, makeMatch);
+        b.r3 = Array.from({length:1}, makeMatch);
+      }
+      if(typeof b.payout1!=="number") b.payout1 = Number(b.payout1||0);
+      if(typeof b.payout2!=="number") b.payout2 = Number(b.payout2||0);
+      // rebuild matches from slots to be safe
+      rebuildMatchesFromSlots(b);
+      return b;
+    });
+
+    // normalize ids sequential (keeps your existing behavior)
+    state.brackets.forEach((b,i)=>b.id=i+1);
+    return true;
+  }
+
+  function loadLocal(){
+    try{
+      const raw = localStorage.getItem(LS_KEY);
+      if(!raw) return false;
+      const obj = JSON.parse(raw);
+      return persistRestore(obj);
+    }catch(e){
+      return false;
+    }
+  }
+
+  function saveLocalNow(){
+    if(!_persistReady) return;
+    try{
+      localStorage.setItem(LS_KEY, JSON.stringify(persistSnapshot()));
+    }catch(e){}
+  }
+
+  function saveLocalDebounced(){
+    if(!_persistReady) return;
+    if(_persistT) clearTimeout(_persistT);
+    _persistT = setTimeout(saveLocalNow, 250);
+  }
+
   function makeMatch(){ return {a:null,b:null,winner:null,loser:null,tie:false,tieNeedsRound:null,finalSplit:false,splitEach:0,splitWith:[]}; }
   function makeBracket(id, type="scratch"){
     return { id, type, payout1:0, payout2:0, slots:Array(BRACKET_SIZE).fill(null),
@@ -1766,12 +1825,18 @@ body{margin:0;font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Ro
     renderTotals();
     updateHcpVisibility();
     updateManualHint();
+    saveLocalDebounced();
   }
 
   async function init(){
     updateHcpVisibility();
     updateManualHint();
     await loadRoster();
+
+    // Restore brackets from local storage (if present)
+    loadLocal();
+    _persistReady = true;
+
     renderAll();
   }
   init();
