@@ -28,7 +28,7 @@
     }
     *{box-sizing:border-box}
     body{
-      margin:0;
+      margin:0; padding:0;
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
       background: var(--bg);
       color:var(--text);
@@ -1120,7 +1120,7 @@ body{
   height:100vh;
   display:flex;
   flex-direction:column;
-  padding:4px 12px 6px;
+  padding:0 10px 2px;
   gap:3px;
 }
 .header{
@@ -1133,18 +1133,18 @@ body{
   flex:0 0 auto;
 }
 .mainLogo{
-  width:min(420px, 94vw);
-  max-height:130px;
+  width:min(460px, 96vw);
+  max-height:140px;
   object-fit:contain;
   height:auto;
   display:block;
-  margin:0 auto;
+  margin:0 auto 0;
 }
 .brTitle{
   margin:0;
   font-weight:900;
   font-size:16px;
-  line-height:1.1;
+  line-height:1.05;
 }
 
 /* Area that gets scaled to fit screen */
@@ -1164,7 +1164,7 @@ body{
   overflow:hidden;
 }
 .bracket .top{
-  padding:12px 12px 10px;
+  padding:10px 12px 8px;
   border-bottom:1px solid var(--border);
   display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;
 }
@@ -1176,7 +1176,7 @@ body{
   display:grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap:var(--treeGap);
-  padding: 0 var(--treePadX) 10px;
+  padding: 0 var(--treePadX) 8px;
 }
 .treeHead h3{
   margin:0;
@@ -1191,7 +1191,7 @@ body{
   display:grid;
   grid-template-columns: repeat(3, minmax(0,1fr));
   gap:var(--treeGap);
-  padding:12px var(--treePadX) 14px;
+  padding:10px var(--treePadX) 12px;
   width:100%;
   min-width:0;
   background:#fff;
@@ -1313,9 +1313,9 @@ body{
               if(!wrap||!inner) return;
               inner.style.transform='none';
               var iw=inner.scrollWidth, ih=inner.scrollHeight;
-              var ww=wrap.clientWidth, wh=wrap.clientHeight;
+              var ww=wrap.clientWidth, wh=Math.max(0, wrap.clientHeight-6);
               if(iw<=0||ih<=0||ww<=0||wh<=0) return;
-              var s=Math.min(ww/iw, wh/ih, 1);
+              var s=Math.min(ww/iw, wh/ih, 1) * 0.98;
               inner.style.transform='scale('+s.toFixed(4)+')';
               inner.style.width=iw+'px';
               inner.style.height=ih+'px';
