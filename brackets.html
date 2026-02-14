@@ -956,6 +956,7 @@
 
   /* ===========================
      EXPORT (CALL export_bracket.html)
+     FIXED: converts inputs/select into plain text so export keeps Type + payouts
      =========================== */
   function saveBracketToPDF(brId){
     const MAIN_LOGO = "assets/9AB9725D-AD71-4DDC-BE9B-03328F663643.png";
@@ -964,18 +965,40 @@
     const el = document.getElementById(`bracket_${brId}`);
     if(!el) return;
 
+    // snapshot current live data from state (more reliable than reading DOM inputs)
+    const br = state.brackets.find(b => b.id === Number(brId));
+    const typeLabel = br ? (br.type === "handicap" ? "Handicap" : "Scratch") : "";
+    const p1 = br ? Number(br.payout1 || 0) : 0;
+    const p2 = br ? Number(br.payout2 || 0) : 0;
+
     const clone = el.cloneNode(true);
 
     // remove buttons from export
     clone.querySelectorAll("[data-save-del]").forEach(b => b.remove());
 
-    // remove payout inputs/selects in header
-    clone.querySelectorAll("select, input").forEach(node=>{
-      if(node.closest(".top")) node.remove();
-    });
+    // Replace header tools (select/inputs) with plain text pills (so export shows Type + payouts)
+    const tools = clone.querySelector(".top .tools");
+    if(tools){
+      tools.innerHTML = `
+        <span class="pill">Type: <b>${escapeHtml(typeLabel || "—")}</b></span>
+        <span class="pill">1st: <b>${escapeHtml(money(p1))}</b></span>
+        <span class="pill">2nd: <b>${escapeHtml(money(p2))}</b></span>
+      `;
+    }
+
+    // Safety: remove any remaining form controls inside the cloned bracket header only
+    clone.querySelectorAll(".top select, .top input, .top button").forEach(node=>node.remove());
 
     try{
       localStorage.setItem("EXPORT_BRACKET_HTML", clone.outerHTML);
+      // Optional: store metadata the export page can use if you want
+      localStorage.setItem("EXPORT_BRACKET_META", JSON.stringify({
+        brId: Number(brId),
+        type: typeLabel,
+        payout1: p1,
+        payout2: p2,
+        exportedAt: new Date().toISOString()
+      }));
     }catch(e){
       alert("Export failed. Storage unavailable.");
       return;
