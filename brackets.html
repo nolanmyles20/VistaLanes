@@ -1010,19 +1010,26 @@
 
       @page{ margin: 12mm; }
 
-      .page{padding:18px 16px 14px}
+      .page{height:100vh; padding:8px 12px 8px; display:flex; flex-direction:column; overflow:hidden}
+      html,body{height:100%; overflow:hidden}
+      .content{flex:1 1 auto; overflow:hidden; display:flex; align-items:stretch; justify-content:center}
+      .fit{width:100%; transform-origin: top center;}
+
       .header{
         display:flex;
         flex-direction:column;
         align-items:center;
-        gap:10px;
-        padding:6px 0 10px;
+        gap:6px;
+        padding:0;
+        margin:0 0 6px;
       }
 
       /* MAIN LOGO centered */
       .mainLogo{
-        width:min(420px, 92vw);
+        width:min(360px, 90vw);
+        max-height:120px;
         height:auto;
+        object-fit:contain;
         display:block;
         margin:0 auto;
       }
@@ -1036,7 +1043,8 @@
 
       /* POWERED BY bigger + shifted up */
       .powered{
-        margin-top:8px;
+        margin-top:6px;
+        flex:0 0 auto;
         display:flex;
         align-items:center;
         justify-content:center;
@@ -1048,7 +1056,7 @@
         color:#111;
       }
       .powered img{
-        width:120px; /* ~2x */
+        width:105px;
         height:auto;
         display:block;
         transform: translateY(-6px); /* shift up */
@@ -1069,7 +1077,7 @@
 
       /* Fit-to-page tweaks for narrow print/preview (iPhone etc.) */
       @media (max-width: 680px){
-        :root{--matchH: 110px; --matchGap: 10px; --treePadX: 10px; --treeGap: 10px;}
+        :root{--matchH: 124px; --matchGap: 10px; --treePadX: 10px; --treeGap: 10px;}
         .slot .nm{font-size: 13px;}
         .slot .sc{font-size: 11px;}
       }
@@ -1174,7 +1182,7 @@
 
       .foot{
         border-top:1px solid var(--border);
-        padding:12px;
+        padding:8px;
         display:grid;
         gap:10px;
         background:#fff;
@@ -1206,7 +1214,7 @@
             <h1 class="brTitle">Bracket #${brId}</h1>
           </div>
 
-          ${clone.outerHTML}
+          <div class="content"><div class="fit">${clone.outerHTML}</div></div>
 
           <div class="powered">
             <div class="label">Powered By</div>
@@ -1216,11 +1224,33 @@
 
         <script>
           (function(){
+            function fitToViewport(){
+              var content = document.querySelector('.content');
+              var fit = document.querySelector('.fit');
+              if(!content || !fit) return;
+              // reset
+              fit.style.transform = 'scale(1)';
+              fit.style.width = '100%';
+              // measure
+              var cw = content.clientWidth;
+              var ch = content.clientHeight;
+              var sw = fit.scrollWidth;
+              var sh = fit.scrollHeight;
+              if(!cw || !ch || !sw || !sh) return;
+              var scale = Math.min(1, cw / sw, ch / sh);
+              // apply scale and expand width so it stays centered and sharp
+              fit.style.transform = 'scale(' + scale + ')';
+              fit.style.width = (100/scale) + '%';
+            }
+
             function doPrint(){
+              fitToViewport();
               setTimeout(function(){ window.focus(); window.print(); }, 150);
             }
             var imgs = Array.prototype.slice.call(document.images||[]);
             var left = imgs.length;
+            fitToViewport();
+            window.addEventListener('resize', fitToViewport);
             if(!left) return doPrint();
             imgs.forEach(function(img){
               if(img.complete){ left--; if(left<=0) doPrint(); }
