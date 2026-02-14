@@ -507,7 +507,10 @@
 
 <script>
 (() => {
-  const LOGO_PATH = "assets/68D8CA4C-741E-41E1-ABBC-8B57D7FD0A57.png";
+  // ===== EXPORT SETTINGS (single file) =====
+  // Swap these two paths if yours are the opposite.
+  const EXPORT_MAIN_LOGO = "assets/68D8CA4C-741E-41E1-ABBC-8B57D7FD0A57.png";   // Vista Lanes
+  const EXPORT_POWERED_LOGO = "assets/9AB9725D-AD71-4DDC-BE9B-03328F663643.png"; // Myles / Powered By
 
   const state = { bowlers: new Map(), brackets: [], roster: [], rosterLoaded:false, selectedRoster:null };
   const BRACKET_SIZE = 8;
@@ -718,6 +721,16 @@
     return uses;
   }
 
+  function remindIfEmptyExport(br){
+    const filled = br.slots.filter(Boolean).length;
+    if(filled === 0) return "This bracket has no bowlers yet.";
+    // Also ensure the bracket DOM exists before export
+    const el = document.getElementById(`bracket_${br.id}`);
+    if(!el) return "Bracket is not rendered yet. Try again in a second.";
+    return "";
+  }
+
+  // ---- totals ----
   function winningsByBowler(){
     const totals=new Map();
     for(const br of state.brackets){
@@ -736,7 +749,7 @@
     return totals;
   }
 
-  // ---- UI rendering ----
+  // ---- UI rendering helpers ----
   function showEntryWarn(msg){
     const el=$("entryWarn");
     if(!msg){ el.style.display="none"; el.textContent=""; return; }
@@ -954,62 +967,105 @@
       </div>`;
   }
 
-  /* ===========================
-     EXPORT (CALL export_bracket.html)
-     FIXED: converts inputs/select into plain text so export keeps Type + payouts
-     =========================== */
-  function saveBracketToPDF(brId){
-    const MAIN_LOGO = "assets/9AB9725D-AD71-4DDC-BE9B-03328F663643.png";
-    const POWERED_LOGO = "assets/68D8CA4C-741E-41E1-ABBC-8B57D7FD0A57.png";
-
+  // ===== SINGLE-FILE EXPORT (no export_bracket.html) =====
+  function buildPrintHTML(brId){
     const el = document.getElementById(`bracket_${brId}`);
-    if(!el) return;
-
-    // snapshot current live data from state (more reliable than reading DOM inputs)
-    const br = state.brackets.find(b => b.id === Number(brId));
-    const typeLabel = br ? (br.type === "handicap" ? "Handicap" : "Scratch") : "";
-    const p1 = br ? Number(br.payout1 || 0) : 0;
-    const p2 = br ? Number(br.payout2 || 0) : 0;
+    if(!el) return null;
 
     const clone = el.cloneNode(true);
+    clone.querySelectorAll("select, input, button").forEach(n => n.remove());
 
-    // remove buttons from export
-    clone.querySelectorAll("[data-save-del]").forEach(b => b.remove());
+    // Prevent blank export
+    if(!clone.querySelector(".tree") || clone.textContent.trim().length < 10) return null;
 
-    // Replace header tools (select/inputs) with plain text pills (so export shows Type + payouts)
-    const tools = clone.querySelector(".top .tools");
-    if(tools){
-      tools.innerHTML = `
-        <span class="pill">Type: <b>${escapeHtml(typeLabel || "—")}</b></span>
-        <span class="pill">1st: <b>${escapeHtml(money(p1))}</b></span>
-        <span class="pill">2nd: <b>${escapeHtml(money(p2))}</b></span>
-      `;
-    }
+    const css = `
+      *{box-sizing:border-box}
+      body{margin:0;font-family: ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:#fff;color:#111;}
+      .page{padding:20px 18px 16px}
+      .header{display:flex;flex-direction:column;align-items:center;gap:10px;padding-bottom:8px}
+      .mainLogo{width:min(420px,90vw);height:auto;display:block;margin:0 auto} /* centered */
+      .brTitle{margin:0;font-weight:900;font-size:16px;color:#111}
+      .bracket{border:1px solid #e5e7eb;background:#fff !important;border-radius:18px;overflow:hidden}
+      .bracket .top{background:#fff !important;border-bottom:1px solid #e5e7eb}
+      .tree, .treeHead, .treeScroll{background:#fff !important}
+      .match{border:1px solid #e5e7eb !important;background:#fff !important}
+      .slot{background:#fff !important;border:1px solid #eef0f3 !important}
+      .slot .sc{color:#444 !important}
+      .pill{border:1px solid #e5e7eb !important;background:#fafafa !important;color:#444 !important}
+      .winnerline{border:1px solid #e5e7eb !important;background:#fff !important}
+      .tree::before{opacity:1 !important;filter:none !important}
+      .treeScroll{overflow:visible !important}
+      .tree{min-width:920px} /* keep bracket visible like your sample */
+      .powered{margin-top:6px;display:flex;align-items:center;justify-content:center;gap:12px}
+      .powered .label{font-weight:800;font-size:14px;color:#111}
+      .powered img{width:84px;height:auto;display:block} /* ~2x + moved up */
+      @media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+    `;
 
-    // Safety: remove any remaining form controls inside the cloned bracket header only
-    clone.querySelectorAll(".top select, .top input, .top button").forEach(node=>node.remove());
+    return `
+      <!doctype html>
+      <html>
+      <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>Bracket #${brId}</title>
+        <style>
+          :root{--matchH:128px;--matchGap:14px;--treePadX:14px;--treeGap:12px;}
+          ${css}
+        </style>
+      </head>
+      <body>
+        <div class="page">
+          <div class="header">
+            <img class="mainLogo" src="${escapeAttr(EXPORT_MAIN_LOGO)}" alt="Logo">
+            <h1 class="brTitle">Bracket #${brId}</h1>
+          </div>
 
-    try{
-      localStorage.setItem("EXPORT_BRACKET_HTML", clone.outerHTML);
-      // Optional: store metadata the export page can use if you want
-      localStorage.setItem("EXPORT_BRACKET_META", JSON.stringify({
-        brId: Number(brId),
-        type: typeLabel,
-        payout1: p1,
-        payout2: p2,
-        exportedAt: new Date().toISOString()
-      }));
-    }catch(e){
-      alert("Export failed. Storage unavailable.");
-      return;
-    }
+          ${clone.outerHTML}
 
-    const url =
-      `export_bracket.html?br=${encodeURIComponent(brId)}` +
-      `&main=${encodeURIComponent(MAIN_LOGO)}` +
-      `&powered=${encodeURIComponent(POWERED_LOGO)}`;
+          <div class="powered">
+            <div class="label">Powered By</div>
+            <img src="${escapeAttr(EXPORT_POWERED_LOGO)}" alt="Powered By">
+          </div>
+        </div>
 
-    window.open(url, "_blank");
+        <script>
+          (function(){
+            function doPrint(){
+              setTimeout(function(){ window.focus(); window.print(); }, 150);
+            }
+            var imgs = Array.prototype.slice.call(document.images||[]);
+            var left = imgs.length;
+            if(!left) return doPrint();
+            imgs.forEach(function(img){
+              if(img.complete){ left--; if(left<=0) doPrint(); }
+              else{
+                img.addEventListener('load', function(){ left--; if(left<=0) doPrint(); });
+                img.addEventListener('error', function(){ left--; if(left<=0) doPrint(); });
+              }
+            });
+          })();
+        <\/script>
+      </body>
+      </html>
+    `;
+  }
+
+  function printBracket(brId){
+    const br = state.brackets.find(b=>b.id===brId);
+    if(!br){ alert("Bracket not found."); return; }
+
+    const warn = remindIfEmptyExport(br);
+    if(warn){ alert("Export blocked: " + warn); return; }
+
+    const html = buildPrintHTML(brId);
+    if(!html){ alert("Export blocked: bracket would be blank (prevented)."); return; }
+
+    const w = window.open("", "_blank");
+    if(!w){ alert("Pop-up blocked. Allow pop-ups to print brackets."); return; }
+    w.document.open();
+    w.document.write(html);
+    w.document.close();
   }
 
   function deleteBracketById(brId){
@@ -1018,6 +1074,7 @@
     renderAll();
   }
 
+  // ---- Brackets UI ----
   function renderBrackets(){
     const root=$("brackets");
     root.innerHTML="";
@@ -1044,7 +1101,8 @@
             </select>
             <input type="number" class="w-sm" data-p1="${br.id}" placeholder="1st payout" value="${escapeAttr(br.payout1||"")}" />
             <input type="number" class="w-sm" data-p2="${br.id}" placeholder="2nd payout" value="${escapeAttr(br.payout2||"")}" />
-            <button class="btn danger" data-save-del="${br.id}" type="button">Save + Delete</button>
+            <button class="btn primary" data-save="${br.id}" type="button">Save</button>
+            <button class="btn danger" data-del="${br.id}" type="button">Delete</button>
           </div>
         </div>
 
@@ -1111,10 +1169,20 @@
       });
     });
 
-    root.querySelectorAll("[data-save-del]").forEach(btn=>{
+    // SAVE (blue)
+    root.querySelectorAll("[data-save]").forEach(btn=>{
       btn.addEventListener("click", ()=>{
-        const id=Number(btn.getAttribute("data-save-del"));
-        saveBracketToPDF(id);
+        const id=Number(btn.getAttribute("data-save"));
+        printBracket(id);
+      });
+    });
+
+    // DELETE (red) with confirmation
+    root.querySelectorAll("[data-del]").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const id=Number(btn.getAttribute("data-del"));
+        const ok = confirm(`Delete Bracket #${id}? This cannot be undone.`);
+        if(!ok) return;
         deleteBracketById(id);
       });
     });
