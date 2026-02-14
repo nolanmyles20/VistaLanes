@@ -1005,7 +1005,10 @@
         color:#111;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
+        page-break-inside: avoid;
       }
+
+      @page{ margin: 12mm; }
 
       .page{padding:18px 16px 14px}
       .header{
@@ -1063,6 +1066,13 @@
         display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;
         background:#fff;
       }
+
+      /* Fit-to-page tweaks for narrow print/preview (iPhone etc.) */
+      @media (max-width: 680px){
+        :root{--matchH: 110px; --matchGap: 10px; --treePadX: 10px; --treeGap: 10px;}
+        .slot .nm{font-size: 13px;}
+        .slot .sc{font-size: 11px;}
+      }
       .bracket .top .meta{display:flex;flex-direction:column;gap:4px;}
       .bracket .top .meta .name{font-weight:900;letter-spacing:.2px;color:#111}
       .bracket .top .meta .small{font-size:12px;color:var(--muted)}
@@ -1090,7 +1100,7 @@
         padding:12px var(--treePadX) 14px;
         border-radius: 18px;
         width:100%;
-        min-width: 920px; /* keep original export look */
+        min-width: 0; /* fit page width (no overflow) */
         background:#fff;
       }
 
