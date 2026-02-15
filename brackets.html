@@ -1132,12 +1132,12 @@
 
   --radius: 18px;
 
-  --matchH: 136px;
-  --matchGap: 14px;
+  --matchH: 122px;
+  --matchGap: 10px;
   --conn: rgba(0,0,0,.18);
 
-  --treePadX: 14px;
-  --treeGap: 12px;
+  --treePadX: 10px;
+  --treeGap: 10px;
 }
 *{box-sizing:border-box}
 html,body{height:100%}
@@ -1191,7 +1191,7 @@ body{
   overflow: hidden;
   border-radius: 18px;
 }
-#fitInner{ transform-origin: top left; }
+#fitInner{ transform-origin: top left; margin:0 auto; }
 
 .bracket{
   border:1px solid var(--border);
@@ -1200,7 +1200,7 @@ body{
   overflow:hidden;
 }
 .bracket .top{
-  padding:10px 12px 8px;
+  padding:8px 10px 6px;
   border-bottom:1px solid var(--border);
   display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;
 }
@@ -1212,7 +1212,7 @@ body{
   display:grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap:var(--treeGap);
-  padding: 0 var(--treePadX) 8px;
+  padding: 0 var(--treePadX) 6px;
 }
 .treeHead h3{
   margin:0;
@@ -1227,7 +1227,7 @@ body{
   display:grid;
   grid-template-columns: repeat(3, minmax(0,1fr));
   gap:var(--treeGap);
-  padding:10px var(--treePadX) 12px;
+  padding:8px var(--treePadX) 10px;
   width:100%;
   min-width:0;
   background:#fff;
@@ -1268,12 +1268,12 @@ body{
 
 .slot .nm.winner{color: var(--success)}
 .slot .nm.loser{color: var(--danger)}
-.slot .sc{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.05;}
+.slot .sc{font-size:10.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.05;}
 .slot .right{font-size:12px;color:var(--muted);display:flex;gap:8px;align-items:center;white-space:nowrap;flex:0 0 auto;}
 
 .foot{
   border-top:1px solid var(--border);
-  padding:12px;
+  padding:10px;
   display:grid;
   gap:10px;
   background:#fff;
@@ -1314,7 +1314,10 @@ body{
   #fitWrap{overflow:visible;}
   #fitInner{transform:none !important;}
   .mainLogo{max-height:1.2in; width:auto;}
-}`;
+}
+.badge.gold{background:#fff3c4;border-color:#f0c35a;color:#9b6b00;}
+.badge.silver{background:#eef1f6;border-color:#b8c0cf;color:#4f5a6b;}
+`;
 
     return `
       <!doctype html>
@@ -1351,7 +1354,7 @@ body{
               var iw=inner.scrollWidth, ih=inner.scrollHeight;
               var ww=wrap.clientWidth, wh=Math.max(0, wrap.clientHeight-6);
               if(iw<=0||ih<=0||ww<=0||wh<=0) return;
-              var s=Math.min(ww/iw, wh/ih, 1) * 0.98;
+              var s=Math.min(ww/iw, wh/ih, 1) * 0.985;
               inner.style.transform='scale('+s.toFixed(4)+')';
               inner.style.width=iw+'px';
               inner.style.height=ih+'px';
