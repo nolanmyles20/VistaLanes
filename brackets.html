@@ -1267,14 +1267,14 @@ body{
 
 /* Area that gets scaled to fit screen */
 #fitWrap{
-      flex: 1 1 auto;
-      min-height:0;
-      overflow:hidden;
-      display:flex;
-      justify-content:center;
-      align-items:flex-start;
-      width:100%;
-    }
+  flex:1;
+  min-height:0;
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+  overflow:hidden;
+  padding:0 6px;
+}
 #fitInner{ transform-origin: top left; }
 
 .bracket{
@@ -1412,6 +1412,28 @@ body{
 @media print{ .card{page-break-inside:avoid;} .powered{page-break-inside:avoid;} }
 
 .brandFooter{display:flex;flex-direction:column;align-items:center;gap:2px;padding:0 6px 4px;}
+
+.brandFooter{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:10px;
+  padding:6px 6px 0;
+  margin-top:10px;
+}
+.powered{display:flex;align-items:center;gap:10px;}
+.powered .label{font-weight:900;color:#8ea0b5;}
+.powered img{height:38px;width:auto;}
+.copy{color:#8ea0b5;font-weight:800;white-space:nowrap;}
+.sitepill{
+  background: rgba(255,255,255,.10);
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:999px;
+  padding:8px 14px;
+  font-weight:900;
+  color:#d8e1ee;
+  white-space:nowrap;
+}
 `;
 
     return `
@@ -1430,7 +1452,7 @@ body{
             <h1 class="brTitle">Bracket #${brId}</h1>
           </div>
 
-          <div id="fitWrap"><div id="fitInner">${clone.outerHTML}</div></div>
+          <div id="fitWrap"><div id="fitInner">${clone.outerHTML}
 
           <div class="brandFooter">
             <div class="powered">
@@ -1438,8 +1460,9 @@ body{
               <img src="${escapeAttr(EXPORT_POWERED_LOGO)}" alt="Powered By">
             </div>
             <div class="copy">&copy; <span id="yr"></span> Myles Bowling Systems</div>
+            <div class="sitepill">vista-lanes.com</div>
           </div>
-        </div>
+        </div></div>
 
         <script>
           (function(){
@@ -1447,14 +1470,18 @@ body{
               var wrap=document.getElementById('fitWrap');
               var inner=document.getElementById('fitInner');
               if(!wrap||!inner) return;
-              inner.style.transform='none';
-              var iw=inner.scrollWidth, ih=inner.scrollHeight;
-              var ww=wrap.clientWidth, wh=Math.max(0, wrap.clientHeight-6);
-              if(iw<=0||ih<=0||ww<=0||wh<=0) return;
-              var s=Math.min(ww/iw, wh/ih, 1) * 0.99;
-              inner.style.transform='scale('+s.toFixed(4)+')';
-              inner.style.width=iw+'px';
-              inner.style.height=ih+'px';
+
+              inner.style.transform='scale(1)';
+              inner.style.transformOrigin='top center';
+
+              var cw = inner.scrollWidth;
+              var ch = inner.scrollHeight;
+              var w  = wrap.clientWidth;
+              var h  = wrap.clientHeight;
+              if(!cw||!ch||!w||!h) return;
+
+              var s = Math.min(w/cw, h/ch, 1) * 0.995;
+              inner.style.transform = 'scale(' + s + ')';
             }
             function doPrint(){
               fit();
