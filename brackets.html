@@ -450,7 +450,7 @@
       border-color:#a9a9a9;
     }
 
-    @media screen and (max-width: 520px){
+    @media (max-width: 520px){
       .menubar a{min-width: 96px; padding: 9px 12px;}
     }
 </style>
@@ -1419,84 +1419,128 @@ body{
 }
 
 /* Small screens */
-@media screen and (max-width: 520px){
+@media (max-width: 520px){
   .page{height:auto; padding:0; gap:8px;}
   #fitWrap{height:auto; max-height:none; overflow:visible;}
   #fitInner{transform:none !important;}
 }
 `;
 
-    return `
-      <!doctype html>
-      <html>
-      <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width,initial-scale=1" />
-        <title>Bracket #${brId}</title>
-        <style>${css}</style>
-      </head>
-      <body>
-        <div class="page">
-          <div class="header">
-            <img class="mainLogo" src="${escapeAttr(EXPORT_MAIN_LOGO)}" alt="Logo">
-            <h1 class="brTitle">Bracket #${brId}</h1>
-          </div>
+    return `<!doctype html><html><head><meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Bracket Export</title>
+<style>
+  @page { size: letter; margin: .35in; }
+  html,body{margin:0;padding:0;background:#fff;color:#111;font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;}
+  *{box-sizing:border-box}
+  .page{
+    height: calc(11in - .70in); /* letter minus top+bottom margins */
+    display:flex;
+    flex-direction:column;
+    align-items:stretch;
+  }
+  .header{
+    text-align:center;
+    padding: 0.05in 0 0.08in;
+  }
+  .header img{width: 2.2in; height:auto; display:block; margin:0 auto 0.08in;}
+  .header h1{margin:0; font-size: 18px; font-weight:900;}
+  /* Fit area takes remaining height between header and footer */
+  #fitWrap{
+    flex: 1 1 auto;
+    overflow:hidden; /* prevent spill to a second page */
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+  }
+  #fitInner{
+    transform-origin: top center;
+    display:inline-block;
+    width: 100%;
+  }
+  /* footer lives OUTSIDE the scaled content */
+  .brandFooter{
+    flex: 0 0 auto;
+    border-top:1px solid #eee;
+    padding-top: 10px;
+    margin-top: 10px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:18px;
+    color:#333;
+  }
+  .brandFooter .powered{font-weight:800}
+  .brandFooter img{height: 40px; width:auto}
+  .copyright{
+    text-align:center;
+    margin-top: 6px;
+    color:#666;
+    font-size:12px;
+  }
+  /* Keep your bracket visuals but tighten spacing for print */
+  .wrap{max-width:none; padding:0 !important; margin:0 !important;}
+  .panel{box-shadow:none !important;}
+</style>
+</head>
+<body>
+  <div class="page">
+    <div class="header">
+      <img class="mainLogo" src="${escapeAttr(EXPORT_MAIN_LOGO)}" alt="Vista Lanes">
+      <h1>Bracket #${brId}</h1>
+    </div>
 
-          <div id="fitWrap"><div id="fitInner">${clone.outerHTML}
+    <div id="fitWrap"><div id="fitInner">${clone.outerHTML}</div></div>
 
-          <div class="brandFooter">
-            <div class="powered">
-              <div class="label">Powered By</div>
-              <img src="${escapeAttr(EXPORT_POWERED_LOGO)}" alt="Powered By">
-            </div>
-            <div class="copy">&copy; <span id="yr"></span> Myles Bowling Systems</div>
-            <div class="sitepill">vista-lanes.com</div>
-          </div>
-        </div></div>
+    ${brandFooterHTML}
+    <div class="copyright">© 2026 Myles Bowling Systems</div>
+  </div>
 
-        <script>
-          (function(){
-            function fit(){
-              var wrap=document.getElementById('fitWrap');
-              var inner=document.getElementById('fitInner');
-              if(!wrap||!inner) return;
+<script>
+(function(){
+  function fit(){
+    const wrap = document.getElementById('fitWrap');
+    const inner = document.getElementById('fitInner');
+    if(!wrap || !inner) return;
 
-              inner.style.transform='scale(1)';
-              inner.style.transformOrigin='top center';
+    // reset
+    inner.style.transform = 'scale(1)';
 
-              var cw = inner.scrollWidth;
-              var ch = inner.scrollHeight;
-              var w  = wrap.clientWidth;
-              var h  = wrap.clientHeight;
-              if(!cw||!ch||!w||!h) return;
+    // force layout
+    const w = wrap.clientWidth;
+    const h = wrap.clientHeight;
 
-              var s = Math.min(w/cw, h/ch, 1) * 0.995;
-              inner.style.transform = 'scale(' + s + ')';
-            }
-            function doPrint(){
-              fit();
-              setTimeout(function(){ window.focus(); window.print(); }, 150);
-            }
-            // year
-            try{ var y=document.getElementById('yr'); if(y) y.textContent=(new Date()).getFullYear(); }catch(e){}
-            window.addEventListener('resize', fit);
-            window.addEventListener('load', function(){ fit(); }, {once:true});
+    // Use scroll sizes (more reliable than bounding box with transform=1)
+    const iw = inner.scrollWidth;
+    const ih = inner.scrollHeight;
 
-            var imgs = Array.prototype.slice.call(document.images||[]);
-            var left = imgs.length;
-            if(!left) return doPrint();
-            imgs.forEach(function(img){
-              if(img.complete){ left--; if(left<=0) doPrint(); }
-              else{
-                img.addEventListener('load', function(){ left--; if(left<=0) doPrint(); });
-                img.addEventListener('error', function(){ left--; if(left<=0) doPrint(); });
-              }
-            });
-          })();
-        <\/script>
-      </body>
-      </html>
-    `;
+    if(!iw || !ih || !w || !h) return;
+
+    const scale = Math.min(w/iw, h/ih);
+
+    inner.style.transform = 'scale(' + scale.toFixed(4) + ')';
+  }
+
+  // wait for images/fonts
+  function whenReady(){
+    const imgs = Array.from(document.images || []);
+    const pending = imgs.filter(im => !im.complete);
+    if(pending.length){
+      let left = pending.length;
+      pending.forEach(im => {
+        im.addEventListener('load', ()=>{ if(--left===0) setTimeout(fit, 50); });
+        im.addEventListener('error', ()=>{ if(--left===0) setTimeout(fit, 50); });
+      });
+    } else {
+      setTimeout(fit, 50);
+    }
+  }
+
+  window.addEventListener('resize', fit);
+  whenReady();
+})();
+<\/script>
+</body></html>`;
   }
 
   function saveBracket(brId){
