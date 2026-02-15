@@ -10,6 +10,10 @@
       --border:rgba(255,255,255,.08);
       --text:#d8e1ee;
       --muted:#8ea0b5;
+      --btn:#d9d9d9;
+      --btnText:#111;
+      --btnBorder:#bdbdbd;
+      --activeShadow: inset 0 3px 10px rgba(0,0,0,.35);
       --accent:#6aa7ff;
       --accent2:#7cf3c3;
       --danger:#ff5a6a;
@@ -34,11 +38,15 @@
       color:var(--text);
       min-height:100vh;
     }
-    .wrap{max-width:1200px;margin:0 auto;padding:14px 14px 60px}
+    .wrap{max-width:1200px;margin:0 auto;padding:14px 14px 60px
+      display:flex;
+      flex-direction:column;
+      min-height:100vh;
+    }
 
     /* FOOTER (WEB) */
     .siteFooter{
-      margin-top:18px;
+      margin-top:auto;
       display:flex;
       align-items:center;
       justify-content:center;
@@ -389,18 +397,85 @@
     .rowPick .hc{color:var(--muted); font-size:12px}
     .pillSm{font-size:12px;padding:4px 8px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background: rgba(255,255,255,.03);color:var(--muted);white-space:nowrap;}
     form{margin:0}
-  </style>
+  
+    
+    /* Top logo (matches bowlers.html) */
+    .brandbar{
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      padding:8px 0 8px;
+    }
+    .brandbar img{
+      width:min(340px, 86vw);
+      height:auto;
+      display:block;
+      filter: drop-shadow(0 10px 22px rgba(0,0,0,.55));
+      opacity:.98;
+    }
+
+    /* Menu bar (matches bowlers.html) */
+    .menubar{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:center;
+      align-items:center;
+      margin: 6px 0 14px;
+    }
+    .menubar a{
+      text-decoration:none;
+      background: var(--btn);
+      color: var(--btnText);
+      border: 1px solid var(--btnBorder);
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-weight: 800;
+      letter-spacing:.2px;
+      box-shadow: 0 3px 0 rgba(255,255,255,.15);
+      transition: .12s ease;
+      user-select:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width: 104px;
+    }
+    .menubar a:hover{transform: translateY(-1px);}
+    .menubar a:active{transform: translateY(0px);}
+
+    .menubar a.active{
+      background: #cfcfcf;
+      box-shadow: inset 0 3px 10px rgba(0,0,0,.35);
+      transform: translateY(1px);
+      border-color:#a9a9a9;
+    }
+
+    @media (max-width: 520px){
+      .menubar a{min-width: 96px; padding: 9px 12px;}
+    }
+</style>
 </head>
 
 <body>
-  <div class="wrap">
+<div class="wrap">
 
     <!-- LOGO TOP CENTERED (WEB) -->
     <div class="brandbar">
       <img src="assets/9AB9725D-AD71-4DDC-BE9B-03328F663643.png" alt="Vista Lanes" />
     </div>
 
-    <header>
+    <!-- Menu buttons -->
+    <nav class="menubar" aria-label="Main menu">
+      <a href="index.html">Home</a>
+      <a href="bowlers.html">Bowlers</a>
+      <a href="leagues.html">Leagues</a>
+      <a href="teams.html">Teams</a>
+      <a href="lanes.html">Lanes</a>
+      <a href="tournaments.html">Tournaments</a>
+      <a class="active" href="brackets.html" aria-current="page">Brackets</a>
+    </nav>
+
+<header>
       <div class="title">
         <h1>Bowling Betting Brackets</h1>
         <div class="sub">Ties: Round1 uses Game2 as tiebreak • Round2 uses Game3 as tiebreak • Final tie splits pot evenly</div>
@@ -1157,12 +1232,15 @@ body{
 
 /* Full-viewport export layout (screen) */
 .page{
-  height:100vh;
-  display:flex;
-  flex-direction:column;
-  padding:0 8px 2px;
-  gap:3px;
-}
+      width:100%;
+      height:100vh;
+      display:flex;
+      flex-direction:column;
+      padding:0;
+      box-sizing:border-box;
+      gap:0;
+      background:transparent;
+    }
 .header{
   display:flex;
   flex-direction:column;
@@ -1189,12 +1267,14 @@ body{
 
 /* Area that gets scaled to fit screen */
 #fitWrap{
-  flex: 1 1 auto;
-  min-height: 0;
-  position: relative;
-  overflow: hidden;
-  border-radius: 18px;
-}
+      flex: 1 1 auto;
+      min-height:0;
+      overflow:hidden;
+      display:flex;
+      justify-content:center;
+      align-items:flex-start;
+      width:100%;
+    }
 #fitInner{ transform-origin: top left; }
 
 .bracket{
@@ -1314,6 +1394,12 @@ body{
 /* Print: normal flow, no scaling transform */
 @media print{
   body{overflow:visible;}
+  .page{height:10.5in;}
+  #fitWrap{overflow:visible;}
+  .mainLogo{max-height:0.8in;width:auto;}
+  .brandFooter{padding:4px 8px 2px;}
+}
+
   .page{height:auto;padding:0;gap:8px;}
   #fitWrap{overflow:visible;}
   /* keep JS scaling so it fills the printable width */
