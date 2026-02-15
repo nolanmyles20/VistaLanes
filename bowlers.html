@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Vista Lanes • Bowlers</title>
+  <style>
+    :root{
+      --bg:#000;
+      --panel: rgba(255,255,255,.04);
+      --panel2: rgba(255,255,255,.02);
+      --border: rgba(255,255,255,.10);
+      --text:#d8e1ee;
+      --muted:#8ea0b5;
+      --btn:#d9d9d9;
+      --btnText:#111;
+      --btnBorder:#bdbdbd;
+      --activeShadow: inset 0 3px 10px rgba(0,0,0,.35);
+      --shadow: 0 10px 30px rgba(0,0,0,.45);
+      --radius:18px;
+      --accent:#6aa7ff;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      background: var(--bg);
+      color: var(--text);
+      min-height:100vh;
+    }
+    .wrap{max-width:1200px;margin:0 auto;padding:14px 14px 60px;}
+
+    /* Top logo */
+    .brandbar{
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      padding:8px 0 8px;
+    }
+    .brandbar img{
+      width:min(340px, 86vw);
+      height:auto;
+      display:block;
+      filter: drop-shadow(0 10px 22px rgba(0,0,0,.55));
+      opacity:.98;
+    }
+
+    /* Menu bar */
+    .menubar{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:center;
+      align-items:center;
+      margin: 6px 0 14px;
+    }
+    .menubar a{
+      text-decoration:none;
+      background: var(--btn);
+      color: var(--btnText);
+      border: 1px solid var(--btnBorder);
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-weight: 800;
+      letter-spacing:.2px;
+      box-shadow: 0 3px 0 rgba(255,255,255,.15);
+      transition: .12s ease;
+      user-select:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width: 104px;
+    }
+    .menubar a:hover{transform: translateY(-1px);}
+    .menubar a:active{transform: translateY(0px);}
+
+    /* Active (current page) */
+    .menubar a.active{
+      background: #cfcfcf;
+      box-shadow: var(--activeShadow);
+      transform: translateY(1px);
+      border-color:#a9a9a9;
+    }
+
+    header{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:flex-end;
+      flex-wrap:wrap;
+      margin: 6px 0 12px;
+    }
+    h1{
+      margin:0;
+      font-size:22px;
+      font-weight:900;
+      letter-spacing:.3px;
+    }
+    .sub{color:var(--muted);font-size:13px;}
+
+    .panel{
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .panel .hd{
+      padding:12px 14px;
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      background: linear-gradient(180deg, rgba(255,255,255,.03), transparent);
+    }
+    .panel .hd .right{
+      display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+    }
+
+    input{
+      background: rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.12);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius: 14px;
+      outline:none;
+      transition:.15s ease;
+      max-width:100%;
+      min-width:220px;
+    }
+    input::placeholder{color:rgba(216,225,238,.35)}
+    input:focus{border-color: rgba(106,167,255,.5);box-shadow: 0 0 0 3px rgba(106,167,255,.15);}
+
+    .pill{
+      font-size:12px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.03);
+      color:var(--muted);
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      white-space:nowrap;
+    }
+    .pill b{color:var(--text)}
+    .btn{
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(106,167,255,.18);
+      color: var(--text);
+      padding:10px 13px;
+      border-radius: 999px;
+      cursor:pointer;
+      transition:.15s ease;
+      display:inline-flex;gap:8px;align-items:center;
+      user-select:none;
+      font-weight:800;
+    }
+    .btn:hover{transform: translateY(-1px);}
+    .btn:active{transform: translateY(0px);}
+
+    .bd{padding:14px;}
+
+    /* Table */
+    .tableWrap{
+      width:100%;
+      overflow:auto;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.10);
+    }
+    table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      min-width: 720px;
+    }
+    thead th{
+      position:sticky;
+      top:0;
+      z-index:2;
+      text-align:left;
+      font-size:12px;
+      letter-spacing:.35px;
+      text-transform:uppercase;
+      color:var(--muted);
+      background: rgba(20,20,20,.98);
+      border-bottom:1px solid rgba(255,255,255,.10);
+      padding:12px 12px;
+      white-space:nowrap;
+    }
+    tbody td{
+      padding:12px 12px;
+      border-bottom:1px solid rgba(255,255,255,.06);
+      color:var(--text);
+      vertical-align:top;
+    }
+    tbody tr:hover td{
+      background: rgba(255,255,255,.03);
+    }
+    .muted{color:var(--muted)}
+    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;}
+    .nameCell{font-weight:900}
+    .numCell{font-weight:800}
+    .err{
+      margin-top:10px;
+      color:#ffd57a;
+      font-size:13px;
+      line-height:1.4;
+    }
+
+    @media (max-width: 520px){
+      .menubar a{min-width: 96px; padding: 9px 12px;}
+      input{min-width: 180px;}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+
+    <!-- Vista Lanes logo (top centered) -->
+    <div class="brandbar">
+      <!-- If you use a different filename for the Vista Lanes logo, update this path -->
+      <img src="assets/9AB9725D-AD71-4DDC-BE9B-03328F663643.png" alt="Vista Lanes" />
+    </div>
+
+    <!-- Menu buttons -->
+    <nav class="menubar" aria-label="Main menu">
+      <a href="index.html">Home</a>
+      <a class="active" href="bowlers.html" aria-current="page">Bowlers</a>
+      <a href="leagues.html">Leagues</a>
+      <a href="teams.html">Teams</a>
+      <a href="lanes.html">Lanes</a>
+      <a href="tournaments.html">Tournaments</a>
+    </nav>
+
+    <header>
+      <div>
+        <h1>Bowlers</h1>
+        <div class="sub">Loaded from <span class="mono">data/bowlers.csv</span></div>
+      </div>
+    </header>
+
+    <div class="panel">
+      <div class="hd">
+        <div class="pill"><b id="count">0</b> bowlers</div>
+        <div class="right">
+          <input id="search" placeholder="Search bowler…" />
+          <button class="btn" id="reload" type="button">Reload CSV</button>
+        </div>
+      </div>
+
+      <div class="bd">
+        <div class="tableWrap">
+          <table id="tbl" aria-label="Bowlers table">
+            <thead><tr id="theadRow"></tr></thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+        <div class="err" id="err" style="display:none"></div>
+      </div>
+    </div>
+
+  </div>
+
+<script>
+(() => {
+  const CSV_PATH = "data/bowlers.csv";
+
+  const $ = (id) => document.getElementById(id);
+  const escapeHtml = (s)=>String(s ?? "").replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+  let rows = [];
+  let headers = [];
+
+  function splitCSVLine(line){
+    const res=[]; let cur=""; let q=false;
+    for(let i=0;i<line.length;i++){
+      const c=line[i];
+      if(c === '"'){
+        if(q && line[i+1] === '"'){ cur+='"'; i++; }
+        else q=!q;
+      } else if(c === ',' && !q){
+        res.push(cur); cur="";
+      } else cur+=c;
+    }
+    res.push(cur);
+    return res;
+  }
+
+  function parseCSV(text){
+    const lines = text.replace(/\r\n/g,"\n").replace(/\r/g,"\n").split("\n").filter(l=>l.trim()!=="");
+    if(!lines.length) return {headers:[], rows:[]};
+
+    const header = splitCSVLine(lines[0]).map(h=>h.trim());
+    const out=[];
+    for(let i=1;i<lines.length;i++){
+      const cols = splitCSVLine(lines[i]);
+      const obj = {};
+      header.forEach((h,idx)=> obj[h] = (cols[idx] ?? "").trim());
+      out.push(obj);
+    }
+    return {headers: header, rows: out};
+  }
+
+  function guessName(obj){
+    const keys = Object.keys(obj);
+    const lower = keys.map(k => k.toLowerCase());
+    const pick = (...names) => {
+      for(const n of names){
+        const idx = lower.indexOf(n);
+        if(idx >= 0) return obj[keys[idx]];
+      }
+      return "";
+    };
+
+    const first = pick("first","firstname","first_name");
+    const last  = pick("last","lastname","last_name");
+    if(first || last) return `${first} ${last}`.trim();
+
+    return pick("name","bowler","bowlername","player") || "";
+  }
+
+  function guessHcp(obj){
+    const keys = Object.keys(obj);
+    const lower = keys.map(k => k.toLowerCase());
+    const cand = ["handicap","hcp","hdcp"];
+    for(const c of cand){
+      const idx = lower.indexOf(c);
+      if(idx >= 0) return obj[keys[idx]];
+    }
+    return "";
+  }
+
+  function compareByLastName(a,b){
+    const an = guessName(a).trim();
+    const bn = guessName(b).trim();
+    const al = an.split(/\s+/).filter(Boolean).slice(-1)[0] || an;
+    const bl = bn.split(/\s+/).filter(Boolean).slice(-1)[0] || bn;
+    const c = al.localeCompare(bl);
+    if(c !== 0) return c;
+    return an.localeCompare(bn);
+  }
+
+  function render(){
+    const q = ($("search").value || "").trim().toLowerCase();
+
+    let filtered = rows.slice();
+    if(q){
+      filtered = filtered.filter(r => {
+        const name = guessName(r).toLowerCase();
+        return name.includes(q) || JSON.stringify(r).toLowerCase().includes(q);
+      });
+    }
+
+    $("count").textContent = String(filtered.length);
+
+    // header
+    const thead = $("theadRow");
+    thead.innerHTML = "";
+    headers.forEach(h => {
+      const th = document.createElement("th");
+      th.textContent = h;
+      thead.appendChild(th);
+    });
+
+    // body
+    const tbody = $("tbody");
+    tbody.innerHTML = "";
+    filtered.forEach(r => {
+      const tr = document.createElement("tr");
+      headers.forEach((h, idx) => {
+        const td = document.createElement("td");
+        const v = r[h] ?? "";
+
+        // lightweight “nice” formatting: bold name col if it looks like name
+        const hn = h.toLowerCase();
+        if(hn.includes("name") || hn === "bowler" || hn === "player"){
+          td.className = "nameCell";
+        }
+        if(hn.includes("hcp") || hn.includes("hdcp") || hn.includes("handicap")){
+          td.className = "numCell mono";
+        }
+
+        td.innerHTML = escapeHtml(v);
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+  }
+
+  async function load(){
+    $("err").style.display = "none";
+    try{
+      const res = await fetch(CSV_PATH, {cache:"no-store"});
+      if(!res.ok) throw new Error("HTTP " + res.status);
+      const text = await res.text();
+      const parsed = parseCSV(text);
+
+      headers = parsed.headers;
+      rows = parsed.rows;
+
+      // If the CSV has no header row, bail cleanly
+      if(!headers.length){
+        throw new Error("CSV appears empty or has no header row.");
+      }
+
+      // Sort by last name if we can
+      rows.sort(compareByLastName);
+
+      render();
+    }catch(e){
+      headers = ["Error"];
+      rows = [{ "Error": `Could not load ${CSV_PATH}. Make sure it exists in your repo and GitHub Pages can serve it.` }];
+      render();
+      $("err").style.display = "block";
+      $("err").textContent = String(e && e.message ? e.message : e);
+    }
+  }
+
+  $("search").addEventListener("input", render);
+  $("reload").addEventListener("click", load);
+
+  load();
+})();
+</script>
+</body>
+</html>
