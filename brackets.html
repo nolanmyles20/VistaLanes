@@ -630,6 +630,9 @@
     </div>
   </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
 <script>
 
 (() => {
@@ -1183,7 +1186,198 @@
       </div>`;
   }
 
+  
   // ===========================
+  // jsPDF EXPORT (single-page Letter) - consistent on iOS/Mac/Windows
+  // ===========================
+  async function _renderExportToPdf(pageEl, filename){
+    // Ensure element is in DOM (offscreen) so layout computes
+    const host = document.createElement("div");
+    host.style.position = "fixed";
+    host.style.left = "-10000px";
+    host.style.top = "0";
+    host.style.width = "816px";   // 8.5in @ 96dpi
+    host.style.height = "1056px"; // 11in @ 96dpi
+    host.style.background = "#fff";
+    host.style.zIndex = "-1";
+    host.appendChild(pageEl);
+    document.body.appendChild(host);
+
+    // wait for images
+    const imgs = Array.from(host.querySelectorAll("img"));
+    await Promise.all(imgs.map(img => new Promise(res=>{
+      if(img.complete) return res();
+      img.onload = ()=>res();
+      img.onerror = ()=>res();
+    })));
+
+    // Wait a tick for fonts/layout
+    await new Promise(r=>setTimeout(r, 80));
+
+    const canvas = await html2canvas(pageEl, {
+      backgroundColor: "#ffffff",
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
+      logging: false,
+      width: 816,
+      height: 1056,
+      windowWidth: 816,
+      windowHeight: 1056
+    });
+
+    const imgData = canvas.toDataURL("image/png");
+
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ orientation:"portrait", unit:"pt", format:"letter" }); // 612x792 pt
+
+    // Add as full-page image (Letter)
+    pdf.addImage(imgData, "PNG", 0, 0, 612, 792, undefined, "FAST");
+    pdf.save(filename);
+
+    host.remove();
+  }
+
+  function _buildExportShell({titleText, mainLogoSrc, poweredLogoSrc, centerNode}){
+    const page = document.createElement("div");
+    page.className = "pdfPage";
+    page.style.width = "816px";
+    page.style.height = "1056px";
+    page.style.background = "#fff";
+    page.style.display = "flex";
+    page.style.flexDirection = "column";
+    page.style.padding = "24px 28px 18px";
+    page.style.boxSizing = "border-box";
+    page.style.fontFamily = "ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial";
+
+    // Header
+    const header = document.createElement("div");
+    header.style.display = "flex";
+    header.style.flexDirection = "column";
+    header.style.alignItems = "center";
+    header.style.gap = "8px";
+    header.style.padding = "0";
+    header.style.margin = "0";
+
+    const logo = document.createElement("img");
+    logo.src = mainLogoSrc;
+    logo.alt = "Logo";
+    logo.style.maxHeight = "92px";
+    logo.style.width = "auto";
+    logo.style.display = "block";
+    logo.style.margin = "0";
+    logo.crossOrigin = "anonymous";
+
+    const h1 = document.createElement("div");
+    h1.textContent = titleText;
+    h1.style.fontSize = "22px";
+    h1.style.fontWeight = "900";
+    h1.style.letterSpacing = ".2px";
+    h1.style.margin = "0";
+
+    header.appendChild(logo);
+    header.appendChild(h1);
+
+    // Center (content)
+    const center = document.createElement("div");
+    center.style.flex = "1";
+    center.style.minHeight = "0";
+    center.style.display = "flex";
+    center.style.alignItems = "center";
+    center.style.justifyContent = "center";
+    center.style.padding = "10px 0 8px";
+
+    // Fit box so we keep footer on same page
+    const fitBox = document.createElement("div");
+    fitBox.style.width = "100%";
+    fitBox.style.maxWidth = "100%";
+    fitBox.style.height = "100%";
+    fitBox.style.display = "flex";
+    fitBox.style.alignItems = "center";
+    fitBox.style.justifyContent = "center";
+    fitBox.style.overflow = "hidden";
+
+    const fitInner = document.createElement("div");
+    fitInner.style.transformOrigin = "center center";
+    fitInner.style.display = "inline-block";
+
+    fitInner.appendChild(centerNode);
+    fitBox.appendChild(fitInner);
+    center.appendChild(fitBox);
+
+    // Footer
+    const footer = document.createElement("div");
+    footer.style.display = "flex";
+    footer.style.flexDirection = "column";
+    footer.style.alignItems = "center";
+    footer.style.gap = "6px";
+
+    const powered = document.createElement("div");
+    powered.style.display = "flex";
+    powered.style.alignItems = "center";
+    powered.style.gap = "10px";
+
+    const pLbl = document.createElement("div");
+    pLbl.textContent = "Powered By";
+    pLbl.style.fontSize = "12px";
+    pLbl.style.fontWeight = "900";
+    pLbl.style.color = "#333";
+
+    const pLogo = document.createElement("img");
+    pLogo.src = poweredLogoSrc;
+    pLogo.alt = "Powered By";
+    pLogo.style.height = "48px";
+    pLogo.style.width = "auto";
+    pLogo.style.display = "block";
+    pLogo.crossOrigin = "anonymous";
+
+    powered.appendChild(pLbl);
+    powered.appendChild(pLogo);
+
+    const meta = document.createElement("div");
+    meta.style.width = "100%";
+    meta.style.display = "flex";
+    meta.style.justifyContent = "space-between";
+    meta.style.fontSize = "11px";
+    meta.style.color = "#555";
+    meta.style.fontWeight = "800";
+
+    const ts = document.createElement("div");
+    const d = new Date();
+    ts.textContent = d.toLocaleString(undefined, {year:"numeric", month:"2-digit", day:"2-digit", hour:"2-digit", minute:"2-digit"});
+    const pn = document.createElement("div");
+    pn.textContent = "Page 1 of 1";
+
+    meta.appendChild(ts);
+    meta.appendChild(pn);
+
+    footer.appendChild(powered);
+    footer.appendChild(meta);
+
+    page.appendChild(header);
+    page.appendChild(center);
+    page.appendChild(footer);
+
+    // After added to DOM, compute scaling to fit available center area
+    setTimeout(()=>{
+      try{
+        const availW = fitBox.clientWidth;
+        const availH = fitBox.clientHeight;
+        // measure inner
+        fitInner.style.transform = "scale(1)";
+        const cw = fitInner.scrollWidth || fitInner.getBoundingClientRect().width;
+        const ch = fitInner.scrollHeight || fitInner.getBoundingClientRect().height;
+        if(cw && ch && availW && availH){
+          const s = Math.min(availW / cw, availH / ch, 1) * 0.98;
+          fitInner.style.transform = "scale(" + s + ")";
+        }
+      }catch(e){}
+    }, 30);
+
+    return page;
+  }
+
+// ===========================
   // EXPORT (SINGLE FILE) - opens a print window with full CSS + white background
   // ===========================
   function buildPrintHTML(brId){
@@ -1426,134 +1620,116 @@ body{
 }
 `;
 
-    return `<!doctype html><html><head><meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Bracket Export</title>
-<style>
-  @page { size: letter; margin: .35in; }
-  html,body{margin:0;padding:0;background:#fff;color:#111;font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;}
-  *{box-sizing:border-box}
-  .page{
-    height: calc(11in - .70in); /* letter minus top+bottom margins */
-    display:flex;
-    flex-direction:column;
-    align-items:stretch;
-  }
-  .header{
-    text-align:center;
-    padding: 0.05in 0 0.08in;
-  }
-  .header img{width: 2.2in; height:auto; display:block; margin:0 auto 0.08in;}
-  .header h1{margin:0; font-size: 18px; font-weight:900;}
-  /* Fit area takes remaining height between header and footer */
-  #fitWrap{
-    flex: 1 1 auto;
-    overflow:hidden; /* prevent spill to a second page */
-    display:flex;
-    justify-content:center;
-    align-items:flex-start;
-  }
-  #fitInner{
-    transform-origin: top center;
-    display:inline-block;
-    width: 100%;
-  }
-  /* footer lives OUTSIDE the scaled content */
-  .brandFooter{
-    flex: 0 0 auto;
-    border-top:1px solid #eee;
-    padding-top: 10px;
-    margin-top: 10px;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    gap:18px;
-    color:#333;
-  }
-  .brandFooter .powered{font-weight:800}
-  .brandFooter img{height: 40px; width:auto}
-  .copyright{
-    text-align:center;
-    margin-top: 6px;
-    color:#666;
-    font-size:12px;
-  }
-  /* Keep your bracket visuals but tighten spacing for print */
-  .wrap{max-width:none; padding:0 !important; margin:0 !important;}
-  .panel{box-shadow:none !important;}
-</style>
-</head>
-<body>
-  <div class="page">
-    <div class="header">
-      <img class="mainLogo" src="${escapeAttr(EXPORT_MAIN_LOGO)}" alt="Vista Lanes">
-      <h1>Bracket #${brId}</h1>
-    </div>
+    return `
+      <!doctype html>
+      <html>
+      <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>Bracket #${brId}</title>
+        <style>${css}</style>
+      </head>
+      <body>
+        <div class="page">
+          <div class="header">
+            <img class="mainLogo" src="${escapeAttr(EXPORT_MAIN_LOGO)}" alt="Logo">
+            <h1 class="brTitle">Bracket #${brId}</h1>
+          </div>
 
-    <div id="fitWrap"><div id="fitInner">${clone.outerHTML}</div></div>
+          <div id="fitWrap"><div id="fitInner">${clone.outerHTML}
 
-    ${brandFooterHTML}
-    <div class="copyright">© 2026 Myles Bowling Systems</div>
-  </div>
+          <div class="brandFooter">
+            <div class="powered">
+              <div class="label">Powered By</div>
+              <img src="${escapeAttr(EXPORT_POWERED_LOGO)}" alt="Powered By">
+            </div>
+            <div class="copy">&copy; <span id="yr"></span> Myles Bowling Systems</div>
+            <div class="sitepill">vista-lanes.com</div>
+          </div>
+        </div></div>
 
-<script>
-(function(){
-  function fit(){
-    const wrap = document.getElementById('fitWrap');
-    const inner = document.getElementById('fitInner');
-    if(!wrap || !inner) return;
+        <script>
+          (function(){
+            function fit(){
+              var wrap=document.getElementById('fitWrap');
+              var inner=document.getElementById('fitInner');
+              if(!wrap||!inner) return;
 
-    // reset
-    inner.style.transform = 'scale(1)';
+              inner.style.transform='scale(1)';
+              inner.style.transformOrigin='top center';
 
-    // force layout
-    const w = wrap.clientWidth;
-    const h = wrap.clientHeight;
+              var cw = inner.scrollWidth;
+              var ch = inner.scrollHeight;
+              var w  = wrap.clientWidth;
+              var h  = wrap.clientHeight;
+              if(!cw||!ch||!w||!h) return;
 
-    // Use scroll sizes (more reliable than bounding box with transform=1)
-    const iw = inner.scrollWidth;
-    const ih = inner.scrollHeight;
+              var s = Math.min(w/cw, h/ch, 1) * 0.995;
+              inner.style.transform = 'scale(' + s + ')';
+            }
+            function doPrint(){
+              fit();
+              setTimeout(function(){ window.focus(); window.print(); }, 150);
+            }
+            // year
+            try{ var y=document.getElementById('yr'); if(y) y.textContent=(new Date()).getFullYear(); }catch(e){}
+            window.addEventListener('resize', fit);
+            window.addEventListener('load', function(){ fit(); }, {once:true});
 
-    if(!iw || !ih || !w || !h) return;
-
-    const scale = Math.min(w/iw, h/ih);
-
-    inner.style.transform = 'scale(' + scale.toFixed(4) + ')';
-  }
-
-  // wait for images/fonts
-  function whenReady(){
-    const imgs = Array.from(document.images || []);
-    const pending = imgs.filter(im => !im.complete);
-    if(pending.length){
-      let left = pending.length;
-      pending.forEach(im => {
-        im.addEventListener('load', ()=>{ if(--left===0) setTimeout(fit, 50); });
-        im.addEventListener('error', ()=>{ if(--left===0) setTimeout(fit, 50); });
-      });
-    } else {
-      setTimeout(fit, 50);
-    }
-  }
-
-  window.addEventListener('resize', fit);
-  whenReady();
-})();
-<\/script>
-</body></html>`;
+            var imgs = Array.prototype.slice.call(document.images||[]);
+            var left = imgs.length;
+            if(!left) return doPrint();
+            imgs.forEach(function(img){
+              if(img.complete){ left--; if(left<=0) doPrint(); }
+              else{
+                img.addEventListener('load', function(){ left--; if(left<=0) doPrint(); });
+                img.addEventListener('error', function(){ left--; if(left<=0) doPrint(); });
+              }
+            });
+          })();
+        <\/script>
+      </body>
+      </html>
+    `;
   }
 
   function saveBracket(brId){
-    const html = buildPrintHTML(brId);
-    if(!html){
-      alert("Nothing to export yet (bracket not rendered).");
+
+    // Save current state (local) and export a single-page Letter PDF using jsPDF
+    saveLocalDebounced();
+
+    const el = document.getElementById(`bracket_${brId}`);
+    if(!el){
+      alert("Bracket not found.");
       return;
     }
-    const w = window.open("", "_blank");
-    if(!w){ alert("Popup blocked. Allow popups to export."); return; }
-    w.document.open();
-    w.document.write(html);
-    w.document.close();
+
+    // Clone bracket (remove inputs/buttons)
+    const clone = el.cloneNode(true);
+    clone.querySelectorAll("select, input, button").forEach(n=>n.remove());
+
+    // Force white background & full-width behavior for clean capture
+    clone.style.background = "transparent";
+    clone.style.boxShadow = "none";
+    clone.style.border = "none";
+    clone.style.width = "100%";
+
+    // Make the scroll areas visible for export
+    clone.querySelectorAll(".treeScroll").forEach(sc=>{
+      sc.style.overflow = "visible";
+      sc.style.maxHeight = "none";
+    });
+
+    // Cap bracket portion visually by shrinking within the PDF shell (the fitter handles it)
+    const page = _buildExportShell({
+      titleText: "Brackets",
+      mainLogoSrc: EXPORT_MAIN_LOGO,
+      poweredLogoSrc: EXPORT_POWERED_LOGO,
+      centerNode: clone
+    });
+
+    _renderExportToPdf(page, `VistaLanes_Brackets_${brId}_${new Date().toISOString().slice(0,10)}.pdf`);
+
   }
 
 
@@ -1695,12 +1871,70 @@ body{ font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, He
   }
 
   function exportPayouts(){
-    const html = buildPayoutsPrintHTML();
-    const w = window.open("", "_blank");
-    if(!w){ alert("Popup blocked. Allow popups to export."); return; }
-    w.document.open();
-    w.document.write(html);
-    w.document.close();
+
+    // Export a single-page Letter PDF payout summary using jsPDF
+    const totals = winningsByBowler();
+    const items = Array.from(totals.entries())
+      .map(([name,amt])=>({name:cleanName(name), amt:Number(amt||0)}))
+      .filter(x=>x.amt>0)
+      .sort((a,b)=>b.amt-a.amt);
+
+    if(!items.length){
+      alert("No payouts to export yet.");
+      return;
+    }
+
+    // Build payout card (outlined rows, amount right)
+    const card = document.createElement("div");
+    card.style.width = "100%";
+    card.style.maxWidth = "720px";
+    card.style.border = "1px solid rgba(0,0,0,.16)";
+    card.style.borderRadius = "18px";
+    card.style.overflow = "hidden";
+
+    const body = document.createElement("div");
+    body.style.padding = "14px";
+    body.style.display = "flex";
+    body.style.flexDirection = "column";
+    body.style.gap = "10px";
+
+    items.forEach(x=>{
+      const row = document.createElement("div");
+      row.style.border = "1px solid rgba(0,0,0,.16)";
+      row.style.borderRadius = "14px";
+      row.style.padding = "12px 14px";
+      row.style.display = "flex";
+      row.style.alignItems = "center";
+      row.style.justifyContent = "space-between";
+      row.style.fontWeight = "900";
+      row.style.fontSize = "18px";
+      row.style.gap = "12px";
+
+      const nm = document.createElement("div");
+      nm.textContent = x.name;
+      nm.style.flex = "1";
+      nm.style.minWidth = "0";
+
+      const amt = document.createElement("div");
+      amt.textContent = money(x.amt);
+      amt.style.whiteSpace = "nowrap";
+
+      row.appendChild(nm);
+      row.appendChild(amt);
+      body.appendChild(row);
+    });
+
+    card.appendChild(body);
+
+    const page = _buildExportShell({
+      titleText: "Payout Summary",
+      mainLogoSrc: EXPORT_MAIN_LOGO,
+      poweredLogoSrc: EXPORT_POWERED_LOGO,
+      centerNode: card
+    });
+
+    _renderExportToPdf(page, `VistaLanes_Payouts_${new Date().toISOString().slice(0,10)}.pdf`);
+
   }
   function deleteBracketById(brId){
     state.brackets = state.brackets.filter(b=>b.id!==brId);
