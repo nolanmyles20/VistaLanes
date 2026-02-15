@@ -453,6 +453,13 @@
     @media (max-width: 520px){
       .menubar a{min-width: 96px; padding: 9px 12px;}
     }
+
+/* --- Export tweaks (jsPDF/html2canvas capture) --- */
+body.exporting .match{ overflow: visible !important; }
+body.exporting .slot .nm{ font-size: 13px !important; line-height: 1.08 !important; }
+body.exporting .slot .sc{ font-size: 11px !important; line-height: 1.25 !important; overflow: visible !important; padding-bottom: 1px !important; }
+body.exporting .slot .wl{ font-size: 12px !important; }
+
 </style>
 </head>
 
@@ -1191,6 +1198,7 @@
   // jsPDF EXPORT (single-page Letter) - consistent on iOS/Mac/Windows
   // ===========================
   async function _renderExportToPdf(pageEl, filename){
+  document.body.classList.add("exporting");
     // Ensure element is in DOM (offscreen) so layout computes
     const host = document.createElement("div");
     host.style.position = "fixed";
@@ -1236,6 +1244,7 @@
     pdf.save(filename);
 
     host.remove();
+  document.body.classList.remove("exporting");
   }
 
   function _buildExportShell({titleText, mainLogoSrc, poweredLogoSrc, centerNode}){
@@ -1881,7 +1890,22 @@ body{ font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, He
 </body></html>`;
   }
 
-  function exportPayouts(){
+  
+    // fallback to DOM list (in case state hasn't been recalculated yet)
+    if(!items.length){
+      const list = $("payoutList");
+      if(list){
+        const lis = Array.from(list.querySelectorAll("li"));
+        items = lis.map(li => {
+          const n = (li.querySelector(".name")?.textContent || "").trim();
+          const a = (li.querySelector(".amt")?.textContent || "").trim();
+          const amt = Number(String(a).replace(/[^0-9.]/g,"")) || 0;
+          return [n, amt];
+        }).filter(x => x[0] && x[1] > 0);
+        items.sort((a,b)=> b[1]-a[1]);
+      }
+    }
+function exportPayouts(){
 
     // Export a single-page Letter PDF payout summary using jsPDF
     const totals = winningsByBowler();
