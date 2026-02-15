@@ -450,7 +450,7 @@
       border-color:#a9a9a9;
     }
 
-    @media (max-width: 520px){
+    @media screen and (max-width: 520px){
       .menubar a{min-width: 96px; padding: 9px 12px;}
     }
 </style>
@@ -1409,17 +1409,17 @@ body{
 @media print{
   body{overflow:visible;}
   @page{size:letter; margin:0.35in;}
-  .page{height:auto; min-height:0; padding:0 0 1.35in; gap:8px; position:relative;}
+  .page{height:auto; min-height:0; padding:0; gap:8px;}
   /* Keep bracket + results on one page */
-  #fitWrap{height:5.0in; max-height:5.0in; overflow:hidden;}
+  #fitWrap{height:6.1in; max-height:6.1in; overflow:hidden;}
   #fitInner{transform-origin: top left;}
   .mainLogo{max-height:0.85in;width:auto;}
-  .brandFooter{padding:4px 10px 2px; position:absolute; left:0; right:0; bottom:0; margin:0;}
+  .brandFooter{padding:4px 10px 2px;}
   .metaLine{font-size:10px;}
 }
 
 /* Small screens */
-@media (max-width: 520px){
+@media screen and (max-width: 520px){
   .page{height:auto; padding:0; gap:8px;}
   #fitWrap{height:auto; max-height:none; overflow:visible;}
   #fitInner{transform:none !important;}
@@ -1442,7 +1442,7 @@ body{
             <h1 class="brTitle">Bracket #${brId}</h1>
           </div>
 
-          <div id="fitWrap"><div id="fitInner">${clone.outerHTML}</div></div>
+          <div id="fitWrap"><div id="fitInner">${clone.outerHTML}
 
           <div class="brandFooter">
             <div class="powered">
@@ -1452,7 +1452,7 @@ body{
             <div class="copy">&copy; <span id="yr"></span> Myles Bowling Systems</div>
             <div class="sitepill">vista-lanes.com</div>
           </div>
-        </div>
+        </div></div>
 
         <script>
           (function(){
