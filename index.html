@@ -20,7 +20,6 @@
 }
 
 *{box-sizing:border-box}
-
 html,body{height:100%}
 
 body{
@@ -31,12 +30,11 @@ body{
 
   height:100svh;
   height:100dvh;
-  overflow:hidden; /* prevent scroll */
+  overflow:hidden;            /* page itself doesn't scroll */
   display:flex;
   flex-direction:column;
 }
 
-/* Layout wrapper */
 .wrap{
   width:100%;
   max-width:880px;
@@ -45,12 +43,10 @@ body{
   flex:1;
   display:flex;
   flex-direction:column;
-  min-height:0;
+  min-height:0;               /* critical */
 }
 
-/* ========== LOGO SECTION ========== */
-
-/* Container */
+/* ========= LOGO ========= */
 .brandArea{
   display:flex;
   justify-content:center;
@@ -61,32 +57,29 @@ body{
   flex:0 0 auto;
 }
 
-/* Crop window */
+/* Crop window - less aggressive so top isn't chopped */
 .brandCrop{
   width:min(700px,96vw);
-  height:clamp(150px,28svh,260px);
+  height:clamp(190px, 26svh, 260px);  /* ↑ taller window */
   overflow:hidden;
   display:flex;
   justify-content:center;
   align-items:center;
 }
 
-/* Image scaled up */
+/* No zoom now, just slight nudge down */
 .brandMain{
   width:100%;
   height:auto;
   display:block;
   object-fit:contain;
 
-  /* 👇 Double visual size */
-  transform: scale(1.0);
+  transform: translateY(18px) scale(1); /* ↓ show more top */
   transform-origin:center;
-
   filter: drop-shadow(0 14px 28px rgba(0,0,0,.60));
 }
 
-/* ========== PANEL ========== */
-
+/* ========= PANEL ========= */
 .panel{
   margin-top:6px;
   background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
@@ -103,6 +96,7 @@ body{
 .hd{
   padding:12px 16px 10px;
   border-bottom:1px solid var(--border);
+  flex:0 0 auto;
 }
 
 .hd h1{
@@ -117,21 +111,22 @@ body{
   font-size:13px;
 }
 
+/* IMPORTANT: make the button area scroll internally if needed */
 .bd{
   padding:12px;
   flex:1 1 auto;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
+  min-height:0;
+  overflow:auto;                 /* internal scroll */
+  -webkit-overflow-scrolling: touch;
 }
 
 .homeBtns{
   display:flex;
   flex-direction:column;
   gap:10px;
+  padding-bottom:6px;            /* small breathing room */
 }
 
-/* Compact buttons */
 .homeBtn{
   display:flex;
   align-items:center;
@@ -162,8 +157,7 @@ body{
   font-size:18px;
 }
 
-/* ========== BOTTOM ========== */
-
+/* ========= BOTTOM ========= */
 .bottomArea{
   flex:0 0 auto;
   display:flex;
@@ -201,16 +195,18 @@ footer{
   border-top:1px solid var(--border);
 }
 
-/* ========== SHORT SCREEN TIGHTENING ========== */
-
+/* Tighten for shorter screens so more buttons show */
 @media (max-height:760px){
-  .brandCrop{ height:clamp(130px,24svh,200px); }
+  .brandCrop{ height:clamp(165px,24svh,220px); }
+  .brandMain{ transform: translateY(14px) scale(1); }
   .homeBtn{ padding:10px 14px; font-size:16px; }
   .poweredByLogo{ width:100px; }
 }
 
 @media (max-height:700px){
-  .brandCrop{ height:clamp(110px,22svh,180px); }
+  .brandCrop{ height:clamp(145px,22svh,200px); }
+  .brandMain{ transform: translateY(10px) scale(1); }
+  .homeBtns{ gap:8px; }
   .homeBtn{ padding:9px 14px; font-size:15px; }
 }
 </style>
@@ -268,7 +264,7 @@ footer{
 </div>
 
 <script>
-document.getElementById("year").textContent = new Date().getFullYear();
+  document.getElementById("year").textContent = new Date().getFullYear();
 </script>
 
 </body>
