@@ -1204,23 +1204,23 @@ body{
   overflow:hidden;
 }
 .bracket .top{
-  padding:8px 10px 6px;
+  padding:6px 8px 4px;
   border-bottom:1px solid var(--border);
-  display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;
+  display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;
 }
 .bracket .top .meta{display:flex;flex-direction:column;gap:4px;}
 .bracket .top .meta .name{font-weight:900;letter-spacing:.2px;}
-.bracket .top .meta .small{font-size:12px;color:var(--muted);}
+.bracket .top .meta .small{font-size:11px;color:var(--muted);}
 
 .treeHead{
   display:grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap:var(--treeGap);
-  padding: 0 var(--treePadX) 6px;
+  padding: 0 var(--treePadX) 4px;
 }
 .treeHead h3{
   margin:0;
-  font-size:12px;
+  font-size:11px;
   color:var(--muted);
   letter-spacing:.35px;
   text-transform:uppercase;
@@ -1273,13 +1273,13 @@ body{
 .slot .nm.winner{color: var(--success)}
 .slot .nm.loser{color: var(--danger)}
 .slot .sc{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.08;}
-.slot .right{font-size:12px;color:var(--muted);display:flex;gap:6px;align-items:center;white-space:nowrap;flex:0 0 auto;}
+.slot .right{font-size:11px;color:var(--muted);display:flex;gap:6px;align-items:center;white-space:nowrap;flex:0 0 auto;}
 
 .foot{
   border-top:1px solid var(--border);
   padding:12px;
   display:grid;
-  gap:10px;
+  gap:8px;
   background:#fff;
 }
 
@@ -1288,24 +1288,24 @@ body{
   display:flex;
   align-items:center;
   justify-content:center;
-  gap:10px;
-  padding:2px 0 0;
+  gap:8px;
+  padding:0;
   margin:0;
   flex:0 0 auto;
 }
 .powered .label{
   font-weight:900;
-  font-size:13px;
+  font-size:11px;
 }
 .powered img{
-  width:110px;
+  width:90px;
   height:auto;
   display:block;
 }
 .copy{
   width:100%;
   text-align:center;
-  font-size:12px;
+  font-size:11px;
   color:#555;
   margin-top:2px;
   font-weight:700;
@@ -1314,19 +1314,21 @@ body{
 /* Print: normal flow, no scaling transform */
 @media print{
   body{overflow:visible;}
-  .page{height:auto;padding:0;gap:10px;}
+  .page{height:auto;padding:0;gap:8px;}
   #fitWrap{overflow:visible;}
   /* keep JS scaling so it fills the printable width */
-  .mainLogo{max-height:1.0in;width:auto;}
+  .mainLogo{max-height:0.8in;width:auto;}
 }
 
-  .page{height:auto;padding:0;gap:10px;}
+  .page{height:auto;padding:0;gap:8px;}
   #fitWrap{overflow:visible;}
   #fitInner{transform:none !important;}
   .mainLogo{max-height:1.2in; width:auto;}
 }
 .badge.gold{background: rgba(255,200,74,.14); border-color: rgba(255,200,74,.45); color: #ffd57a;}
 .badge.silver{background: rgba(184,198,217,.12); border-color: rgba(184,198,217,.42); color: #dbe6f6;}
+
+@media print{ .card{page-break-inside:avoid;} .powered{page-break-inside:avoid;} }
 `;
 
     return `
