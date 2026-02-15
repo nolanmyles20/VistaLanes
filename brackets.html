@@ -1125,7 +1125,7 @@
     const hasAnyMatch = !!clone.querySelector(".match");
     if(!hasTree || !hasAnyMatch) return null;
 
-    const css = `@page { size: letter; margin: 0.5in; }
+    const css = `@page { size: letter; margin: 0.25in; }
 :root{
   --bg:#fff;
   --border: rgba(0,0,0,.10);
@@ -1314,6 +1314,12 @@ body{
 /* Print: normal flow, no scaling transform */
 @media print{
   body{overflow:visible;}
+  .page{height:auto;padding:0;gap:10px;}
+  #fitWrap{overflow:visible;}
+  /* keep JS scaling so it fills the printable width */
+  .mainLogo{max-height:1.0in;width:auto;}
+}
+
   .page{height:auto;padding:0;gap:10px;}
   #fitWrap{overflow:visible;}
   #fitInner{transform:none !important;}
