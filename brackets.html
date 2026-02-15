@@ -1708,6 +1708,17 @@ body{
     const clone = el.cloneNode(true);
     clone.querySelectorAll("select, input, button").forEach(n=>n.remove());
 
+    // EXPORT SAFETY: keep game score line visible (prevent 2-line names from clipping the G1/G2/G3 row)
+    clone.querySelectorAll(".match .name").forEach(n=>{
+      n.style.whiteSpace = "nowrap";
+      n.style.overflow = "hidden";
+      n.style.textOverflow = "ellipsis";
+    });
+    // Ensure meta line isn't clipped inside match cards
+    clone.querySelectorAll(".match").forEach(n=>{
+      n.style.overflow = "hidden"; // keep layout, but avoid inner text clipping by preventing wraps above
+    });
+
     // Force white background & full-width behavior for clean capture
     clone.style.background = "transparent";
     clone.style.boxShadow = "none";
