@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>Vista Lanes - Home</title>
 
   <style>
@@ -21,56 +21,83 @@
 
     *{box-sizing:border-box}
 
+    html, body{
+      height:100%;
+    }
+
     body{
       margin:0;
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
       background: var(--bg);
       color:var(--text);
-      min-height:100vh;
+
+      /* "fit whole page" strategy */
+      height: 100svh;          /* stable viewport height (iOS friendly) */
+      height: 100dvh;          /* dynamic viewport height (newer browsers) */
+      overflow:hidden;         /* prevent scrolling */
       display:flex;
       flex-direction:column;
     }
 
+    /* page container uses full height, layout columns */
     .wrap{
+      width:100%;
       max-width:880px;
       margin:0 auto;
-      padding:0 14px 40px; /* removed top padding */
+      padding: 0 14px env(safe-area-inset-bottom);
       flex:1;
+      display:flex;
+      flex-direction:column;
+      min-height:0; /* allow flex children to shrink */
     }
 
-    /* TOP LOGO - NO EXTRA PADDING */
+    /* TOP LOGO — eliminate all extra space */
     .brandArea{
       display:flex;
       justify-content:center;
       align-items:center;
       margin:0;
       padding:0;
+      line-height:0; /* kills inline image baseline gap */
+      flex:0 0 auto;
     }
 
     .brandMain{
-      width:min(560px, 92vw);
+      /* scales with screen height so everything can fit */
+      width: min(560px, 92vw);
+      max-height: clamp(110px, 22svh, 210px);
       height:auto;
       display:block;
+      margin:0;
+      padding:0;
+      object-fit:contain;
       filter: drop-shadow(0 14px 28px rgba(0,0,0,.60));
     }
 
     .panel{
-      margin-top:10px;
+      margin-top: 6px; /* tight */
       background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
       border:1px solid var(--border);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
       overflow:hidden;
+      flex: 1 1 auto;
+      min-height:0; /* important for no-scroll */
+      display:flex;
+      flex-direction:column;
     }
 
     .hd{
-      padding:14px 16px 10px;
+      padding: 12px 16px 10px;
       border-bottom:1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,.03), transparent);
+      flex:0 0 auto;
     }
 
     .hd h1{
       margin:0;
-      font-size:20px;
+      font-size: 20px;
+      letter-spacing:.2px;
       font-weight:900;
     }
 
@@ -78,98 +105,129 @@
       margin-top:6px;
       color:var(--muted);
       font-size:13px;
+      line-height:1.3;
     }
 
-    .bd{padding:14px}
+    .bd{
+      padding: 12px;
+      flex: 1 1 auto;
+      min-height:0;
+      display:flex;
+      flex-direction:column;
+      justify-content:flex-start;
+      gap:10px;
+    }
 
     .homeBtns{
       display:flex;
       flex-direction:column;
-      gap:10px;
+      gap:10px; /* tighter */
     }
 
-    /* SHORTER BUTTONS */
+    /* compact buttons so 6 fit */
     .homeBtn{
       display:flex;
       align-items:center;
       justify-content:space-between;
-      padding:12px 18px;   /* reduced height */
+      gap:12px;
+      padding: 11px 16px;
       border-radius:999px;
       background: var(--btnBg);
       color: var(--btnText);
       border:1px solid var(--btnBorder);
       font-weight:900;
       font-size:17px;
+      letter-spacing:.2px;
       text-decoration:none;
+      user-select:none;
       box-shadow: 0 8px 18px rgba(0,0,0,.35);
       transition:.15s ease;
     }
 
-    .homeBtn:hover{
-      background:#ffffff;
-      transform: translateY(-1px);
-    }
+    .homeBtn:active{ transform: translateY(1px); }
 
     .chev{
-      width:30px;
-      height:30px;
+      width:30px;height:30px;
       border-radius:999px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
+      display:flex;align-items:center;justify-content:center;
       border:1px solid rgba(0,0,0,.20);
       background: rgba(255,255,255,.45);
       font-size:18px;
+      line-height:1;
+      flex:0 0 auto;
     }
 
-    .footerHint{
-      margin-top:14px;
-      font-size:12px;
-      color:var(--muted);
-      text-align:center;
+    /* Powered by + footer live at bottom, no scrolling */
+    .bottomArea{
+      flex:0 0 auto;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:8px;
+      padding: 10px 0 0;
     }
 
-    /* BOTTOM POWERED BY */
     .poweredByWrap{
       display:flex;
-      justify-content:center;
       align-items:center;
-      gap:12px;
-      margin-top:30px;
+      gap:10px;
     }
 
     .poweredByText{
       color:var(--muted);
       font-size:12px;
+      letter-spacing:.25px;
       font-weight:800;
       text-transform:uppercase;
+      white-space:nowrap;
     }
 
     .poweredByLogo{
-      width:120px;
+      width: 118px;
       height:auto;
-      filter: drop-shadow(0 8px 20px rgba(0,0,0,.55));
+      display:block;
+      filter: drop-shadow(0 8px 18px rgba(0,0,0,.55));
+      opacity:.98;
     }
 
     footer{
-      margin-top:25px;
-      padding:14px 0 20px;
+      width:100%;
       text-align:center;
       font-size:12px;
       color:var(--muted);
+      padding: 6px 0 10px;
       border-top:1px solid var(--border);
     }
 
+    /* Height-based tightening for iPhones with Safari bars */
+    @media (max-height: 780px){
+      .brandMain{ max-height: clamp(95px, 18svh, 175px); }
+      .panel{ margin-top:4px; }
+      .hd{ padding: 10px 14px 8px; }
+      .hd h1{ font-size:19px; }
+      .homeBtns{ gap:8px; }
+      .homeBtn{ padding: 10px 14px; font-size:16px; }
+      .chev{ width:28px;height:28px; }
+      .poweredByLogo{ width: 108px; }
+      footer{ padding: 6px 0 8px; }
+    }
+
+    @media (max-height: 710px){
+      .brandMain{ max-height: clamp(82px, 16svh, 150px); }
+      .homeBtns{ gap:7px; }
+      .homeBtn{ padding: 9px 14px; font-size:15px; }
+      .poweredByLogo{ width: 100px; }
+      footer{ font-size:11px; }
+    }
+
     @media (max-width: 420px){
-      .homeBtn{font-size:15px}
-      .chev{width:28px;height:28px}
-      .poweredByLogo{width:100px}
+      .homeBtn{ font-size:15px; }
+      .poweredByLogo{ width: 102px; }
     }
   </style>
 </head>
 
 <body>
-
   <div class="wrap">
 
     <!-- TOP LOGO -->
@@ -181,6 +239,7 @@
       />
     </div>
 
+    <!-- MAIN PANEL -->
     <div class="panel">
       <div class="hd">
         <h1>Home</h1>
@@ -196,33 +255,29 @@
           <a class="homeBtn" href="tournaments.html"><span>Tournaments</span><span class="chev">›</span></a>
           <a class="homeBtn" href="brackets.html"><span>Brackets</span><span class="chev">›</span></a>
         </div>
-
-        <div class="footerHint">
-          Tip: rotate landscape for a roomier layout on bracket views.
-        </div>
       </div>
     </div>
 
-    <!-- MOVED TO BOTTOM -->
-    <div class="poweredByWrap">
-      <div class="poweredByText">Powered By</div>
-      <img
-        class="poweredByLogo"
-        src="assets/68D8CA4C-741E-41E1-ABBC-8B57D7FD0A57.png"
-        alt="Myles Bowling Systems"
-      />
-    </div>
+    <!-- BOTTOM AREA -->
+    <div class="bottomArea">
+      <div class="poweredByWrap">
+        <div class="poweredByText">Powered By</div>
+        <img
+          class="poweredByLogo"
+          src="assets/68D8CA4C-741E-41E1-ABBC-8B57D7FD0A57.png"
+          alt="Myles Bowling Systems"
+        />
+      </div>
 
-    <footer>
-      © <span id="year"></span> Vista Lanes. All Rights Reserved.
-    </footer>
+      <footer>
+        © <span id="year"></span> Vista Lanes. All Rights Reserved.
+      </footer>
+    </div>
 
   </div>
 
-  <!-- AUTO YEAR -->
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();
   </script>
-
 </body>
 </html>
