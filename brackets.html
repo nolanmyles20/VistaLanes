@@ -1409,13 +1409,12 @@ body{
 @media print{
   body{overflow:visible;}
   @page{size:letter; margin:0.35in;}
-  .page{height:auto; min-height:10.3in; padding:0; gap:8px;}
+  .page{height:auto; min-height:0; padding:0 0 1.35in; gap:8px; position:relative;}
   /* Keep bracket + results on one page */
-  #fitWrap{height:5.05in; max-height:5.05in; overflow:hidden;}
-  .brandFooter{margin-top:auto;}
+  #fitWrap{height:5.0in; max-height:5.0in; overflow:hidden;}
   #fitInner{transform-origin: top left;}
   .mainLogo{max-height:0.85in;width:auto;}
-  .brandFooter{padding:4px 10px 2px;}
+  .brandFooter{padding:4px 10px 2px; position:absolute; left:0; right:0; bottom:0; margin:0;}
   .metaLine{font-size:10px;}
 }
 
@@ -1453,7 +1452,7 @@ body{
             <div class="copy">&copy; <span id="yr"></span> Myles Bowling Systems</div>
             <div class="sitepill">vista-lanes.com</div>
           </div>
-        </div></div>
+        </div>
 
         <script>
           (function(){
