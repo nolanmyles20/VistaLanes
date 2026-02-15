@@ -1545,32 +1545,81 @@ body{
 
     const totalPaid = items.reduce((s,x)=>s+x.amt,0);
 
-    const css = `@page { size: letter; margin: 0.5in; }
-*{box-sizing:border-box}
-body{margin:0;font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;background:#fff;color:#111;-webkit-print-color-adjust: exact;print-color-adjust: exact;}
-.page{padding:12px 14px;min-height:10in;display:flex;flex-direction:column;}
-.header{display:flex;flex-direction:column;align-items:center;gap:6px;margin-bottom:10px}
-.mainLogo{width:min(420px,94vw);max-height:130px;object-fit:contain}
-.h1{font-weight:900;margin:0;font-size:18px}
-.card{border:1px solid rgba(0,0,0,.10);border-radius:18px;overflow:hidden}
-.card .top{padding:12px;border-bottom:1px solid rgba(0,0,0,.10);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
-.kpi{display:flex;gap:10px;flex-wrap:wrap;font-weight:900}
-.kpi .box{border:1px solid rgba(0,0,0,.10);border-radius:14px;padding:8px 10px}
-.list{padding:12px;display:grid;gap:8px}
-.rowItem{display:flex;justify-content:space-between;gap:10px;align-items:center;border:1px solid rgba(0,0,0,.10);border-radius:14px;padding:10px 12px}
-.rowItem .who{font-weight:900;min-width:0}
-.rowItem .amt{font-weight:900}
-.hint{color:#555;font-size:13px;padding:10px 2px}
-.powered{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:12px}
-.powered .label{font-weight:900;font-size:13px}
-.powered img{width:110px;height:auto;display:block}
-.copy{width:100%;text-align:center;font-size:12px;color:#555;margin-top:3px;font-weight:700}
+    const css = `
+@page{ size: letter; margin: 0.35in; }
+*{ box-sizing:border-box; }
+html,body{ margin:0; padding:0; }
+body{ font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; background:#fff; color:#111; }
+.page{
+  position:relative;
+  width:100%;
+  min-height:100vh;
+  padding:0 0 150px; /* reserve footer space so it never overlaps */
+}
+.header{ display:flex; flex-direction:column; align-items:center; justify-content:center; padding:0; margin:0; }
+.mainLogo{ width:min(340px, 60vw); height:auto; display:block; margin:0; }
+.h1{ margin:10px 0 10px; font-size:28px; font-weight:900; letter-spacing:.2px; }
 
-.footer{margin-top:auto; padding-top:16px; text-align:center;}
-.meta{display:flex; justify-content:space-between; gap:12px; margin-top:6px; width:100%; font-size:11px; color:#555; font-weight:700;}
-.meta .pagenum:after{content:"Page " counter(page) " of " counter(pages);}
-@media screen{
-  .page{min-height:100vh;}
+.card{
+  max-width:920px;
+  margin:0 auto;
+  border:1px solid rgba(0,0,0,.14);
+  border-radius:22px;
+  overflow:hidden;
+}
+.top{ padding:12px 14px; border-bottom:1px solid rgba(0,0,0,.10); }
+.kpi{ display:flex; gap:12px; }
+.box{
+  flex:1;
+  border:1px solid rgba(0,0,0,.14);
+  border-radius:16px;
+  padding:10px 12px;
+  font-weight:900;
+  font-size:18px;
+  text-align:center;
+}
+.list{ padding:14px; display:flex; flex-direction:column; gap:12px; }
+.row{
+  border:1px solid rgba(0,0,0,.14);
+  border-radius:18px;
+  padding:14px 16px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  font-weight:900;
+  font-size:20px;
+}
+.row .name{ font-weight:900; }
+.row .amt{ font-weight:900; }
+
+.footer{
+  position:absolute;
+  left:0; right:0; bottom:0;
+  padding:12px 14px 6px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:6px;
+}
+.powered{ display:flex; align-items:center; gap:10px; }
+.powered .label{ font-weight:900; color:#444; }
+.powered img{ height:56px; width:auto; display:block; }
+.copy{ color:#444; font-weight:900; }
+.meta{
+  width:100%;
+  max-width:920px;
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  font-size:11px;
+  color:#666;
+  font-weight:800;
+}
+.meta .pagenum::after{ content:"Page 1"; } /* screen fallback */
+
+@media print{
+  .page{ min-height:auto; padding-bottom:150px; }
+  .meta .pagenum::after{ content:"Page " counter(page) " of " counter(pages); }
 }
 `;
 
@@ -1600,14 +1649,16 @@ body{margin:0;font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Ro
       <div class="copy">&copy; <span id="yr"></span> Myles Bowling Systems</div>
       <div class="meta">
         <div id="ts"></div>
-        <div class="pagenum"></div>
+        <div class="pagenum" id="pn"></div>
       </div>
     </div>
   </div>
 
   <script>
     (function(){
-      try{ var d=new Date(); var y=document.getElementById('yr'); if(y) y.textContent=d.getFullYear(); var ts=document.getElementById('ts'); if(ts){ ts.textContent = d.toLocaleString(undefined,{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}); } }catch(e){}
+      try{ var d=new Date(); var y=document.getElementById('yr'); if(y) y.textContent=d.getFullYear(); var ts=document.getElementById('ts'); if(ts){ ts.textContent = d.toLocaleString(undefined,{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}); }
+        var pn=document.getElementById('pn'); if(pn){ pn.textContent = 'Page 1 of 1'; }
+      }catch(e){}
       setTimeout(function(){ window.focus(); window.print(); }, 150);
     })();
   <\/script>
