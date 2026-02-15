@@ -558,7 +558,7 @@
                 <option value="az">Name: A → Z</option>
                 <option value="za">Name: Z → A</option>
               </select>
-              <button class="btn primary" id="btnExportPayouts" type="button" onclick="exportPayouts()">Export Payouts</button>
+              <button class="btn primary" id="btnExportPayouts" type="button">Export Payouts</button>
             </div>
           </div>
           <div class="bd">
@@ -1535,11 +1535,13 @@ body{
       .filter(x=>x.amt>0)
       .sort((a,b)=>b.amt-a.amt);
 
-    const rows = payouts.map(p => {
-      const name = esc(p.name || p.bowler || "");
-      const amt  = esc(money(p.amount || p.payout || 0));
-      return `<div class="row"><div class="name">${name}</div><div class="amt">${amt}</div></div>`;
-    }).join("");
+    const rows = items.length
+      ? items.map(x=>`
+          <div class="rowItem">
+            <div class="who">${escapeHtml(x.name)}</div>
+            <div class="amt">${money(x.amt)}</div>
+          </div>`).join("")
+      : `<div class="hint">No payouts yet.</div>`;
 
     const totalPaid = items.reduce((s,x)=>s+x.amt,0);
 
@@ -1613,20 +1615,12 @@ body{ font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, He
   color:#666;
   font-weight:800;
 }
-/* screen fallback */
-
-
-.pagenum{ display:flex; align-items:center; justify-content:flex-end; gap:0; }
-.pn_print{ display:none; }
-@media print{
-  .pn_js{ display:none !important; }
-  .pn_print{ display:inline !important; }
-  .pn_print::after{ content:"Page " counter(page) " of " counter(pages); }
-}
+.meta .pagenum::after{ content:"Page 1"; } /* screen fallback */
 
 @media print{
   .page{ min-height:auto; padding-bottom:150px; }
-  }
+  .meta .pagenum::after{ content:"Page " counter(page) " of " counter(pages); }
+}
 `;
 
     return `<!doctype html><html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Payouts</title><style>${css}</style></head>
@@ -1655,7 +1649,7 @@ body{ font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, He
       <div class="copy">&copy; <span id="yr"></span> Myles Bowling Systems</div>
       <div class="meta">
         <div id="ts"></div>
-        <div class="pagenum"><span class="pn_js" id="pn_js"></span><span class="pn_print" aria-hidden="true"></span></div>
+        <div class="pagenum" id="pn"></div>
       </div>
     </div>
   </div>
@@ -1663,7 +1657,7 @@ body{ font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, He
   <script>
     (function(){
       try{ var d=new Date(); var y=document.getElementById('yr'); if(y) y.textContent=d.getFullYear(); var ts=document.getElementById('ts'); if(ts){ ts.textContent = d.toLocaleString(undefined,{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}); }
-        var pn=document.getElementById('pn_js'); if(pn){ pn.textContent = 'Page 1 of 1'; }
+        var pn=document.getElementById('pn'); if(pn){ pn.textContent = 'Page 1 of 1'; }
       }catch(e){}
       setTimeout(function(){ window.focus(); window.print(); }, 150);
     })();
@@ -1679,8 +1673,6 @@ body{ font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, He
     w.document.write(html);
     w.document.close();
   }
-  window.exportPayouts = exportPayouts;
-
   function deleteBracketById(brId){
     state.brackets = state.brackets.filter(b=>b.id!==brId);
     state.brackets.forEach((b,i)=>b.id=i+1);
