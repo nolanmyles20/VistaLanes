@@ -1399,11 +1399,6 @@ body{
   .mainLogo{max-height:0.8in;width:auto;}
   .brandFooter{padding:4px 8px 2px;}
 }
-
-  .page{height:auto;padding:0;gap:8px;}
-  #fitWrap{overflow:visible;}
-  /* keep JS scaling so it fills the printable width */
-  .mainLogo{max-height:0.8in;width:auto;}
 }
 
   .page{height:auto;padding:0;gap:8px;}
@@ -1415,6 +1410,8 @@ body{
 .badge.silver{background: rgba(184,198,217,.12); border-color: rgba(184,198,217,.42); color: #dbe6f6;}
 
 @media print{ .card{page-break-inside:avoid;} .powered{page-break-inside:avoid;} }
+
+.brandFooter{display:flex;flex-direction:column;align-items:center;gap:2px;padding:0 6px 4px;}
 `;
 
     return `
@@ -1435,11 +1432,13 @@ body{
 
           <div id="fitWrap"><div id="fitInner">${clone.outerHTML}</div></div>
 
-          <div class="powered">
-            <div class="label">Powered By</div>
-            <img src="${escapeAttr(EXPORT_POWERED_LOGO)}" alt="Powered By">
+          <div class="brandFooter">
+            <div class="powered">
+              <div class="label">Powered By</div>
+              <img src="${escapeAttr(EXPORT_POWERED_LOGO)}" alt="Powered By">
+            </div>
+            <div class="copy">&copy; <span id="yr"></span> Myles Bowling Systems</div>
           </div>
-          <div class="copy">&copy; <span id="yr"></span> Myles Bowling Systems</div>
         </div>
 
         <script>
