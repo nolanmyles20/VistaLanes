@@ -30,7 +30,7 @@ body{
 
   height:100svh;
   height:100dvh;
-  overflow:hidden;            /* page itself doesn't scroll */
+  overflow:hidden;          /* page does not scroll */
   display:flex;
   flex-direction:column;
 }
@@ -43,45 +43,45 @@ body{
   flex:1;
   display:flex;
   flex-direction:column;
-  min-height:0;               /* critical */
+  min-height:0;
 }
 
-/* ========= LOGO ========= */
+/* ================= LOGO ================= */
+
 .brandArea{
   display:flex;
   justify-content:center;
   align-items:center;
-  margin:0;
-  padding:0;
   line-height:0;
   flex:0 0 auto;
 }
 
-/* Crop window - less aggressive so top isn't chopped */
 .brandCrop{
-  width:min(700px,96vw);
-  height:clamp(200px, 26svh, 260px);  /* ↑ taller window */
+  width:min(720px,96vw);
+  height:clamp(230px,30svh,300px);  /* taller so nothing clips */
   overflow:hidden;
   display:flex;
   justify-content:center;
   align-items:center;
 }
 
-/* No zoom now, just slight nudge down */
 .brandMain{
   width:100%;
   height:auto;
   display:block;
   object-fit:contain;
 
-  transform: translateY(18px) scale(1); /* ↓ show more top */
+  /* Minimal nudge just to remove bottom transparent padding */
+  transform: translateY(10px) scale(1);
   transform-origin:center;
+
   filter: drop-shadow(0 14px 28px rgba(0,0,0,.60));
 }
 
-/* ========= PANEL ========= */
+/* ================= PANEL ================= */
+
 .panel{
-  margin-top:6px;
+  margin-top:4px;
   background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
   border:1px solid var(--border);
   border-radius:var(--radius);
@@ -96,7 +96,6 @@ body{
 .hd{
   padding:12px 16px 10px;
   border-bottom:1px solid var(--border);
-  flex:0 0 auto;
 }
 
 .hd h1{
@@ -111,20 +110,19 @@ body{
   font-size:13px;
 }
 
-/* IMPORTANT: make the button area scroll internally if needed */
+/* Internal scroll only if needed */
 .bd{
   padding:12px;
   flex:1 1 auto;
   min-height:0;
-  overflow:auto;                 /* internal scroll */
-  -webkit-overflow-scrolling: touch;
+  overflow:auto;
+  -webkit-overflow-scrolling:touch;
 }
 
 .homeBtns{
   display:flex;
   flex-direction:column;
   gap:10px;
-  padding-bottom:6px;            /* small breathing room */
 }
 
 .homeBtn{
@@ -157,7 +155,8 @@ body{
   font-size:18px;
 }
 
-/* ========= BOTTOM ========= */
+/* ================= BOTTOM ================= */
+
 .bottomArea{
   flex:0 0 auto;
   display:flex;
@@ -195,17 +194,16 @@ footer{
   border-top:1px solid var(--border);
 }
 
-/* Tighten for shorter screens so more buttons show */
+/* Slight tightening for shorter screens */
 @media (max-height:760px){
-  .brandCrop{ height:clamp(165px,24svh,220px); }
-  .brandMain{ transform: translateY(14px) scale(1); }
+  .brandCrop{ height:clamp(200px,28svh,260px); }
+  .brandMain{ transform: translateY(6px) scale(1); }
   .homeBtn{ padding:10px 14px; font-size:16px; }
   .poweredByLogo{ width:100px; }
 }
 
 @media (max-height:700px){
-  .brandCrop{ height:clamp(145px,22svh,200px); }
-  .brandMain{ transform: translateY(10px) scale(1); }
+  .brandCrop{ height:clamp(170px,24svh,230px); }
   .homeBtns{ gap:8px; }
   .homeBtn{ padding:9px 14px; font-size:15px; }
 }
@@ -264,7 +262,7 @@ footer{
 </div>
 
 <script>
-  document.getElementById("year").textContent = new Date().getFullYear();
+document.getElementById("year").textContent = new Date().getFullYear();
 </script>
 
 </body>
