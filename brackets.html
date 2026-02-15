@@ -558,7 +558,7 @@
                 <option value="az">Name: A → Z</option>
                 <option value="za">Name: Z → A</option>
               </select>
-              <button class="btn primary" id="btnExportPayouts" type="button">Export Payouts</button>
+              <button class="btn primary" id="btnExportPayouts" type="button" onclick="exportPayouts()">Export Payouts</button>
             </div>
           </div>
           <div class="bd">
@@ -1679,6 +1679,8 @@ body{ font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, He
     w.document.write(html);
     w.document.close();
   }
+  window.exportPayouts = exportPayouts;
+
   function deleteBracketById(brId){
     state.brackets = state.brackets.filter(b=>b.id!==brId);
     state.brackets.forEach((b,i)=>b.id=i+1);
