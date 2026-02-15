@@ -1590,7 +1590,7 @@ body{ font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, He
   font-size:20px;
 }
 .row .name{ font-weight:900; }
-.row .amt{ font-weight:900; }
+.row .amt{ font-weight:900; ; white-space:nowrap; margin-left:16px; }
 
 .footer{
   position:absolute;
@@ -1615,12 +1615,10 @@ body{ font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, He
   color:#666;
   font-weight:800;
 }
-.meta .pagenum::after{ content:"Page 1"; } /* screen fallback */
 
 @media print{
   .page{ min-height:auto; padding-bottom:150px; }
-  .meta .pagenum::after{ content:"Page " counter(page) " of " counter(pages); }
-}
+  }
 `;
 
     return `<!doctype html><html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Payouts</title><style>${css}</style></head>
