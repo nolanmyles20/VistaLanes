@@ -1186,471 +1186,279 @@
   // ===========================
   // EXPORT (SINGLE FILE) - opens a print window with full CSS + white background
   // ===========================
-  function buildPrintHTML(brId){
-    const el = document.getElementById(`bracket_${brId}`);
-    if(!el) return null;
+    function buildPrintHTML(brId){
+    const bracketEl = document.querySelector(`[data-bracket-id="${brId}"]`);
+    if(!bracketEl) return null;
 
-    const clone = el.cloneNode(true);
+    // Clone the bracket card so the print view doesn't mutate the live UI
+    const clone = bracketEl.cloneNode(true);
 
-    // Remove interactive controls only (keep the bracket tree!)
-    clone.querySelectorAll("select, input, button").forEach(n => n.remove());
-
-    // Prevent blank exports
-    const hasTree = !!clone.querySelector(".tree");
-    const hasAnyMatch = !!clone.querySelector(".match");
-    if(!hasTree || !hasAnyMatch) return null;
-
-    const css = `@page { size: letter; margin: 0.25in; }
-:root{
-  --bg:#fff;
-  --border: rgba(0,0,0,.10);
-  --text:#111;
-  --muted:#444;
-  --success:#148a49;
-  --danger:#c62828;
-
-  --radius: 18px;
-
-  --matchH: 136px;
-  --matchGap: 10px;
-  --conn: rgba(0,0,0,.18);
-
-  --treePadX: 10px;
-  --treeGap: 10px;
-}
-*{box-sizing:border-box}
-html,body{height:100%}
+    const css = `
+@page{ size: letter portrait; margin: .35in; }
+html,body{ height:100%; }
 body{
   margin:0;
   font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-  background:#fff;
   color:#111;
+  background:#fff;
   -webkit-print-color-adjust: exact;
   print-color-adjust: exact;
-  overflow:hidden;
 }
-
-/* Full-viewport export layout (screen) */
 .page{
-      width:100%;
-      height:100vh;
-      display:flex;
-      flex-direction:column;
-      padding:0;
-      box-sizing:border-box;
-      gap:0;
-      background:transparent;
-    }
-.header{
+  height:100%;
   display:flex;
   flex-direction:column;
-  align-items:center;
-  gap:2px;
-  padding:0;
-  margin:0;
+}
+.hdr{
   flex:0 0 auto;
+  text-align:center;
+  padding: .08in 0 .06in;
 }
-.mainLogo{
-  width:min(480px, 96vw);
-  max-height:120px;
-  object-fit:contain;
-  height:auto;
-  display:block;
-  margin:0;
-}
-.brTitle{
-  margin:0;
-  font-weight:900;
-  font-size:16px;
-  line-height:1.08;
-}
-
-/* Area that gets scaled to fit screen */
-#fitWrap{
-  /* Bracket area is capped so results/footer always show */
-  flex:0 0 auto;
-  height:60vh;
-  max-height:60vh;
+.hdr img{ width: 2.45in; height:auto; }
+.hdr .title{ margin:.06in 0 0; font-size:18pt; font-weight:900; }
+.fitWrap{
+  flex:0 0 60%;
+  overflow:hidden;
   display:flex;
-  align-items:flex-start;
   justify-content:center;
-  overflow:hidden;
-  padding:0 6px;
+  padding: 0 .02in;
 }
-#fitInner{ transform-origin: top left; }
-
-.bracket{
-  border:1px solid var(--border);
-  background:#fff;
-  border-radius: 18px;
-  overflow:hidden;
-}
-.bracket .top{
-  padding:6px 8px 4px;
-  border-bottom:1px solid var(--border);
-  display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;
-}
-.bracket .top .meta{display:flex;flex-direction:column;gap:4px;}
-.bracket .top .meta .name{font-weight:900;letter-spacing:.2px;}
-.bracket .top .meta .small{font-size:11px;color:var(--muted);}
-
-.treeHead{
-  display:grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap:var(--treeGap);
-  padding: 0 var(--treePadX) 4px;
-}
-.treeHead h3{
-  margin:0;
-  font-size:11px;
-  color:var(--muted);
-  letter-spacing:.35px;
-  text-transform:uppercase;
-}
-
-.tree{
-  position:relative;
-  display:grid;
-  grid-template-columns: repeat(3, minmax(0,1fr));
-  gap:var(--treeGap);
-  padding:8px var(--treePadX) 10px;
+.fitInner{
   width:100%;
-  min-width:0;
-  background:#fff;
+  transform-origin: top center;
+  transform: scale(.82);
 }
-.col{display:flex;flex-direction:column;gap: var(--matchGap);min-width:0;}
-.col.r2{padding-top: calc((var(--matchH) + var(--matchGap)) / 2);}
-.r2Spacer{height: var(--matchH);}
-.col.final{justify-content:center;}
-
-.match{
-  width:100%;
-  height: var(--matchH);
-  border:1px solid var(--border);
-  border-radius:16px;
-  background:#fff;
-  padding:7px;
-  position:relative;
-  overflow:hidden;
-  min-width:0;
+.ftr{
+  margin-top:auto;
+  flex:0 0 auto;
+  padding: .10in 0 .06in;
+  text-align:center;
 }
-
-.slot{
-  display:flex;justify-content:space-between;align-items:center;
-  padding:6px 9px;border-radius: 12px;
-  background:#fff;
+.ftr .powered{
+  display:flex; justify-content:center; align-items:center; gap:.18in;
+  font-weight:900; color:#333; margin-bottom:.04in;
+}
+.ftr .powered img{ width:.55in; height:auto; }
+.ftr .copy{ color:#666; font-weight:800; margin-top:.02in; }
+.ftr .meta{
+  margin-top:.08in;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:9.5pt;
+  color:#777;
+}
+.ftr .site{
+  margin:.06in auto 0;
+  display:inline-block;
+  padding: .08in .22in;
   border:1px solid rgba(0,0,0,.10);
-  margin-bottom:6px;gap:8px;min-width:0;
-}
-.slot:last-child{margin-bottom:0}
-.slot .left{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1 1 auto;}
-.slot .nm{
-  font-weight:900;line-height:1.08;
-  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
-  overflow:hidden;word-break:normal;overflow-wrap:break-word;
-  font-size: 15px;
-}
-.slot .nm .nm1,.slot .nm .nm2{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-
-.slot .nm.winner{color: var(--success)}
-.slot .nm.loser{color: var(--danger)}
-.slot .sc{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.08;}
-.slot .right{font-size:11px;color:var(--muted);display:flex;gap:6px;align-items:center;white-space:nowrap;flex:0 0 auto;}
-
-.foot{
-  border-top:1px solid var(--border);
-  padding:8px 10px;
-  display:grid;
-  gap:6px;
-  background:#fff;
-}
-
-/* Powered by footer (screen) */
-.powered{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
-  padding:0;
-  margin:0;
-  flex:0 0 auto;
-}
-.powered .label{
+  border-radius:999px;
+  color:#5d79a6;
+  background:#f3f4f6;
   font-weight:900;
-  font-size:11px;
 }
-.powered img{
-  width:90px;
-  height:auto;
-  display:block;
-}
-.copy{
-  width:100%;
-  text-align:center;
-  font-size:11px;
-  color:#555;
-  margin-top:2px;
-  font-weight:700;
-}
-
-
-/* Payout export list */
-.payoutList{display:flex; flex-direction:column; gap:12px; margin-top:14px;}
-.rowItem{
-  display:flex; justify-content:space-between; align-items:center;
-  border:1px solid rgba(0,0,0,.14);
-  border-radius:18px;
-  padding:14px 16px;
-  background:#fff;
-}
-.rowItem .who{font-weight:900; font-size:16px; color:#111;}
-.rowItem .amt{font-weight:900; font-size:18px; color:#111;}
-/* Print */
-@media print{
-  body{overflow:visible;}
-  @page{size:letter; margin:0.35in;}
-  .page{height:auto; min-height:0; padding:0; gap:8px;}
-  /* Keep bracket + results on one page */
-  #fitWrap{height:6.1in; max-height:6.1in; overflow:hidden;}
-  #fitInner{transform-origin: top left;}
-  .mainLogo{max-height:0.85in;width:auto;}
-  .brandFooter{padding:4px 10px 2px;}
-  .metaLine{font-size:10px;}
-}
-
-/* Small screens */
-@media (max-width: 520px){
-  .page{height:auto; padding:0; gap:8px;}
-  #fitWrap{height:auto; max-height:none; overflow:visible;}
-  #fitInner{transform:none !important;}
+@media screen{
+  body{ background:#ddd; }
+  .page{ width:8.5in; height:11in; margin:12px auto; background:#fff; box-shadow:0 10px 40px rgba(0,0,0,.25); }
 }
 `;
-
-    return `
-      <!doctype html>
-      <html>
-      <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width,initial-scale=1" />
-        <title>Bracket #${brId}</title>
-        <style>${css}</style>
-      </head>
-      <body>
-        <div class="page">
-          <div class="header">
-            <img class="mainLogo" src="${escapeAttr(EXPORT_MAIN_LOGO)}" alt="Logo">
-            <h1 class="brTitle">Bracket #${brId}</h1>
-          </div>
-
-          <div id="fitWrap"><div id="fitInner">${clone.outerHTML}
-
-          <div class="brandFooter">
-            <div class="powered">
-              <div class="label">Powered By</div>
-              <img src="${escapeAttr(EXPORT_POWERED_LOGO)}" alt="Powered By">
-            </div>
-            <div class="copy">&copy; <span id="yr"></span> Myles Bowling Systems</div>
-            <div class="sitepill">vista-lanes.com</div>
-          </div>
-        </div></div>
-
-        <script>
-          (function(){
-            function fit(){
-              var wrap=document.getElementById('fitWrap');
-              var inner=document.getElementById('fitInner');
-              if(!wrap||!inner) return;
-
-              inner.style.transform='scale(1)';
-              inner.style.transformOrigin='top center';
-
-              var cw = inner.scrollWidth;
-              var ch = inner.scrollHeight;
-              var w  = wrap.clientWidth;
-              var h  = wrap.clientHeight;
-              if(!cw||!ch||!w||!h) return;
-
-              var s = Math.min(w/cw, h/ch, 1) * 0.995;
-              inner.style.transform = 'scale(' + s + ')';
-            }
-            function doPrint(){
-              fit();
-              setTimeout(function(){ window.focus(); window.print(); }, 150);
-            }
-            // year
-            try{ var y=document.getElementById('yr'); if(y) y.textContent=(new Date()).getFullYear(); }catch(e){}
-            window.addEventListener('resize', fit);
-            window.addEventListener('load', function(){ fit(); }, {once:true});
-
-            var imgs = Array.prototype.slice.call(document.images||[]);
-            var left = imgs.length;
-            if(!left) return doPrint();
-            imgs.forEach(function(img){
-              if(img.complete){ left--; if(left<=0) doPrint(); }
-              else{
-                img.addEventListener('load', function(){ left--; if(left<=0) doPrint(); });
-                img.addEventListener('error', function(){ left--; if(left<=0) doPrint(); });
-              }
-            });
-          })();
-        <\/script>
-      </body>
-      </html>
-    `;
-  }
-
-  function saveBracket(brId){
-    const html = buildPrintHTML(brId);
-    if(!html){
-      alert("Nothing to export yet (bracket not rendered).");
-      return;
-    }
-    const w = window.open("", "_blank");
-    if(!w){ alert("Popup blocked. Allow popups to export."); return; }
-    w.document.open();
-    w.document.write(html);
-    w.document.close();
-  }
-
-
-  // ===========================
-  // EXPORT PAYOUTS (SUMMARY)
-  // ===========================
-  function buildPayoutsPrintHTML(){
-    const totals = winningsByBowler();
-    const items = Array.from(totals.entries()).map(([name,amt])=>({name,amt:Number(amt||0)}))
-      .filter(x=>x.amt>0)
-      .sort((a,b)=>b.amt-a.amt);
-
-    const rows = items.length
-      ? items.map(x=>`
-          <div class="rowItem">
-            <div class="who">${escapeHtml(x.name)}</div>
-            <div class="amt">${money(x.amt)}</div>
-          </div>`).join("")
-      : `<div class="hint">No payouts yet.</div>`;
-
-    const totalPaid = items.reduce((s,x)=>s+x.amt,0);
-
-    const css = `
-@page{ size: letter; margin: 0.35in; }
-*{ box-sizing:border-box; }
-html,body{ margin:0; padding:0; }
-body{ font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; background:#fff; color:#111; }
-.page{
-  position:relative;
-  width:100%;
-  min-height:100vh;
-  padding:0 0 150px; /* reserve footer space so it never overlaps */
-}
-.header{ display:flex; flex-direction:column; align-items:center; justify-content:center; padding:0; margin:0; }
-.mainLogo{ width:min(340px, 60vw); height:auto; display:block; margin:0; }
-.h1{ margin:10px 0 10px; font-size:28px; font-weight:900; letter-spacing:.2px; }
-
-.card{
-  max-width:920px;
-  margin:0 auto;
-  border:1px solid rgba(0,0,0,.14);
-  border-radius:22px;
-  overflow:hidden;
-}
-.top{ padding:12px 14px; border-bottom:1px solid rgba(0,0,0,.10); }
-.kpi{ display:flex; gap:12px; }
-.box{
-  flex:1;
-  border:1px solid rgba(0,0,0,.14);
-  border-radius:16px;
-  padding:10px 12px;
-  font-weight:900;
-  font-size:18px;
-  text-align:center;
-}
-.list{ padding:14px; display:flex; flex-direction:column; gap:12px; }
-.row{
-  border:1px solid rgba(0,0,0,.14);
-  border-radius:18px;
-  padding:14px 16px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  font-weight:900;
-  font-size:20px;
-}
-.row .name{ font-weight:900; }
-.row .amt{ font-weight:900; ; white-space:nowrap; margin-left:16px; }
-
-.footer{
-  position:absolute;
-  left:0; right:0; bottom:0;
-  padding:12px 14px 6px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:6px;
-}
-.powered{ display:flex; align-items:center; gap:10px; }
-.powered .label{ font-weight:900; color:#444; }
-.powered img{ height:56px; width:auto; display:block; }
-.copy{ color:#444; font-weight:900; }
-.meta{
-  width:100%;
-  max-width:920px;
-  display:flex;
-  justify-content:space-between;
-  gap:12px;
-  font-size:11px;
-  color:#666;
-  font-weight:800;
-}
-
-@media print{
-  .page{ min-height:auto; padding-bottom:150px; }
-  }
-`;
-
-    return `<!doctype html><html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Payouts</title><style>${css}</style></head>
+    const html = `
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Bracket Export</title>
+  <style>${css}</style>
+</head>
 <body>
-  <div class="page">
-    <div class="header">
-      <img class="mainLogo" src="${escapeAttr(EXPORT_MAIN_LOGO)}" alt="Logo">
-      <h1 class="h1">Payout Summary</h1>
+  <div class="page" id="page">
+    <div class="hdr" id="hdr">
+      <img src="${VISTA_LOGO_SRC}" alt="Vista Lanes" />
+      <div class="title">Bracket #${brId}</div>
     </div>
 
-    <div class="card">
-      <div class="top">
-        <div class="kpi">
-          <div class="box">Winners: ${items.length}</div>
-          <div class="box">Total Paid: ${money(totalPaid)}</div>
-        </div>
-      </div>
-      <div class="list">${rows}</div>
+    <div class="fitWrap" id="fitWrap">
+      <div class="fitInner" id="fitInner">${clone.outerHTML}</div>
     </div>
 
-    <div class="footer">
+    <div class="ftr" id="ftr">
       <div class="powered">
-        <div class="label">Powered By</div>
-        <img src="${escapeAttr(EXPORT_POWERED_LOGO)}" alt="Powered By">
+        <span>Powered By</span>
+        <img src="${MBS_LOGO_SRC}" alt="Myles Bowling Systems" />
       </div>
-      <div class="copy">&copy; <span id="yr"></span> Myles Bowling Systems</div>
-      <div class="meta">
-        <div id="ts"></div>
-        <div class="pagenum" id="pn"></div>
-      </div>
+      <div>© 2026 Myles Bowling Systems</div>
+      <div class="site">vista-lanes.com</div>
     </div>
   </div>
 
-  <script>
-    (function(){
-      try{ var d=new Date(); var y=document.getElementById('yr'); if(y) y.textContent=d.getFullYear(); var ts=document.getElementById('ts'); if(ts){ ts.textContent = d.toLocaleString(undefined,{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}); }
-        var pn=document.getElementById('pn'); if(pn){ pn.textContent = 'P1/1'; }
-      }catch(e){}
-      setTimeout(function(){ window.focus(); window.print(); }, 150);
-    })();
-  <\/script>
-</body></html>`;
+  
+</body>
+</html>`;
+    return html;
   }
 
-  function exportPayouts(){
+  function buildPayoutsPrintHTML(){
+    // Pull payout results from state (same source the on-screen summary uses)
+    const items = getPayoutItems(); // [{name, amount}]
+    const winners = items.length;
+    const totalPaid = items.reduce((s,i)=> s + (Number(i.amount)||0), 0);
+
+    const rows = items.map(i => `
+      <div class="rowItem">
+        <div class="name">${escapeHtml(i.name || "")}</div>
+        <div class="amt">$${Number(i.amount||0).toFixed(0)}</div>
+      </div>
+    `).join("");
+
+    const now = new Date();
+    const stamp = now.toLocaleDateString(undefined,{year:"numeric",month:"2-digit",day:"2-digit"}) + ", " +
+                  now.toLocaleTimeString(undefined,{hour:"2-digit",minute:"2-digit"});
+
+    const css = `
+      @page { size: letter portrait; margin: 0.25in; }
+      html,body{margin:0;padding:0;background:#fff;color:#111;}
+      *{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+
+      /* Printable content box (after @page margins): 8.0in × 10.5in */
+      .page{
+        width: 8in;
+        height: 10.5in;
+        margin: 0 auto;
+        position: relative;
+        overflow: hidden;
+        background:#fff;
+      }
+
+      .hdr{
+        text-align:center;
+        padding: 0.10in 0.10in 0;
+      }
+      .hdr img{height:1.05in;width:auto;display:block;margin:0 auto 0.10in;}
+      .hdr .title{font:900 26pt/1.05 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;margin:0 0 0.18in;}
+
+      .panel{
+        margin: 0 0.10in;
+        border: 1px solid rgba(0,0,0,.14);
+        border-radius: 18px;
+        overflow: hidden;
+        background:#fff;
+      }
+
+      .pills{
+        display:flex;
+        gap:10px;
+        padding: 12px 12px 10px;
+        border-bottom:1px solid rgba(0,0,0,.10);
+      }
+      .pill{
+        flex:1;
+        border:1px solid rgba(0,0,0,.14);
+        border-radius: 999px;
+        padding: 10px 12px;
+        font:800 14pt/1 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+        text-align:center;
+      }
+
+      .list{
+        padding: 12px;
+        display:flex;
+        flex-direction:column;
+        gap:10px;
+      }
+      /* Requested: each entry outlined, amount to the right of name */
+      .rowItem{
+        border:1px solid rgba(0,0,0,.14);
+        border-radius: 14px;
+        padding: 12px 14px;
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        font: 800 15pt/1.1 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+      }
+      .rowItem .name{font-weight:900;}
+      .rowItem .amt{font-weight:900;}
+
+      /* Footer pinned to bottom */
+      .ftr{
+        position:absolute;
+        left:0.10in;
+        right:0.10in;
+        bottom:0.10in;
+        text-align:center;
+        color:#666;
+        font: 500 10pt/1.2 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+      }
+      .powered{display:flex;gap:12px;align-items:center;justify-content:center;margin:0 0 6px;}
+      .powered img{height:0.34in;width:auto;display:block;}
+      .meta{
+        display:flex;
+        justify-content:space-between;
+        gap:12px;
+        margin-top:6px;
+        color:#666;
+        font: 600 10pt/1.1 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+      }
+      .site{
+        margin-top:6px;
+        display:inline-block;
+        padding:6px 14px;
+        border-radius:999px;
+        border:1px solid rgba(0,0,0,.12);
+        color:#111;
+        background:#fff;
+        font-weight:700;
+      }
+
+      .page,.hdr,.panel,.ftr{page-break-inside:avoid;break-inside:avoid;}
+    `;
+
+    const html = `
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Payout Summary</title>
+  <style>${css}</style>
+</head>
+<body>
+  <div class="page">
+    <div class="hdr">
+      <img src="${VISTA_LOGO_SRC}" alt="Vista Lanes" />
+      <div class="title">Payout Summary</div>
+    </div>
+
+    <div class="panel">
+      <div class="pills">
+        <div class="pill">Winners: ${winners}</div>
+        <div class="pill">Total Paid: $${totalPaid}</div>
+      </div>
+      <div class="list">
+        ${rows || `<div class="rowItem"><div class="name">No winners yet</div><div class="amt">$0</div></div>`}
+      </div>
+    </div>
+
+    <div class="ftr">
+      <div class="powered">
+        <span>Powered By</span>
+        <img src="${MBS_LOGO_SRC}" alt="Myles Bowling Systems" />
+      </div>
+      <div>© 2026 Myles Bowling Systems</div>
+      <div class="meta">
+        <div>${stamp}</div>
+        <div>Page 1 of 1</div>
+      </div>
+      <div class="site">vista-lanes.com</div>
+    </div>
+  </div>
+</body>
+</html>`;
+    return html;
+  }
+
+function exportPayouts(){
     const html = buildPayoutsPrintHTML();
     const w = window.open("", "_blank");
     if(!w){ alert("Popup blocked. Allow popups to export."); return; }
