@@ -453,13 +453,6 @@
     @media (max-width: 520px){
       .menubar a{min-width: 96px; padding: 9px 12px;}
     }
-
-/* --- Export tweaks (jsPDF/html2canvas capture) --- */
-body.exporting .match{ overflow: visible !important; }
-body.exporting .slot .nm{ font-size: 13px !important; line-height: 1.08 !important; }
-body.exporting .slot .sc{ font-size: 11px !important; line-height: 1.25 !important; overflow: visible !important; padding-bottom: 1px !important; }
-body.exporting .slot .wl{ font-size: 12px !important; }
-
 </style>
 </head>
 
@@ -1198,7 +1191,6 @@ body.exporting .slot .wl{ font-size: 12px !important; }
   // jsPDF EXPORT (single-page Letter) - consistent on iOS/Mac/Windows
   // ===========================
   async function _renderExportToPdf(pageEl, filename){
-  document.body.classList.add("exporting");
     // Ensure element is in DOM (offscreen) so layout computes
     const host = document.createElement("div");
     host.style.position = "fixed";
@@ -1244,7 +1236,6 @@ body.exporting .slot .wl{ font-size: 12px !important; }
     pdf.save(filename);
 
     host.remove();
-  document.body.classList.remove("exporting");
   }
 
   function _buildExportShell({titleText, mainLogoSrc, poweredLogoSrc, centerNode}){
@@ -1465,15 +1456,15 @@ body{
   margin:0;
   font-weight:900;
   font-size:16px;
-  line-height:1.22;margin-top:2px;
+  line-height:1.08;
 }
 
 /* Area that gets scaled to fit screen */
 #fitWrap{
   /* Bracket area is capped so results/footer always show */
   flex:0 0 auto;
-  height:60vh;
-  max-height:60vh;
+  height:55vh;
+  max-height:55vh;
   display:flex;
   align-items:flex-start;
   justify-content:center;
@@ -1534,13 +1525,13 @@ body{
   background:#fff;
   padding:7px;
   position:relative;
-  overflow:hidden;
+  overflow:visible;
   min-width:0;
 }
 
 .slot{
   display:flex;justify-content:space-between;align-items:center;
-  padding:6px 9px;border-radius: 12px;
+  padding:6px 9px 8px;border-radius: 12px;
   background:#fff;
   border:1px solid rgba(0,0,0,.10);
   margin-bottom:6px;gap:8px;min-width:0;
@@ -1548,7 +1539,7 @@ body{
 .slot:last-child{margin-bottom:0}
 .slot .left{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1 1 auto;}
 .slot .nm{
-  font-weight:900;line-height:1.22;margin-top:2px;
+  font-weight:900;line-height:1.08;
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
   overflow:hidden;word-break:normal;overflow-wrap:break-word;
   font-size: 15px;
@@ -1557,7 +1548,7 @@ body{
 
 .slot .nm.winner{color: var(--success)}
 .slot .nm.loser{color: var(--danger)}
-.slot .sc{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.22;margin-top:2px;}
+.slot .sc{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2;margin-top:1px;}
 .slot .right{font-size:11px;color:var(--muted);display:flex;gap:6px;align-items:center;white-space:nowrap;flex:0 0 auto;}
 
 .foot{
@@ -1716,17 +1707,6 @@ body{
     // Clone bracket (remove inputs/buttons)
     const clone = el.cloneNode(true);
     clone.querySelectorAll("select, input, button").forEach(n=>n.remove());
-
-    // EXPORT SAFETY: keep game score line visible (prevent 2-line names from clipping the G1/G2/G3 row)
-    clone.querySelectorAll(".match .name").forEach(n=>{
-      n.style.whiteSpace = "nowrap";
-      n.style.overflow = "hidden";
-      n.style.textOverflow = "ellipsis";
-    });
-    // Ensure meta line isn't clipped inside match cards
-    clone.querySelectorAll(".match").forEach(n=>{
-      n.style.overflow = "hidden"; // keep layout, but avoid inner text clipping by preventing wraps above
-    });
 
     // Force white background & full-width behavior for clean capture
     clone.style.background = "transparent";
@@ -1890,22 +1870,7 @@ body{ font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, He
 </body></html>`;
   }
 
-  
-    // fallback to DOM list (in case state hasn't been recalculated yet)
-    if(!items.length){
-      const list = $("payoutList");
-      if(list){
-        const lis = Array.from(list.querySelectorAll("li"));
-        items = lis.map(li => {
-          const n = (li.querySelector(".name")?.textContent || "").trim();
-          const a = (li.querySelector(".amt")?.textContent || "").trim();
-          const amt = Number(String(a).replace(/[^0-9.]/g,"")) || 0;
-          return [n, amt];
-        }).filter(x => x[0] && x[1] > 0);
-        items.sort((a,b)=> b[1]-a[1]);
-      }
-    }
-function exportPayouts(){
+  function exportPayouts(){
 
     // Export a single-page Letter PDF payout summary using jsPDF
     const totals = winningsByBowler();
