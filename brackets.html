@@ -1292,7 +1292,7 @@
     host.remove();
   }
 
-  function _buildExportShell({titleText, mainLogoSrc, poweredLogoSrc, centerNode}){
+  function _buildExportShell({titleText, mainLogoSrc, poweredLogoSrc, centerNode, fitSlack=0.98, fitOverflow="hidden"}){
     const page = document.createElement("div");
     page.className = "pdfPage";
     page.style.width = "816px";
@@ -1309,9 +1309,12 @@
 // Fix iOS canvas text clipping in bracket slots
     const fixStyle = document.createElement("style");
     fixStyle.textContent = `
-      .slot{ align-items:flex-start !important; padding-top:9px !important; padding-bottom:9px !important; }
-      .slot .nm{ overflow:visible !important; line-height:1.15 !important; }
-      .slot .sc{ overflow:visible !important; line-height:1.25 !important; }
+      /* Avoid html2canvas/jspdf clipping + stop transitions during capture */
+      *{ transition:none !important; animation:none !important; }
+      .tree, .col, .match{ overflow:visible !important; }
+      .slot{ align-items:flex-start !important; padding-top:10px !important; padding-bottom:10px !important; }
+      .slot .nm{ overflow:visible !important; line-height:1.18 !important; }
+      .slot .sc{ overflow:visible !important; line-height:1.28 !important; }
     `;
     page.appendChild(fixStyle);
 
@@ -1362,9 +1365,11 @@ h1.style.letterSpacing = ".2px";
     fitBox.style.display = "flex";
     fitBox.style.alignItems = "center";
     fitBox.style.justifyContent = "center";
-    fitBox.style.overflow = "hidden";
+    fitBox.className = "fitBox";
+    fitBox.style.overflow = fitOverflow;
 
     const fitInner = document.createElement("div");
+    fitInner.className = "fitInner";
     fitInner.style.transformOrigin = "center center";
     fitInner.style.display = "inline-block";
 
@@ -1435,7 +1440,7 @@ h1.style.letterSpacing = ".2px";
         const cw = fitInner.scrollWidth || fitInner.getBoundingClientRect().width;
         const ch = fitInner.scrollHeight || fitInner.getBoundingClientRect().height;
         if(cw && ch && availW && availH){
-          const s = Math.min(availW / cw, availH / ch, 1) * 0.98;
+          const s = Math.min(availW / cw, availH / ch, 1) * fitSlack;
           fitInner.style.transform = "scale(" + s + ")";
         }
       }catch(e){}
@@ -1788,11 +1793,15 @@ body{
     });
 
     // Cap bracket portion visually by shrinking within the PDF shell (the fitter handles it)
+    clone.style.paddingBottom = "14px"; // breathing room to avoid bottom clipping
+
     const page = _buildExportShell({
       titleText: "Brackets",
       mainLogoSrc: EXPORT_MAIN_LOGO,
       poweredLogoSrc: EXPORT_POWERED_LOGO,
-      centerNode: clone
+      centerNode: clone,
+      fitOverflow: "visible",
+      fitSlack: 0.94
     });
 
     _renderExportToPdf(page, `VistaLanes_Brackets_${brId}_${new Date().toISOString().slice(0,10)}.pdf`);
