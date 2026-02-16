@@ -19,6 +19,8 @@
       --shadow: 0 10px 30px rgba(0,0,0,.45);
       --radius:18px;
       --accent:#6aa7ff;
+      --good:#2aa77a;
+      --warn:#ffd57a;
     }
     *{box-sizing:border-box}
     body{
@@ -30,7 +32,6 @@
     }
     .wrap{max-width:1200px;margin:0 auto;padding:14px 14px 60px;}
 
-    /* Top logo */
     .brandbar{
       display:flex;
       justify-content:center;
@@ -45,7 +46,6 @@
       opacity:.98;
     }
 
-    /* Menu bar */
     .menubar{
       display:flex;
       gap:10px;
@@ -73,8 +73,6 @@
     }
     .menubar a:hover{transform: translateY(-1px);}
     .menubar a:active{transform: translateY(0px);}
-
-    /* Active (current page) */
     .menubar a.active{
       background: #cfcfcf;
       box-shadow: var(--activeShadow);
@@ -90,12 +88,7 @@
       flex-wrap:wrap;
       margin: 6px 0 12px;
     }
-    h1{
-      margin:0;
-      font-size:22px;
-      font-weight:900;
-      letter-spacing:.3px;
-    }
+    h1{margin:0;font-size:22px;font-weight:900;letter-spacing:.3px;}
     .sub{color:var(--muted);font-size:13px;}
 
     .panel{
@@ -115,9 +108,7 @@
       border-bottom:1px solid rgba(255,255,255,.08);
       background: linear-gradient(180deg, rgba(255,255,255,.03), transparent);
     }
-    .panel .hd .right{
-      display:flex;gap:10px;align-items:center;flex-wrap:wrap;
-    }
+    .panel .hd .right{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
 
     input{
       background: rgba(255,255,255,.03);
@@ -161,9 +152,14 @@
     .btn:hover{transform: translateY(-1px);}
     .btn:active{transform: translateY(0px);}
 
+    /* Save button (blue) */
+    .btnSave{
+      background: rgba(106,167,255,.30);
+      border-color: rgba(106,167,255,.55);
+    }
+
     .bd{padding:14px;}
 
-    /* Table */
     .tableWrap{
       width:100%;
       overflow:auto;
@@ -192,18 +188,51 @@
       white-space:nowrap;
     }
     tbody td{
-      padding:12px 12px;
+      padding:10px 12px;
       border-bottom:1px solid rgba(255,255,255,.06);
       color:var(--text);
       vertical-align:top;
     }
-    tbody tr:hover td{
-      background: rgba(255,255,255,.03);
-    }
+    tbody tr:hover td{background: rgba(255,255,255,.03);}
+
     .muted{color:var(--muted)}
     .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;}
     .nameCell{font-weight:900}
     .numCell{font-weight:800}
+
+    /* Editable cells */
+    .cellInput{
+      width:100%;
+      min-width: 120px;
+      padding:8px 10px;
+      border-radius:12px;
+      background: rgba(255,255,255,.02);
+      border:1px solid rgba(255,255,255,.10);
+      color: var(--text);
+      outline:none;
+      transition:.12s ease;
+      font: inherit;
+    }
+    .cellInput:focus{
+      border-color: rgba(106,167,255,.55);
+      box-shadow: 0 0 0 3px rgba(106,167,255,.12);
+      background: rgba(255,255,255,.03);
+    }
+
+    .status{
+      margin-left:6px;
+      font-size:12px;
+      color: var(--muted);
+      padding:6px 10px;
+      border-radius: 999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.03);
+      display:none;
+      white-space:nowrap;
+    }
+    .status.ok{color:#a8f3d5;border-color: rgba(42,167,122,.35); background: rgba(42,167,122,.12);}
+    .status.bad{color: var(--warn); border-color: rgba(255,213,122,.35); background: rgba(255,213,122,.10);}
+
     .err{
       margin-top:10px;
       color:#ffd57a;
@@ -221,13 +250,10 @@
 <body>
   <div class="wrap">
 
-    <!-- Vista Lanes logo (top centered) -->
     <div class="brandbar">
-      <!-- If you use a different filename for the Vista Lanes logo, update this path -->
       <img src="assets/9AB9725D-AD71-4DDC-BE9B-03328F663643.png" alt="Vista Lanes" />
     </div>
 
-    <!-- Menu buttons -->
     <nav class="menubar" aria-label="Main menu">
       <a href="index.html">Home</a>
       <a class="active" href="bowlers.html" aria-current="page">Bowlers</a>
@@ -250,6 +276,8 @@
         <div class="right">
           <input id="search" placeholder="Search bowler…" />
           <button class="btn" id="reload" type="button">Reload CSV</button>
+          <button class="btn btnSave" id="save" type="button" title="Send edits to the server">Save</button>
+          <span class="status" id="status"></span>
         </div>
       </div>
 
@@ -270,11 +298,30 @@
 (() => {
   const CSV_PATH = "data/bowlers.csv";
 
-  const $ = (id) => document.getElementById(id);
-  const escapeHtml = (s)=>String(s ?? "").replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  // IMPORTANT:
+  // Point this to your Raspberry Pi HTTPS endpoint (Cloudflare Tunnel recommended).
+  // Example:
+  // const SAVE_URL = "https://vista-lanes-api.yourdomain.com/save-bowlers";
+  const SAVE_URL = ""; // <-- set me
 
-  let rows = [];
-  let headers = [];
+  const $ = (id) => document.getElementById(id);
+
+  let rows = [];              // full data (objects)
+  let headers = [];           // header order
+  let viewIndices = [];       // map visible row -> original row index (for search filter)
+
+  function showStatus(msg, kind){
+    const el = $("status");
+    if(!msg){
+      el.style.display = "none";
+      el.textContent = "";
+      el.className = "status";
+      return;
+    }
+    el.style.display = "inline-flex";
+    el.textContent = msg;
+    el.className = "status " + (kind || "");
+  }
 
   function splitCSVLine(line){
     const res=[]; let cur=""; let q=false;
@@ -306,6 +353,21 @@
     return {headers: header, rows: out};
   }
 
+  // CSV stringify with proper quoting
+  function csvEscape(val){
+    const s = String(val ?? "");
+    if(/[",\n\r]/.test(s)){
+      return '"' + s.replace(/"/g,'""') + '"';
+    }
+    return s;
+  }
+
+  function toCSV(headers, rows){
+    const head = headers.map(csvEscape).join(",");
+    const body = rows.map(r => headers.map(h => csvEscape(r[h] ?? "")).join(",")).join("\n");
+    return head + "\n" + body + "\n";
+  }
+
   function guessName(obj){
     const keys = Object.keys(obj);
     const lower = keys.map(k => k.toLowerCase());
@@ -316,23 +378,10 @@
       }
       return "";
     };
-
     const first = pick("first","firstname","first_name");
     const last  = pick("last","lastname","last_name");
     if(first || last) return `${first} ${last}`.trim();
-
     return pick("name","bowler","bowlername","player") || "";
-  }
-
-  function guessHcp(obj){
-    const keys = Object.keys(obj);
-    const lower = keys.map(k => k.toLowerCase());
-    const cand = ["handicap","hcp","hdcp"];
-    for(const c of cand){
-      const idx = lower.indexOf(c);
-      if(idx >= 0) return obj[keys[idx]];
-    }
-    return "";
   }
 
   function compareByLastName(a,b){
@@ -348,15 +397,20 @@
   function render(){
     const q = ($("search").value || "").trim().toLowerCase();
 
-    let filtered = rows.slice();
-    if(q){
-      filtered = filtered.filter(r => {
-        const name = guessName(r).toLowerCase();
-        return name.includes(q) || JSON.stringify(r).toLowerCase().includes(q);
-      });
+    // Build filtered view list (indices into rows[])
+    viewIndices = [];
+    for(let i=0;i<rows.length;i++){
+      const r = rows[i];
+      if(!q){
+        viewIndices.push(i);
+        continue;
+      }
+      const name = guessName(r).toLowerCase();
+      const blob = JSON.stringify(r).toLowerCase();
+      if(name.includes(q) || blob.includes(q)) viewIndices.push(i);
     }
 
-    $("count").textContent = String(filtered.length);
+    $("count").textContent = String(viewIndices.length);
 
     // header
     const thead = $("theadRow");
@@ -367,32 +421,46 @@
       thead.appendChild(th);
     });
 
-    // body
+    // body (editable)
     const tbody = $("tbody");
     tbody.innerHTML = "";
-    filtered.forEach(r => {
+
+    viewIndices.forEach((rowIndex) => {
+      const r = rows[rowIndex];
       const tr = document.createElement("tr");
-      headers.forEach((h, idx) => {
+
+      headers.forEach((h) => {
         const td = document.createElement("td");
-        const v = r[h] ?? "";
 
-        // lightweight “nice” formatting: bold name col if it looks like name
         const hn = h.toLowerCase();
-        if(hn.includes("name") || hn === "bowler" || hn === "player"){
-          td.className = "nameCell";
-        }
-        if(hn.includes("hcp") || hn.includes("hdcp") || hn.includes("handicap")){
-          td.className = "numCell mono";
-        }
+        if(hn.includes("name") || hn === "bowler" || hn === "player") td.classList.add("nameCell");
+        if(hn.includes("hcp") || hn.includes("hdcp") || hn.includes("handicap")) td.classList.add("numCell","mono");
 
-        td.innerHTML = escapeHtml(v);
+        const inp = document.createElement("input");
+        inp.className = "cellInput";
+        inp.value = (r[h] ?? "");
+        inp.setAttribute("data-row", String(rowIndex));
+        inp.setAttribute("data-col", h);
+
+        // Update underlying data model as user types
+        inp.addEventListener("input", (ev) => {
+          const el = ev.target;
+          const ri = Number(el.getAttribute("data-row"));
+          const col = el.getAttribute("data-col");
+          rows[ri][col] = el.value;
+          showStatus("Unsaved changes", "");
+        });
+
+        td.appendChild(inp);
         tr.appendChild(td);
       });
+
       tbody.appendChild(tr);
     });
   }
 
   async function load(){
+    showStatus("", "");
     $("err").style.display = "none";
     try{
       const res = await fetch(CSV_PATH, {cache:"no-store"});
@@ -403,26 +471,68 @@
       headers = parsed.headers;
       rows = parsed.rows;
 
-      // If the CSV has no header row, bail cleanly
-      if(!headers.length){
-        throw new Error("CSV appears empty or has no header row.");
-      }
+      if(!headers.length) throw new Error("CSV appears empty or has no header row.");
 
-      // Sort by last name if we can
+      // Sort by last name
       rows.sort(compareByLastName);
 
       render();
+      showStatus("Loaded", "ok");
+      setTimeout(()=>showStatus("", ""), 1200);
     }catch(e){
       headers = ["Error"];
       rows = [{ "Error": `Could not load ${CSV_PATH}. Make sure it exists in your repo and GitHub Pages can serve it.` }];
       render();
       $("err").style.display = "block";
       $("err").textContent = String(e && e.message ? e.message : e);
+      showStatus("Load failed", "bad");
+    }
+  }
+
+  async function save(){
+    if(!SAVE_URL){
+      showStatus("Set SAVE_URL in bowlers.html first", "bad");
+      return;
+    }
+    try{
+      showStatus("Saving…", "");
+
+      const csvText = toCSV(headers, rows);
+
+      const res = await fetch(SAVE_URL, {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({
+          file: "data/bowlers.csv",
+          csvText
+        })
+      });
+
+      if(!res.ok){
+        const t = await res.text().catch(()=> "");
+        throw new Error(`Save failed (HTTP ${res.status}) ${t}`.trim());
+      }
+
+      const out = await res.json().catch(()=> ({}));
+      if(out && out.ok){
+        showStatus("Saved to GitHub ✅", "ok");
+      }else{
+        showStatus("Saved (no JSON)", "ok");
+      }
+
+      // Optional: reload after save to ensure you see repo version
+      // await load();
+
+    }catch(e){
+      $("err").style.display = "block";
+      $("err").textContent = String(e && e.message ? e.message : e);
+      showStatus("Save failed", "bad");
     }
   }
 
   $("search").addEventListener("input", render);
   $("reload").addEventListener("click", load);
+  $("save").addEventListener("click", save);
 
   load();
 })();
