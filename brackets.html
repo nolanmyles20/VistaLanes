@@ -1309,41 +1309,33 @@
 // Fix iOS canvas text clipping in bracket slots
     const fixStyle = document.createElement("style");
     fixStyle.textContent = `
-      /* Export-only: prevent overlaps/clipping + increase contrast on white paper */
+      /* Export-only: stop UI shifting + prevent score/text clipping in slots */
       *{ transition:none !important; animation:none !important; }
-      .tree{ overflow:visible !important; --matchH: 140px !important; --matchGap: 16px !important; }
-      .col{ overflow:visible !important; }
-      .match{ overflow:hidden !important; } /* keep slots inside their card */
 
-      /* Make bracket cards readable on white */
-      .match{
-        border-color: rgba(0,0,0,.25) !important;
-        background: rgba(0,0,0,.04) !important;
-      }
+      /* Give each match a bit more vertical room so the 2nd line (G1/G2/G3) never clips */
+      .tree{ overflow:visible !important; --matchH: 160px !important; --matchGap: 18px !important; }
+      .col{ overflow:visible !important; }
+      .match{ overflow:hidden !important; } /* contain content; no bleed into next match */
+
       .slot{
-        background: rgba(0,0,0,.06) !important;
-        border-color: rgba(0,0,0,.18) !important;
         align-items:flex-start !important;
-        padding-top:8px !important;
-        padding-bottom:8px !important;
+        padding-top:10px !important;
+        padding-bottom:10px !important;
+        margin-bottom:10px !important;
+        min-height:64px !important;      /* ensures 2 lines + spacing fit */
+        box-sizing:border-box !important;
       }
-      .slot .nm{ overflow:visible !important; line-height:1.18 !important; }
+      .slot .left{ min-width:0 !important; }
+
+      .slot .nm{
+        overflow:visible !important;
+        line-height:1.15 !important;
+      }
       .slot .sc{
+        display:block !important;
         overflow:visible !important;
         line-height:1.28 !important;
-        color:#222 !important;
-        opacity:1 !important;
-        -webkit-text-fill-color:#222 !important;
-      }
-      .slot .wl{
-        color:#222 !important;
-        opacity:1 !important;
-        -webkit-text-fill-color:#222 !important;
-      }
-      .top .small, .treeHead h3{
-        color:#333 !important;
-        opacity:1 !important;
-        -webkit-text-fill-color:#333 !important;
+        margin-top:4px !important;
       }
     `;
     page.appendChild(fixStyle);
