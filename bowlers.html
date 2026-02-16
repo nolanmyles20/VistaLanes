@@ -152,10 +152,13 @@
     .btn:hover{transform: translateY(-1px);}
     .btn:active{transform: translateY(0px);}
 
-    /* Save button (blue) */
     .btnSave{
       background: rgba(106,167,255,.30);
       border-color: rgba(106,167,255,.55);
+    }
+    .btnExport{
+      background: rgba(255,255,255,.10);
+      border-color: rgba(255,255,255,.20);
     }
 
     .bd{padding:14px;}
@@ -195,12 +198,10 @@
     }
     tbody tr:hover td{background: rgba(255,255,255,.03);}
 
-    .muted{color:var(--muted)}
     .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;}
     .nameCell{font-weight:900}
     .numCell{font-weight:800}
 
-    /* Editable cells */
     .cellInput{
       width:100%;
       min-width: 120px;
@@ -231,7 +232,7 @@
       white-space:nowrap;
     }
     .status.ok{color:#a8f3d5;border-color: rgba(42,167,122,.35); background: rgba(42,167,122,.12);}
-    .status.bad{color: var(--warn); border-color: rgba(255,213,122,.35); background: rgba(255,213,122,.10);}
+    .status.bad{color: #ffd57a; border-color: rgba(255,213,122,.35); background: rgba(255,213,122,.10);}
 
     .err{
       margin-top:10px;
@@ -249,7 +250,6 @@
 
 <body>
   <div class="wrap">
-
     <div class="brandbar">
       <img src="assets/9AB9725D-AD71-4DDC-BE9B-03328F663643.png" alt="Vista Lanes" />
     </div>
@@ -277,6 +277,7 @@
           <input id="search" placeholder="Search bowler…" />
           <button class="btn" id="reload" type="button">Reload CSV</button>
           <button class="btn btnSave" id="save" type="button" title="Send edits to the server">Save</button>
+          <button class="btn btnExport" id="export" type="button" title="Download a new CSV from your current edits">Export</button>
           <span class="status" id="status"></span>
         </div>
       </div>
@@ -291,24 +292,21 @@
         <div class="err" id="err" style="display:none"></div>
       </div>
     </div>
-
   </div>
 
 <script>
 (() => {
   const CSV_PATH = "data/bowlers.csv";
 
-  // IMPORTANT:
-  // Point this to your Raspberry Pi HTTPS endpoint (Cloudflare Tunnel recommended).
-  // Example:
-  // const SAVE_URL = "https://vista-lanes-api.yourdomain.com/save-bowlers";
+  // Set this to your Raspberry Pi HTTPS endpoint (Cloudflare Tunnel recommended)
+  // Example: const SAVE_URL = "https://vista-lanes-api.example.com/save-bowlers";
   const SAVE_URL = ""; // <-- set me
 
   const $ = (id) => document.getElementById(id);
 
-  let rows = [];              // full data (objects)
-  let headers = [];           // header order
-  let viewIndices = [];       // map visible row -> original row index (for search filter)
+  let rows = [];
+  let headers = [];
+  let viewIndices = [];
 
   function showStatus(msg, kind){
     const el = $("status");
@@ -353,7 +351,6 @@
     return {headers: header, rows: out};
   }
 
-  // CSV stringify with proper quoting
   function csvEscape(val){
     const s = String(val ?? "");
     if(/[",\n\r]/.test(s)){
@@ -397,14 +394,10 @@
   function render(){
     const q = ($("search").value || "").trim().toLowerCase();
 
-    // Build filtered view list (indices into rows[])
     viewIndices = [];
     for(let i=0;i<rows.length;i++){
       const r = rows[i];
-      if(!q){
-        viewIndices.push(i);
-        continue;
-      }
+      if(!q){ viewIndices.push(i); continue; }
       const name = guessName(r).toLowerCase();
       const blob = JSON.stringify(r).toLowerCase();
       if(name.includes(q) || blob.includes(q)) viewIndices.push(i);
@@ -412,7 +405,6 @@
 
     $("count").textContent = String(viewIndices.length);
 
-    // header
     const thead = $("theadRow");
     thead.innerHTML = "";
     headers.forEach(h => {
@@ -421,7 +413,6 @@
       thead.appendChild(th);
     });
 
-    // body (editable)
     const tbody = $("tbody");
     tbody.innerHTML = "";
 
@@ -431,7 +422,6 @@
 
       headers.forEach((h) => {
         const td = document.createElement("td");
-
         const hn = h.toLowerCase();
         if(hn.includes("name") || hn === "bowler" || hn === "player") td.classList.add("nameCell");
         if(hn.includes("hcp") || hn.includes("hdcp") || hn.includes("handicap")) td.classList.add("numCell","mono");
@@ -442,7 +432,6 @@
         inp.setAttribute("data-row", String(rowIndex));
         inp.setAttribute("data-col", h);
 
-        // Update underlying data model as user types
         inp.addEventListener("input", (ev) => {
           const el = ev.target;
           const ri = Number(el.getAttribute("data-row"));
@@ -473,7 +462,6 @@
 
       if(!headers.length) throw new Error("CSV appears empty or has no header row.");
 
-      // Sort by last name
       rows.sort(compareByLastName);
 
       render();
@@ -496,7 +484,6 @@
     }
     try{
       showStatus("Saving…", "");
-
       const csvText = toCSV(headers, rows);
 
       const res = await fetch(SAVE_URL, {
@@ -514,14 +501,8 @@
       }
 
       const out = await res.json().catch(()=> ({}));
-      if(out && out.ok){
-        showStatus("Saved to GitHub ✅", "ok");
-      }else{
-        showStatus("Saved (no JSON)", "ok");
-      }
-
-      // Optional: reload after save to ensure you see repo version
-      // await load();
+      if(out && out.ok) showStatus("Saved to GitHub ✅", "ok");
+      else showStatus("Saved ✅", "ok");
 
     }catch(e){
       $("err").style.display = "block";
@@ -530,9 +511,43 @@
     }
   }
 
+  function pad2(n){ return String(n).padStart(2,"0"); }
+  function exportCSV(){
+    try{
+      const csvText = toCSV(headers, rows);
+
+      const d = new Date();
+      const stamp =
+        d.getFullYear() + "-" + pad2(d.getMonth()+1) + "-" + pad2(d.getDate()) + "_" +
+        pad2(d.getHours()) + pad2(d.getMinutes()) + pad2(d.getSeconds());
+
+      const filename = `bowlers.csv`;
+
+      const blob = new Blob([csvText], {type: "text/csv;charset=utf-8"});
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+
+      URL.revokeObjectURL(url);
+
+      showStatus("Exported CSV ✅", "ok");
+      setTimeout(()=>showStatus("", ""), 1400);
+    }catch(e){
+      showStatus("Export failed", "bad");
+      $("err").style.display = "block";
+      $("err").textContent = String(e && e.message ? e.message : e);
+    }
+  }
+
   $("search").addEventListener("input", render);
   $("reload").addEventListener("click", load);
   $("save").addEventListener("click", save);
+  $("export").addEventListener("click", exportCSV);
 
   load();
 })();
