@@ -1253,6 +1253,15 @@
     page.style.boxSizing = "border-box";
     page.style.fontFamily = "ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial";
 
+    // Fix iOS canvas text clipping in bracket slots
+    const fixStyle = document.createElement("style");
+    fixStyle.textContent = `
+      .slot{ align-items:flex-start !important; padding-top:9px !important; padding-bottom:9px !important; }
+      .slot .nm{ overflow:visible !important; line-height:1.15 !important; }
+      .slot .sc{ overflow:visible !important; line-height:1.25 !important; }
+    `;
+    page.appendChild(fixStyle);
+
     // Header
     const header = document.createElement("div");
     header.style.display = "flex";
@@ -1873,7 +1882,11 @@ body{ font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, He
 </body></html>`;
   }
 
-  function exportPayouts(){
+  function cleanName(s){
+  return String(s ?? "").replace(/\s+/g," ").trim();
+}
+
+function exportPayouts(){
   try{
 
     // Export a single-page Letter PDF payout summary using jsPDF
