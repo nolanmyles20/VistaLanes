@@ -1378,6 +1378,49 @@ root.querySelectorAll("*").forEach(el => {
         opacity:1 !important;
         -webkit-text-fill-color:#000 !important;
       }
+
+      /* NCAA-style bracket connector lines (export only) */
+      :root{ --conn: rgba(0,0,0,.85) !important; }
+      .tree::before{
+        opacity:1 !important;
+        background:
+          linear-gradient(var(--conn), var(--conn)) calc(33.333% + 2px) calc(12px + var(--matchH) * 0.5) / 28px 2px no-repeat,
+          linear-gradient(var(--conn), var(--conn)) calc(33.333% + 2px) calc(12px + (var(--matchH) + var(--matchGap)) + var(--matchH) * 0.5) / 28px 2px no-repeat,
+          linear-gradient(var(--conn), var(--conn)) calc(33.333% + 2px) calc(12px + 2*(var(--matchH) + var(--matchGap)) + var(--matchH) * 0.5) / 28px 2px no-repeat,
+          linear-gradient(var(--conn), var(--conn)) calc(33.333% + 2px) calc(12px + 3*(var(--matchH) + var(--matchGap)) + var(--matchH) * 0.5) / 28px 2px no-repeat,
+          linear-gradient(var(--conn), var(--conn)) calc(66.666% + 2px) calc(12px + (var(--matchH) + var(--matchGap))/2 + var(--matchH) * 0.5) / 28px 2px no-repeat,
+          linear-gradient(var(--conn), var(--conn)) calc(66.666% + 2px) calc(12px + (var(--matchH) + var(--matchGap))/2 + var(--matchH) + var(--matchH) + var(--matchGap) + var(--matchH) * 0.5) / 28px 2px no-repeat;
+      }
+
+      /* add bracket stems on the right edge of matches (visual NCAA feel) */
+      .col.r1 .match::before,
+      .col.r2 .match::before{
+        content:"";
+        position:absolute;
+        right:-1px;
+        top:22%;
+        height:56%;
+        width:2px;
+        background:var(--conn);
+        border-radius:2px;
+        opacity:1;
+      }
+      .col.r1 .match::after,
+      .col.r2 .match::after{
+        content:"";
+        position:absolute;
+        right:-28px;
+        top:50%;
+        width:28px;
+        height:2px;
+        background:var(--conn);
+        border-radius:2px;
+        transform: translateY(-1px);
+        opacity:1;
+      }
+      /* final column doesn't need connector out */
+      .col.final .match::before, .col.final .match::after{ display:none !important; }
+    
     `;
     page.appendChild(fixStyle);
 
