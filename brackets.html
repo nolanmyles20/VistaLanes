@@ -1268,17 +1268,19 @@
     // Wait a tick for fonts/layout
     await new Promise(r=>setTimeout(r, 80));
 
-    const canvas = await html2canvas(pageEl, {
-      backgroundColor: "#ffffff",
-      scale: 2,
-      useCORS: true,
-      allowTaint: true,
-      logging: false,
-      width: 816,
-      height: 1056,
-      windowWidth: 816,
-      windowHeight: 1056
-    });
+    const canvas = await html2canvas(page, {
+        backgroundColor: "#ffffff",
+        scale: 2,
+        useCORS: true,
+        onclone: function(clonedDoc) {
+          const root = clonedDoc.querySelector(".exportPage") || clonedDoc.body;
+          root.querySelectorAll("*").forEach(el => {
+            el.style.color = "#000000";
+            el.style.webkitTextFillColor = "#000000";
+            el.style.opacity = "1";
+          });
+        }
+      });
 
     const imgData = canvas.toDataURL("image/png");
 
