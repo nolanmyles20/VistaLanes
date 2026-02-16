@@ -502,15 +502,32 @@
       .menubar a{min-width: 96px; padding: 9px 12px;}
     }
 
-    /* ===== PAYOUT EXPORT FONT FIX ===== */
-    .exportDoc, .exportDoc *,
-    .payoutExport, .payoutExport *,
-    .exportPage, .exportPage * {
+    /* ===== STRONG PAYOUT EXPORT FIX ===== */
+    .exportDoc,
+    .exportDoc *,
+    .payoutExport,
+    .payoutExport *,
+    .exportPage,
+    .exportPage * {
         color:#000 !important;
+        opacity:1 !important;
+        -webkit-text-fill-color:#000 !important;
+    }
+
+    .exportDoc *,
+    .payoutExport *,
+    .exportPage * {
+        border-color:#000 !important;
+        box-shadow:none !important;
     }
 
     @media print {
-        body { color:#000 !important; }
+        * {
+            color:#000 !important;
+            opacity:1 !important;
+            -webkit-text-fill-color:#000 !important;
+            border-color:#000 !important;
+        }
     }
 
 </style>
