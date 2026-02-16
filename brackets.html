@@ -1379,47 +1379,91 @@ root.querySelectorAll("*").forEach(el => {
         -webkit-text-fill-color:#000 !important;
       }
 
-      /* NCAA-style bracket connector lines (export only) */
-      :root{ --conn: rgba(0,0,0,.85) !important; }
-      .tree::before{
-        opacity:1 !important;
-        background:
-          linear-gradient(var(--conn), var(--conn)) calc(33.333% + 2px) calc(12px + var(--matchH) * 0.5) / 28px 2px no-repeat,
-          linear-gradient(var(--conn), var(--conn)) calc(33.333% + 2px) calc(12px + (var(--matchH) + var(--matchGap)) + var(--matchH) * 0.5) / 28px 2px no-repeat,
-          linear-gradient(var(--conn), var(--conn)) calc(33.333% + 2px) calc(12px + 2*(var(--matchH) + var(--matchGap)) + var(--matchH) * 0.5) / 28px 2px no-repeat,
-          linear-gradient(var(--conn), var(--conn)) calc(33.333% + 2px) calc(12px + 3*(var(--matchH) + var(--matchGap)) + var(--matchH) * 0.5) / 28px 2px no-repeat,
-          linear-gradient(var(--conn), var(--conn)) calc(66.666% + 2px) calc(12px + (var(--matchH) + var(--matchGap))/2 + var(--matchH) * 0.5) / 28px 2px no-repeat,
-          linear-gradient(var(--conn), var(--conn)) calc(66.666% + 2px) calc(12px + (var(--matchH) + var(--matchGap))/2 + var(--matchH) + var(--matchH) + var(--matchGap) + var(--matchH) * 0.5) / 28px 2px no-repeat;
+            /* NCAA-style bracket connector lines (export only) - thin */
+      :root{ --conn: rgba(0,0,0,.85) !important; --connW:1px !important; --connLen:22px !important; }
+
+      /* remove any old connector styling */
+      .tree::before{ opacity:0 !important; background:none !important; }
+
+      /* Round 1 -> Round 2 connectors */
+      .col.r1 .match{ position:relative !important; }
+      .col.r1 .match::after{
+        content:"";
+        position:absolute;
+        right: calc(-1 * var(--connLen));
+        top: 50%;
+        width: var(--connLen);
+        height: var(--connW);
+        background: var(--conn);
+        transform: translateY(-0.5px);
+      }
+      /* vertical joining the pair (odd match to even match) at the junction */
+      .col.r1 .match:nth-child(odd)::before{
+        content:"";
+        position:absolute;
+        right: calc(-1 * var(--connLen));
+        top: 50%;
+        width: var(--connW);
+        height: calc(var(--matchH) + var(--matchGap));
+        background: var(--conn);
       }
 
-      /* add bracket stems on the right edge of matches (visual NCAA feel) */
-      .col.r1 .match::before,
+      /* Round 2 left connectors from junction */
+      .col.r2 .match{ position:relative !important; }
       .col.r2 .match::before{
         content:"";
         position:absolute;
-        right:-1px;
-        top:22%;
-        height:56%;
-        width:2px;
-        background:var(--conn);
-        border-radius:2px;
-        opacity:1;
+        left: calc(-1 * var(--connLen));
+        top: 50%;
+        width: var(--connLen);
+        height: var(--connW);
+        background: var(--conn);
+        transform: translateY(-0.5px);
       }
-      .col.r1 .match::after,
+
+      /* Round 2 -> Final connectors:
+         - each R2 match has a small rightward line
+         - first R2 match also draws the vertical join + midline to final */
       .col.r2 .match::after{
         content:"";
         position:absolute;
-        right:-28px;
-        top:50%;
-        width:28px;
-        height:2px;
-        background:var(--conn);
-        border-radius:2px;
-        transform: translateY(-1px);
-        opacity:1;
+        right: calc(-1 * var(--connLen));
+        top: 50%;
+        width: var(--connLen);
+        height: var(--connW);
+        background: var(--conn);
+        transform: translateY(-0.5px);
       }
-      /* final column doesn't need connector out */
-      .col.final .match::before, .col.final .match::after{ display:none !important; }
+      /* big connector block from R2 match #1 */
+      .col.r2 .match:first-child::after{
+        content:"";
+        position:absolute;
+        right: calc(-1 * var(--connLen));
+        top: 50%;
+        width: var(--connLen);
+        height: calc(2 * (var(--matchH) + var(--matchGap)));
+        background:
+          /* vertical spine at the junction */
+          linear-gradient(var(--conn), var(--conn)) 0 0 / var(--connW) 100% no-repeat,
+          /* horizontal from upper R2 match to the right */
+          linear-gradient(var(--conn), var(--conn)) 0 0 / var(--connLen) var(--connW) no-repeat,
+          /* horizontal from midpoint (winner) to the right (toward Final) */
+          linear-gradient(var(--conn), var(--conn)) 0 50% / var(--connLen) var(--connW) no-repeat;
+        transform: none;
+      }
+
+      /* Final column: line coming in from the left */
+      .col.final .match{ position:relative !important; }
+      .col.final .match::before{
+        content:"";
+        position:absolute;
+        left: calc(-1 * var(--connLen));
+        top: 50%;
+        width: var(--connLen);
+        height: var(--connW);
+        background: var(--conn);
+        transform: translateY(-0.5px);
+      }
     
     `;
     page.appendChild(fixStyle);
