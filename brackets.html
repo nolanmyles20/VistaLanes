@@ -501,6 +501,18 @@
     @media (max-width: 520px){
       .menubar a{min-width: 96px; padding: 9px 12px;}
     }
+
+    /* ===== PAYOUT EXPORT FONT FIX ===== */
+    .exportDoc, .exportDoc *,
+    .payoutExport, .payoutExport *,
+    .exportPage, .exportPage * {
+        color:#000 !important;
+    }
+
+    @media print {
+        body { color:#000 !important; }
+    }
+
 </style>
 </head>
 
