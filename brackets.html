@@ -1275,7 +1275,30 @@
         onclone: function(clonedDoc) {
           const root = clonedDoc.querySelector(".exportPage") || clonedDoc.body;
 
-          root.querySelectorAll("*").forEach(el => {
+          
+          // Move game score (G1/G2/G3) inline: Name  [Gx: ###]   (W/L on right)
+          root.querySelectorAll(".slot").forEach(slot => {
+            const nm = slot.querySelector(".nm");
+            const sc = slot.querySelector(".sc");
+            const left = slot.querySelector(".left");
+            if (!nm || !sc || !left) return;
+
+            // Ensure score sits right after name inside left container
+            if (sc.parentElement !== left) left.appendChild(sc);
+            if (nm.nextSibling !== sc) {
+              try { left.insertBefore(sc, nm.nextSibling); } catch(e) {}
+            }
+
+            // Safety styles (export only)
+            left.style.display = "flex";
+            left.style.alignItems = "center";
+            sc.style.display = "inline-block";
+            sc.style.marginLeft = "8px";
+            sc.style.whiteSpace = "nowrap";
+            sc.style.marginTop = "0";
+          });
+
+root.querySelectorAll("*").forEach(el => {
             // Keep win/loss colors (green/red) for names and W/L marks
             if (el.classList && (el.classList.contains("winner") || el.classList.contains("loser"))) return;
             if (el.closest && el.closest(".winner, .loser")) return;
@@ -1320,29 +1343,31 @@
       *{ transition:none !important; animation:none !important; }
 
       /* Give each match more vertical room so the 2nd line (G1/G2/G3) never clips */
-      .tree{ overflow:visible !important; --matchH: 232px !important; --matchGap: 34px !important; }
+      .tree{ overflow:visible !important; --matchH: 150px !important; --matchGap: 14px !important; }
       .col{ overflow:visible !important; }
       .match{ overflow:hidden !important; } /* contain content; no bleed into next match */
 
       .slot{
         align-items:flex-start !important;
-        padding-top:20px !important;
-        padding-bottom:20px !important;
-        margin-bottom:12px !important;
-        min-height:110px !important;      /* ensures 2 lines + spacing fit */
+        padding-top:10px !important;
+        padding-bottom:10px !important;
+        margin-bottom:8px !important;
+        min-height:58px !important;      /* ensures 2 lines + spacing fit */
         box-sizing:border-box !important;
       }
-      .slot .left{ min-width:0 !important; }
+      .slot .left{ min-width:0 !important; display:flex !important; align-items:center !important; gap:0 !important; }
 
       .slot .nm{
         overflow:visible !important;
         line-height:1.15 !important;
       }
       .slot .sc{
-        display:block !important;
+        display:inline-block !important;
         overflow:visible !important;
-        line-height:1.30 !important;
-        margin-top:10px !important;
+        line-height:1.15 !important;
+        margin-top:0 !important;
+        margin-left:8px !important;
+        white-space:nowrap !important;
       }
 
       /* Force all export text to solid black (no faint greys) */
