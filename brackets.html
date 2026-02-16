@@ -1313,16 +1313,16 @@
       *{ transition:none !important; animation:none !important; }
 
       /* Give each match a bit more vertical room so the 2nd line (G1/G2/G3) never clips */
-      .tree{ overflow:visible !important; --matchH: 176px !important; --matchGap: 20px !important; }
+      .tree{ overflow:visible !important; --matchH: 188px !important; --matchGap: 24px !important; }
       .col{ overflow:visible !important; }
       .match{ overflow:hidden !important; } /* contain content; no bleed into next match */
 
       .slot{
         align-items:flex-start !important;
-        padding-top:12px !important;
-        padding-bottom:12px !important;
+        padding-top:14px !important;
+        padding-bottom:14px !important;
         margin-bottom:10px !important;
-        min-height:70px !important;      /* ensures 2 lines + spacing fit */
+        min-height:78px !important;      /* ensures 2 lines + spacing fit */
         box-sizing:border-box !important;
       }
       .slot .left{ min-width:0 !important; }
@@ -1335,7 +1335,7 @@
         display:block !important;
         overflow:visible !important;
         line-height:1.28 !important;
-        margin-top:6px !important;
+        margin-top:8px !important;
       }
     `;
     page.appendChild(fixStyle);
