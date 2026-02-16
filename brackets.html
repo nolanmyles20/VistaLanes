@@ -1309,10 +1309,12 @@
 // Fix iOS canvas text clipping in bracket slots
     const fixStyle = document.createElement("style");
     fixStyle.textContent = `
-      /* Avoid html2canvas/jspdf clipping + stop transitions during capture */
+      /* Export-only: prevent overlaps/clipping in html2canvas capture */
       *{ transition:none !important; animation:none !important; }
-      .tree, .col, .match{ overflow:visible !important; }
-      .slot{ align-items:flex-start !important; padding-top:10px !important; padding-bottom:10px !important; }
+      .tree{ overflow:visible !important; --matchH: 140px !important; --matchGap: 16px !important; }
+      .col{ overflow:visible !important; }
+      .match{ overflow:hidden !important; } /* keep slots inside their card */
+      .slot{ align-items:flex-start !important; padding-top:8px !important; padding-bottom:8px !important; }
       .slot .nm{ overflow:visible !important; line-height:1.18 !important; }
       .slot .sc{ overflow:visible !important; line-height:1.28 !important; }
     `;
