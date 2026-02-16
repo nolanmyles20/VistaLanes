@@ -89,13 +89,7 @@
       align-items:center;
       padding:10px 0 6px;
     }
-    .brandbar img{
-      width:min(260px, 70vw);
-      height:auto;
-      display:block;
-      filter: drop-shadow(0 10px 22px rgba(0,0,0,.55));
-      opacity:.98;
-    }
+    .brandbar img{width:min(340px,88vw); height:auto; display:block; margin:0 auto;}
 
     header{display:flex;gap:12px;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;margin-bottom:14px;}
     .title{display:flex;flex-direction:column;gap:6px;}
@@ -1886,77 +1880,295 @@ body{ font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, He
   return String(s ?? "").replace(/\s+/g," ").trim();
 }
 
-function exportPayouts(){
-  try{
+async function _renderExportToPdf(pageEl, filename){
+    // Ensure element is in DOM (offscreen) so layout computes
+    const host = document.createElement("div");
+    host.style.position = "fixed";
+    host.style.left = "-10000px";
+    host.style.top = "0";
+    host.style.width = "816px";   // 8.5in @ 96dpi
+    host.style.height = "1056px"; // 11in @ 96dpi
+    host.style.background = "#fff";
+    host.style.zIndex = "-1";
+    host.appendChild(pageEl);
+    document.body.appendChild(host);
 
-    // Export a single-page Letter PDF payout summary using jsPDF
-    const totals = winningsByBowler();
-    const items = Array.from(totals.entries())
-      .map(([name,amt])=>({name:cleanName(name), amt:Number(amt||0)}))
-      .filter(x=>x.amt>0)
-      .sort((a,b)=>b.amt-a.amt);
+    // wait for images
+    const imgs = Array.from(host.querySelectorAll("img"));
+    await Promise.all(imgs.map(img => new Promise(res=>{
+      if(img.complete) return res();
+      img.onload = ()=>res();
+      img.onerror = ()=>res();
+    })));
 
-    if(!items.length){
-      alert("No payouts to export yet.");
-      return;
-    }
+    // Wait a tick for fonts/layout
+    await new Promise(r=>setTimeout(r, 80));
 
-    // Build payout card (outlined rows, amount right)
-    const card = document.createElement("div");
-    card.style.width = "100%";
-    card.style.maxWidth = "720px";
-    card.style.border = "1px solid rgba(0,0,0,.16)";
-    card.style.borderRadius = "18px";
-    card.style.overflow = "hidden";
-
-    const body = document.createElement("div");
-    body.style.padding = "14px";
-    body.style.display = "flex";
-    body.style.flexDirection = "column";
-    body.style.gap = "10px";
-
-    items.forEach(x=>{
-      const row = document.createElement("div");
-      row.style.border = "1px solid rgba(0,0,0,.16)";
-      row.style.borderRadius = "14px";
-      row.style.padding = "12px 14px";
-      row.style.display = "flex";
-      row.style.alignItems = "center";
-      row.style.justifyContent = "space-between";
-      row.style.fontWeight = "900";
-      row.style.fontSize = "18px";
-      row.style.gap = "12px";
-
-      const nm = document.createElement("div");
-      nm.textContent = x.name;
-      nm.style.flex = "1";
-      nm.style.minWidth = "0";
-
-      const amt = document.createElement("div");
-      amt.textContent = money(x.amt);
-      amt.style.whiteSpace = "nowrap";
-
-      row.appendChild(nm);
-      row.appendChild(amt);
-      body.appendChild(row);
+    const canvas = await html2canvas(pageEl, {
+      backgroundColor: "#ffffff",
+      scale: 3,
+      useCORS: true,
+      allowTaint: true,
+      logging: false,
+      width: 816,
+      height: 1056,
+      windowWidth: 816,
+      windowHeight: 1056
     });
 
-    card.appendChild(body);
+    const imgData = canvas.toDataURL("image/png");
 
-    const page = _buildExportShell({
-      titleText: "Payout Summary",
-      mainLogoSrc: EXPORT_MAIN_LOGO,
-      poweredLogoSrc: EXPORT_POWERED_LOGO,
-      centerNode: card
-    });
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ orientation:"portrait", unit:"pt", format:"letter" }); // 612x792 pt
 
-    _renderExportToPdf(page, `VistaLanes_Payouts_${new Date().toISOString().slice(0,10)}.pdf`);
+    // Add as full-page image (Letter)
+    pdf.addImage(imgData, "PNG", 0, 0, 612, 792, undefined, "FAST");
+    pdf.save(filename);
 
-  
-  } catch(e){
-    console.error(e);
-    alert('Payout export failed: ' + (e && e.message ? e.message : e));
+    host.remove();
   }
+
+  function _buildExportShell({titleText, mainLogoSrc, poweredLogoSrc, centerNode}){
+    const page = document.createElement("div");
+    page.className = "pdfPage";
+    page.style.width = "816px";
+    page.style.height = "1056px";
+    page.style.background = "#fff";
+    page.style.display = "flex";
+    page.style.flexDirection = "column";
+    page.style.padding = "24px 28px 18px";
+    page.style.boxSizing = "border-box";
+    page.style.fontFamily = "ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial";
+
+    // Fix iOS canvas text clipping in bracket slots
+    const fixStyle = document.createElement("style");
+        fixStyle.textContent = `      /* Force a light, high-contrast look inside the export */
+      .pdfPage, .pdfPage *{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+      .pdfPage{
+        --text:#111;
+        --muted:#444;
+        --border:#d6d6d6;
+        --card:#fff;
+        --card2:#f6f6f6;
+        font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        color:var(--text);
+        background:#fff;
+      }
+      .pdfHeader{ padding:8px 0 2px; text-align:center; }
+      .pdfHeader img{ max-height:92px; width:auto; object-fit:contain; }
+      .pdfTitle{ font-size:22px; font-weight:800; margin:6px 0 8px; color:#111; }
+      .pdfContent{ display:flex; justify-content:center; align-items:flex-start; padding:0 10mm; }
+      .pdfFooter{
+        position:absolute; left:0; right:0; bottom:0;
+        display:flex; flex-direction:column; align-items:center;
+        padding:6mm 10mm 8mm;
+        color:#111;
+      }
+      .pdfFooter .pb{ display:flex; gap:8px; align-items:center; font-weight:800; margin-bottom:6px; }
+      .pdfFooter img{ height:24px; width:auto; }
+      .pdfMeta{
+        position:absolute; left:10mm; right:10mm; bottom:4mm;
+        display:flex; justify-content:space-between; font-size:10px; color:#111;
+      }
+
+      /* Common “card” overrides (prevents the grey/low-contrast look) */
+      .pdfPage .card,
+      .pdfPage .panel,
+      .pdfPage .box,
+      .pdfPage .treeWrap{
+        background:#fff !important;
+        color:#111 !important;
+      }
+
+      /* Bracket node overrides */
+      .pdfPage .treeHead, .pdfPage .treeMeta, .pdfPage .treeHead *{
+        color:#111 !important;
+      }
+      .pdfPage .slot{
+        background:#fff !important;
+        border:1px solid #cfcfcf !important;
+        box-shadow:none !important;
+      }
+      .pdfPage .slot .nm{ color:#111 !important; }
+      .pdfPage .slot .sc{
+        color:#111 !important;
+        line-height:1.25 !important;
+        padding-top:2px !important;
+        padding-bottom:2px !important;
+        display:block !important;
+      }
+      .pdfPage .win{ color:#15803d !important; }
+      .pdfPage .loss{ color:#b91c1c !important; }
+
+      /* Payout node overrides */
+      .pdfPage .pRow{
+        border:1px solid #d9d9d9 !important;
+        background:#fff !important;
+      }
+      .pdfPage .pName, .pdfPage .pAmt{ color:#111 !important; }`;
+    page.appendChild(fixStyle);
+
+    // Header
+    const header = document.createElement("div");
+    header.style.display = "flex";
+    header.style.flexDirection = "column";
+    header.style.alignItems = "center";
+    header.style.gap = "8px";
+    header.style.padding = "0";
+    header.style.margin = "0";
+
+    const logo = document.createElement("img");
+    logo.src = mainLogoSrc;
+    logo.alt = "Logo";
+    logo.style.maxHeight = "92px";
+    logo.style.width = "auto";
+    logo.style.display = "block";
+    logo.style.margin = "0";
+    logo.crossOrigin = "anonymous";
+
+    const h1 = document.createElement("div");
+    h1.textContent = titleText;
+    h1.style.fontSize = "22px";
+    h1.style.fontWeight = "900";
+    h1.style.letterSpacing = ".2px";
+    h1.style.margin = "0";
+
+    header.appendChild(logo);
+    header.appendChild(h1);
+
+    // Center (content)
+    const center = document.createElement("div");
+    center.style.flex = "1";
+    center.style.minHeight = "0";
+    center.style.display = "flex";
+    center.style.alignItems = "center";
+    center.style.justifyContent = "center";
+    center.style.padding = "10px 0 8px";
+
+    // Fit box so we keep footer on same page
+    const fitBox = document.createElement("div");
+    fitBox.style.width = "100%";
+    fitBox.style.maxWidth = "100%";
+    fitBox.style.height = "100%";
+    fitBox.style.display = "flex";
+    fitBox.style.alignItems = "center";
+    fitBox.style.justifyContent = "center";
+    fitBox.style.overflow = "hidden";
+
+    const fitInner = document.createElement("div");
+    fitInner.style.transformOrigin = "center center";
+    fitInner.style.display = "inline-block";
+
+    fitInner.appendChild(centerNode);
+    fitBox.appendChild(fitInner);
+    center.appendChild(fitBox);
+
+    // Footer
+    const footer = document.createElement("div");
+    footer.style.display = "flex";
+    footer.style.flexDirection = "column";
+    footer.style.alignItems = "center";
+    footer.style.gap = "6px";
+
+    const powered = document.createElement("div");
+    powered.style.display = "flex";
+    powered.style.alignItems = "center";
+    powered.style.gap = "10px";
+
+    const pLbl = document.createElement("div");
+    pLbl.textContent = "Powered By";
+    pLbl.style.fontSize = "12px";
+    pLbl.style.fontWeight = "900";
+    pLbl.style.color = "#333";
+
+    const pLogo = document.createElement("img");
+    pLogo.src = poweredLogoSrc;
+    pLogo.alt = "Powered By";
+    pLogo.style.height = "48px";
+    pLogo.style.width = "auto";
+    pLogo.style.display = "block";
+    pLogo.crossOrigin = "anonymous";
+
+    powered.appendChild(pLbl);
+    powered.appendChild(pLogo);
+
+    const meta = document.createElement("div");
+    meta.style.width = "100%";
+    meta.style.display = "flex";
+    meta.style.justifyContent = "space-between";
+    meta.style.fontSize = "11px";
+    meta.style.color = "#555";
+    meta.style.fontWeight = "800";
+
+    const ts = document.createElement("div");
+    const d = new Date();
+    ts.textContent = d.toLocaleString(undefined, {year:"numeric", month:"2-digit", day:"2-digit", hour:"2-digit", minute:"2-digit"});
+    const pn = document.createElement("div");
+    pn.textContent = "Page 1 of 1";
+
+    meta.appendChild(ts);
+    meta.appendChild(pn);
+
+    footer.appendChild(powered);
+    footer.appendChild(meta);
+
+    page.appendChild(header);
+    page.appendChild(center);
+    page.appendChild(footer);
+
+    // After added to DOM, compute scaling to fit available center area
+    setTimeout(()=>{
+      try{
+        const availW = fitBox.clientWidth;
+        const availH = fitBox.clientHeight;
+        // measure inner
+        fitInner.style.transform = "scale(1)";
+        const cw = fitInner.scrollWidth || fitInner.getBoundingClientRect().width;
+        const ch = fitInner.scrollHeight || fitInner.getBoundingClientRect().height;
+        if(cw && ch && availW && availH){
+          const s = Math.min(availW / cw, availH / ch, 1) * 0.98;
+          fitInner.style.transform = "scale(" + s + ")";
+        }
+      }catch(e){}
+    }, 30);
+
+    return page;
+  }
+
+// ===========================
+  // EXPORT (SINGLE FILE) - opens a print window with full CSS + white background
+  // ===========================
+  function buildPrintHTML(brId){
+    const el = document.getElementById(`bracket_${brId}`);
+    if(!el) return null;
+
+    const clone = el.cloneNode(true);
+
+    // Remove interactive controls only (keep the bracket tree!)
+    clone.querySelectorAll("select, input, button").forEach(n => n.remove());
+
+    // Prevent blank exports
+    const hasTree = !!clone.querySelector(".tree");
+    const hasAnyMatch = !!clone.querySelector(".match");
+    if(!hasTree || !hasAnyMatch) return null;
+
+    const css = `@page { size: letter; margin: 0.25in; }
+:root{
+  --bg:#fff;
+  --border: rgba(0,0,0,.10);
+  --text:#111;
+  --muted:#444;
+  --success:#148a49;
+  --danger:#c62828;
+
+  --radius: 18px;
+
+  --matchH: 136px;
+  --matchGap: 10px;
+  --conn: rgba(0,0,0,.18);
+
+  --treePadX: 10px;
+  --treeGap: 10px;
 }
   function deleteBracketById(brId){
     state.brackets = state.brackets.filter(b=>b.id!==brId);
