@@ -403,13 +403,16 @@
     .brandbar{
       display:flex;
       justify-content:center;
-      align-items:center;
-      padding:8px 0 8px;
+      align-items:flex-start;
+      padding:8px 0 2px;
+      height:84px;
+      overflow:hidden;
     }
     .brandbar img{
       width:min(340px, 86vw);
       height:auto;
       display:block;
+      margin-top:-22px;
       filter: drop-shadow(0 10px 22px rgba(0,0,0,.55));
       opacity:.98;
     }
@@ -1871,6 +1874,7 @@ body{ font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, He
   }
 
   function exportPayouts(){
+  try{
 
     // Export a single-page Letter PDF payout summary using jsPDF
     const totals = winningsByBowler();
@@ -1935,7 +1939,12 @@ body{ font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, He
 
     _renderExportToPdf(page, `VistaLanes_Payouts_${new Date().toISOString().slice(0,10)}.pdf`);
 
+  
+  } catch(e){
+    console.error(e);
+    alert('Payout export failed: ' + (e && e.message ? e.message : e));
   }
+}
   function deleteBracketById(brId){
     state.brackets = state.brackets.filter(b=>b.id!==brId);
     state.brackets.forEach((b,i)=>b.id=i+1);
