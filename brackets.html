@@ -83,6 +83,34 @@
     }
 
     /* LOGO (WEB) */
+    /* LOGO (MATCHES INDEX STRUCTURE — SIZED FOR THIS PAGE) */
+    .brandArea{
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      line-height:0;
+      flex:0 0 auto;
+      margin:0 0 6px 0;
+    }
+    .brandCrop{
+      width:min(720px,96vw);
+      height:140px;          /* cropped logo height */
+      overflow:hidden;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+    }
+    .brandMain{
+      width:100%;
+      height:auto;
+      display:block;
+      object-fit:contain;
+      transform: translateY(10px) scale(1);
+      transform-origin:center;
+      filter: drop-shadow(0 14px 28px rgba(0,0,0,.60));
+      opacity:.99;
+    }
+
     /* ===================================================== */
 /* ===== UPDATED TOP LOGO CROP (Matches Home Page) ===== */
 /* ===================================================== */
