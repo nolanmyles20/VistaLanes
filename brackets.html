@@ -1268,7 +1268,7 @@
     // Wait a tick for fonts/layout
     await new Promise(r=>setTimeout(r, 80));
 
-    const canvas = await html2canvas(page, {
+    const canvas = await html2canvas(pageEl, {
         backgroundColor: "#ffffff",
         scale: 2,
         useCORS: true,
