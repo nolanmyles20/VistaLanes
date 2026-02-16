@@ -1,0 +1,2467 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Bowling Betting Brackets</title>
+  <style>
+    :root{
+      --bg:#000; /* web page = black */
+      --border:rgba(255,255,255,.08);
+      --text:#d8e1ee;
+      --muted:#8ea0b5;
+      --btn:#d9d9d9;
+      --btnText:#111;
+      --btnBorder:#bdbdbd;
+      --activeShadow: inset 0 3px 10px rgba(0,0,0,.35);
+      --accent:#6aa7ff;
+      --accent2:#7cf3c3;
+      --danger:#ff5a6a;
+      --success:#31d07f;
+      --warn:#ffc84a;
+      --silver:#b8c6d9;
+      --shadow: 0 10px 30px rgba(0,0,0,.45);
+      --radius: 18px;
+
+      --matchH: 128px;
+      --matchGap: 14px;
+      --conn: rgba(255,255,255,.12);
+
+      --treePadX: 14px;
+      --treeGap: 12px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; padding:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      background: var(--bg);
+      color:var(--text);
+      min-height:100vh;
+    }
+    .wrap{max-width:1200px;margin:0 auto;padding:14px 14px 60px
+      display:flex;
+      flex-direction:column;
+      min-height:100vh;
+    }
+
+    /* FOOTER (WEB) */
+    .siteFooter{
+      margin-top:auto;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:12px;
+      padding:10px 0 6px;
+    }
+    .siteFooter .label{
+      font-weight:900;
+      letter-spacing:.35px;
+      color:var(--muted);
+      font-size:14px;
+    }
+    .siteFooter img{
+      width:130px;
+      height:auto;
+      display:block;
+      filter: drop-shadow(0 10px 22px rgba(0,0,0,.55));
+      opacity:.98;
+    }
+    
+    .siteFooter .copyright{
+      width:100%;
+      text-align:center;
+      font-size:13px;
+      color:#888;
+      margin-top:6px;
+      font-weight:600;
+      letter-spacing:.2px;
+    }
+@media (max-width:520px){
+      .siteFooter{margin-top:14px;padding:8px 0 4px}
+      .siteFooter img{width:120px}
+      .siteFooter .label{font-size:13px}
+    }
+
+    /* LOGO (WEB) */
+    /* ===================================================== */
+/* ===== UPDATED TOP LOGO CROP (Matches Home Page) ===== */
+/* ===================================================== */
+
+.brandbar{
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  height:110px;
+  overflow:hidden;
+  padding:0;
+  margin:0 0 6px 0;
+}
+
+.brandbar img{
+  width:min(520px, 96vw);
+  height:auto;
+  display:block;
+  transform: translateY(-14px) scale(1);
+  transform-origin:center top;
+  filter: drop-shadow(0 14px 28px rgba(0,0,0,.60));
+  opacity:.99;
+}
+
+    
+    /* ===== LOGO ADJUSTED (MORE TOP & BOTTOM VISIBLE) ===== */
+    .brandArea{
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      line-height:0;
+      margin:0 0 12px 0;
+    }
+
+    .brandCrop{
+      width:min(720px,96vw);
+      height:260px; /* slightly taller */
+      overflow:hidden;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+    }
+
+    .brandMain{
+      width:100%;
+      height:auto;
+      object-fit:contain;
+      transform: translateY(6px); /* less vertical nudge */
+      transform-origin:center;
+      filter: drop-shadow(0 14px 28px rgba(0,0,0,.60));
+    }
+
+    header{display:flex;gap:12px;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;margin-bottom:14px;}
+    .title{display:flex;flex-direction:column;gap:6px;}
+    .title h1{margin:0;font-size:22px;letter-spacing:.3px;font-weight:800;}
+    .title .sub{color:var(--muted);font-size:13px;}
+    .grid{display:grid;grid-template-columns: 1fr;gap:14px;}
+
+    .panel{
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .panel .hd{
+      padding:14px 14px 12px;
+      display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;
+      background: linear-gradient(180deg, rgba(255,255,255,.03), transparent);
+      border-bottom:1px solid var(--border);
+    }
+    .panel .hd h2{margin:0;font-size:14px;letter-spacing:.4px;text-transform:uppercase;color:var(--muted);}
+    .panel .bd{padding:14px}
+
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .spacer{flex:1 1 auto}
+
+    input, select{
+      background: rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.10);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius: 14px;
+      outline:none;
+      transition:.15s ease;
+      max-width:100%;
+    }
+    input::placeholder{color:rgba(216,225,238,.35)}
+    input:focus, select:focus{border-color: rgba(106,167,255,.5);box-shadow: 0 0 0 3px rgba(106,167,255,.15);}
+    input[type="number"]{width:120px}
+    .w-sm{width:160px}
+    .w-md{width:240px}
+    .w-xs{width:110px}
+
+    .btn{
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      color:var(--text);
+      padding:10px 13px;
+      border-radius: 999px;
+      cursor:pointer;
+      transition:.15s ease;
+      display:inline-flex;gap:8px;align-items:center;
+      user-select:none;
+    }
+    .btn:hover{transform: translateY(-1px); border-color: rgba(255,255,255,.18)}
+    .btn:active{transform: translateY(0px)}
+    .btn.primary{background: linear-gradient(180deg, rgba(106,167,255,.22), rgba(106,167,255,.10));border-color: rgba(106,167,255,.40);}
+    .btn.good{background: linear-gradient(180deg, rgba(124,243,195,.18), rgba(124,243,195,.08));border-color: rgba(124,243,195,.40);}
+    .btn.danger{background: linear-gradient(180deg, rgba(255,90,106,.18), rgba(255,90,106,.08));border-color: rgba(255,90,106,.40);}
+    .btn:disabled{opacity:.55; cursor:not-allowed; transform:none}
+
+    .chip{
+      font-size:12px;
+      padding:6px 10px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      color:var(--muted);
+      background: rgba(255,255,255,.03);
+      display:inline-flex;gap:8px;align-items:center;
+    }
+    .chip b{color:var(--text)}
+    .chip .dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.25)}
+    .chip.on .dot{background: var(--accent2)}
+
+    .hint{font-size:12px;color:var(--muted);line-height:1.45}
+    .warnText{font-size:12px;color:rgba(255,200,74,.9);line-height:1.45}
+    .hr{height:1px;background:rgba(255,255,255,.08);margin:12px 0}
+
+    .kpi{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+    .kpi .box{
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.12);
+      padding:10px 12px;border-radius:16px;
+      display:flex;gap:8px;align-items:baseline;
+    }
+    .kpi .box .lbl{font-size:12px;color:var(--muted)}
+    .kpi .box .val{font-weight:900;font-size:16px}
+
+    .two-col{display:grid;grid-template-columns: 1.2fr .8fr;gap:14px;}
+    @media (max-width: 980px){ .two-col{grid-template-columns:1fr} }
+
+    .score-sections{display:grid;gap:12px}
+    .score-section{
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.10);
+      border-radius: 18px;
+      overflow:hidden;
+    }
+    .score-section .shd{
+      padding:10px 12px;
+      display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      background: linear-gradient(180deg, rgba(255,255,255,.03), transparent);
+    }
+    .score-section .shd .ttl{font-weight:900;letter-spacing:.3px;}
+    .score-section .shd .meta{font-size:12px;color:var(--muted);}
+    .score-section .sbd{padding:12px}
+
+    .score-list{display:grid;grid-template-columns: 1fr;gap:10px;}
+    .score-item{
+      display:grid;
+      grid-template-columns: 1.1fr .7fr .7fr auto;
+      gap:10px;
+      align-items:center;
+      padding:10px 10px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.10);
+      border-radius: 16px;
+    }
+    @media (max-width: 780px){
+      .score-item{grid-template-columns:1fr 1fr; grid-auto-rows:auto}
+      .score-item .tag{grid-column:1/-1}
+    }
+    .tag{
+      font-size:12px;
+      color:var(--muted);
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      border-radius:999px;
+      padding:6px 10px;
+      justify-self:start;
+    }
+
+    .brackets{display:grid;grid-template-columns: 1fr 1fr;gap:14px;}
+    @media (max-width: 980px){ .brackets{grid-template-columns:1fr} }
+
+    .bracket{
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.12);
+      border-radius: 18px;
+      overflow:hidden;
+    }
+    .bracket .top{
+      padding:12px 12px 10px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;
+      background: linear-gradient(180deg, rgba(255,255,255,.03), transparent);
+    }
+    .bracket .top .meta{display:flex;flex-direction:column;gap:4px;}
+    .bracket .top .meta .name{font-weight:800;letter-spacing:.3px}
+    .bracket .top .meta .small{font-size:12px;color:var(--muted)}
+    .bracket .top .tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+
+    .treeHead{
+      display:grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap:var(--treeGap);
+      padding: 0 var(--treePadX) 10px;
+    }
+    .treeHead h3{margin:0;font-size:12px;color:var(--muted);letter-spacing:.35px;text-transform:uppercase;}
+
+    .treeScroll{overflow-x:hidden;overflow-y:hidden;-webkit-overflow-scrolling: touch;}
+    .tree{
+      position:relative;
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap:var(--treeGap);
+      padding:12px var(--treePadX) 14px;
+      overflow:hidden;
+      border-radius: 18px;
+      width:100%;
+    }
+    .col{display:flex;flex-direction:column;gap: var(--matchGap);min-width:0;}
+    .col.r2{padding-top: calc((var(--matchH) + var(--matchGap)) / 2);}
+    .r2Spacer{height: var(--matchH);}
+    .col.final{justify-content:center;}
+
+    .match{
+      width:100%;
+      height: var(--matchH);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:16px;
+      background: rgba(255,255,255,.02);
+      padding:8px;
+      position:relative;
+      overflow:hidden;
+      min-width:0;
+    }
+
+    .tree::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:
+        linear-gradient(var(--conn), var(--conn)) calc(33.333% + 2px) calc(12px + var(--matchH) * 0.5) / 18px 1px no-repeat,
+        linear-gradient(var(--conn), var(--conn)) calc(33.333% + 2px) calc(12px + (var(--matchH) + var(--matchGap)) + var(--matchH) * 0.5) / 18px 1px no-repeat,
+        linear-gradient(var(--conn), var(--conn)) calc(33.333% + 2px) calc(12px + 2*(var(--matchH) + var(--matchGap)) + var(--matchH) * 0.5) / 18px 1px no-repeat,
+        linear-gradient(var(--conn), var(--conn)) calc(33.333% + 2px) calc(12px + 3*(var(--matchH) + var(--matchGap)) + var(--matchH) * 0.5) / 18px 1px no-repeat,
+        linear-gradient(var(--conn), var(--conn)) calc(66.666% + 2px) calc(12px + (var(--matchH) + var(--matchGap))/2 + var(--matchH) * 0.5) / 18px 1px no-repeat,
+        linear-gradient(var(--conn), var(--conn)) calc(66.666% + 2px) calc(12px + (var(--matchH) + var(--matchGap))/2 + var(--matchH) + var(--matchH) + var(--matchGap) + var(--matchH) * 0.5) / 18px 1px no-repeat;
+      opacity:.9;
+    }
+
+    .slot{
+      display:flex;justify-content:space-between;align-items:center;
+      padding:7px 10px;border-radius: 12px;
+      background: rgba(0,0,0,.18);
+      border:1px solid rgba(255,255,255,.06);
+      margin-bottom:8px;gap:8px;min-width:0;
+    }
+    .slot:last-child{margin-bottom:0}
+    .slot .left{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1 1 auto;}
+    .slot .nm{
+      font-weight:900;
+      line-height:1.05;
+      font-size: clamp(12px, 2.6vw, 15px);
+      min-width:0;
+      /* two clean lines: first name then last name */
+      display:block;
+      overflow:hidden;
+    }
+    .slot .nm .nm1,.slot .nm .nm2{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .slot .sc{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.12;}
+    .slot .right{font-size:12px;color:var(--muted);display:flex;gap:6px;align-items:center;white-space:nowrap;flex:0 0 auto;}
+    .nm.winner{color:var(--success)}
+    .nm.loser{color:var(--danger)}
+    .pill{padding:4px 8px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background: rgba(255,255,255,.03);font-size:12px;color:var(--muted)}
+
+    .badge{
+      width:18px;height:18px;border-radius:6px;
+      display:inline-flex;align-items:center;justify-content:center;
+      font-size:11px;font-weight:900;line-height:1;
+      border:1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.04);
+    }
+    .badge.gold{background: rgba(255,200,74,.14); border-color: rgba(255,200,74,.45); color: #ffd57a;}
+    .badge.silver{background: rgba(184,198,217,.12); border-color: rgba(184,198,217,.42); color: #dbe6f6;}
+
+    .foot{border-top:1px solid rgba(255,255,255,.08);padding:12px;display:grid;gap:10px;background: rgba(0,0,0,.10);}
+    .winnerline{
+      display:flex;justify-content:space-between;align-items:center;gap:10px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.12);
+      padding:10px 12px;border-radius: 16px;
+    }
+    .winnerline .who{display:flex;gap:10px;align-items:center;min-width:0}
+    .winnerline .who .nm{font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .winnerline .amt{font-weight:900}
+
+    @media (max-width: 420px){
+      :root{--treePadX: 10px;--treeGap: 10px;--matchGap: 12px;--matchH: 124px;}
+      .treeHead h3{font-size:11px}
+      .match{padding:7px;border-radius:14px}
+      .slot{padding:7px 9px;border-radius:11px}
+      .slot .sc{font-size:11px}
+      .slot .nm{font-size: clamp(12px, 3.2vw, 14px);}
+    }
+    @media (orientation: landscape){
+      :root{--treePadX: 18px;--treeGap: 14px;--matchH: 138px;}
+      .treeScroll{overflow-x:auto}
+      .tree{min-width: 920px;}
+      .slot .nm{font-size: 15px;}
+    }
+
+    .modalBackdrop{
+      position:fixed; inset:0;
+      background: rgba(0,0,0,.60);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      display:none; align-items:center; justify-content:center;
+      padding:16px; z-index: 9999;
+    }
+    .modal{
+      width:min(720px, 100%); max-height:min(82vh, 720px);
+      overflow:hidden; border-radius: 18px;
+      border:1px solid rgba(255,255,255,.12);
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      box-shadow: 0 30px 80px rgba(0,0,0,.55);
+      display:flex; flex-direction:column;
+    }
+    .modal .mhd{
+      padding:12px; border-bottom:1px solid rgba(255,255,255,.10);
+      display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap;
+    }
+    .modal .mhd .ttl{font-weight:900;letter-spacing:.3px;}
+    .modal .mhd .x{border:1px solid rgba(255,255,255,.12);background: rgba(255,255,255,.04);color:var(--text);border-radius: 999px;padding:8px 11px;cursor:pointer;}
+    .modal .mbd{padding:12px; overflow:auto;}
+    .modal .mft{padding:12px; border-top:1px solid rgba(255,255,255,.10); display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap;}
+    .list{display:grid; gap:10px;}
+    .rowPick{
+      display:flex; justify-content:space-between; align-items:center; gap:10px;
+      padding:10px 12px; border-radius:16px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.12);
+      cursor:pointer; transition:.12s ease;
+    }
+    .rowPick:hover{transform: translateY(-1px); border-color: rgba(255,255,255,.14)}
+    .rowPick .nm{font-weight:900}
+    .rowPick .hc{color:var(--muted); font-size:12px}
+    .pillSm{font-size:12px;padding:4px 8px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background: rgba(255,255,255,.03);color:var(--muted);white-space:nowrap;}
+    form{margin:0}
+  
+    
+    /* Top logo (matches bowlers.html) */
+    /* ===================================================== */
+/* ===== UPDATED TOP LOGO CROP (Matches Home Page) ===== */
+/* ===================================================== */
+
+.brandbar{
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  height:110px;
+  overflow:hidden;
+  padding:0;
+  margin:0 0 6px 0;
+}
+
+.brandbar img{
+  width:min(520px, 96vw);
+  height:auto;
+  display:block;
+  transform: translateY(-14px) scale(1);
+  transform-origin:center top;
+  filter: drop-shadow(0 14px 28px rgba(0,0,0,.60));
+  opacity:.99;
+}
+
+    /* Menu bar (matches bowlers.html) */
+    .menubar{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:center;
+      align-items:center;
+      margin: 6px 0 14px;
+    }
+    .menubar a{
+      text-decoration:none;
+      background: var(--btn);
+      color: var(--btnText);
+      border: 1px solid var(--btnBorder);
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-weight: 800;
+      letter-spacing:.2px;
+      box-shadow: 0 3px 0 rgba(255,255,255,.15);
+      transition: .12s ease;
+      user-select:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width: 104px;
+    }
+    .menubar a:hover{transform: translateY(-1px);}
+    .menubar a:active{transform: translateY(0px);}
+
+    .menubar a.active{
+      background: #cfcfcf;
+      box-shadow: inset 0 3px 10px rgba(0,0,0,.35);
+      transform: translateY(1px);
+      border-color:#a9a9a9;
+    }
+
+    @media (max-width: 520px){
+      .menubar a{min-width: 96px; padding: 9px 12px;}
+    }
+</style>
+</head>
+
+<body>
+<div class="wrap">
+
+    <!-- LOGO (MATCHES INDEX) -->
+  <div class="brandArea">
+    <div class="brandCrop">
+      <img
+        class="brandMain"
+        src="assets/9AB9725D-AD71-4DDC-BE9B-03328F663643.png"
+        alt="Vista Lanes"
+      />
+    </div>
+  </div>
+
+    <!-- Menu buttons -->
+    <nav class="menubar" aria-label="Main menu">
+      <a href="index.html">Home</a>
+      <a href="bowlers.html">Bowlers</a>
+      <a href="leagues.html">Leagues</a>
+      <a href="teams.html">Teams</a>
+      <a href="lanes.html">Lanes</a>
+      <a href="tournaments.html">Tournaments</a>
+      <a class="active" href="brackets.html" aria-current="page">Brackets</a>
+    </nav>
+
+<header>
+      <div class="title">
+        <h1>Bowling Betting Brackets</h1>
+        <div class="sub">Ties: Round1 uses Game2 as tiebreak • Round2 uses Game3 as tiebreak • Final tie splits pot evenly</div>
+      </div>
+      <div class="row">
+        <span class="chip" id="chipOpen"><span class="dot"></span> <b id="openSpots">0</b> open spots</span>
+        <button class="btn danger" id="btnReset" type="button">Reset</button>
+      </div>
+    </header>
+
+    <div class="grid">
+      <div class="panel">
+        <div class="hd">
+          <h2>Setup</h2>
+          <div class="row">
+            <button class="btn primary" id="btnAddBracket" type="button">+ Add Bracket</button>
+          </div>
+        </div>
+        <div class="bd">
+          <form id="setupForm">
+            <div class="row">
+              <input class="w-md" id="bowlerName" placeholder="Bowler name (tap to pick from list)" readonly />
+              <button class="btn" id="btnPickBowler" type="button">Pick</button>
+
+              <select id="entryType" class="w-sm">
+                <option value="scratch">Enter Scratch bracket</option>
+                <option value="handicap">Enter Handicap bracket</option>
+              </select>
+
+              <input type="number" id="bowlerHcp" placeholder="Handicap" />
+
+              <input type="number" id="entryQty" class="w-xs" min="1" max="50" value="1" />
+              <span class="pillSm">Qty</span>
+
+              <button class="btn good" id="btnAddBowler" type="submit">Add Bowler</button>
+
+              <div class="spacer"></div>
+              <span class="hint">Tip: On iPhone, tap <b>Done</b> to add.</span>
+            </div>
+          </form>
+
+          <div class="hr"></div>
+          <div class="kpi">
+            <div class="box"><span class="lbl">Brackets</span> <span class="val" id="kpiBrackets">0</span></div>
+            <div class="box"><span class="lbl">Bowlers</span> <span class="val" id="kpiBowlers">0</span></div>
+            <div class="box"><span class="lbl">Completed Brackets</span> <span class="val" id="kpiDone">0</span></div>
+          </div>
+          <div class="hr"></div>
+          <div class="warnText" id="entryWarn" style="display:none"></div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="panel">
+          <div class="hd">
+            <h2>Score Entry</h2>
+            <div class="row">
+              <button class="btn primary" id="btnApplyScores" type="button">Apply Scores</button>
+            </div>
+          </div>
+          <div class="bd">
+            <div class="hint">
+              Matchups resolve as soon as the needed scores exist.
+              If Round 1 ties, it waits for <b>Game 2</b>. If Round 2 ties, it waits for <b>Game 3</b>.
+              If the final ties on Game 3, the pot is split evenly.
+            </div>
+            <div class="hr"></div>
+            <div class="score-sections" id="scoreSections"></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="hd">
+            <h2>Total Payouts</h2>
+            <div class="row">
+              <input class="w-sm" id="filterName" placeholder="Filter by name…" />
+              <select id="sortMode" class="w-sm">
+                <option value="high">Winnings: High → Low</option>
+                <option value="low">Winnings: Low → High</option>
+                <option value="az">Name: A → Z</option>
+                <option value="za">Name: Z → A</option>
+              </select>
+              <button class="btn primary" id="btnExportPayouts" type="button">Export Payouts</button>
+            </div>
+          </div>
+          <div class="bd">
+            <div class="winners" id="payoutList"></div>
+            <div class="hr"></div>
+            <div class="kpi">
+              <div class="box"><span class="lbl">Total Paid</span> <span class="val" id="kpiTotalPaid">$0</span></div>
+              <div class="box"><span class="lbl">Winners</span> <span class="val" id="kpiWinners">0</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="hd">
+          <h2>Brackets</h2>
+          <div class="row">
+            <span class="hint">Portrait fits without scrolling. Rotate landscape to see a larger bracket view.</span>
+          </div>
+        </div>
+        <div class="bd">
+          <div class="brackets" id="brackets"></div>
+        </div>
+      </div>
+    </div>
+    <!-- FOOTER (WEB) -->
+    <div class="siteFooter">
+      <div class="label">Powered By</div>
+      <img src="assets/68D8CA4C-741E-41E1-ABBC-8B57D7FD0A57.png" alt="Myles Bowling Systems" />
+      <div class="copyright">&copy; <span id="copyrightYear"></span> Myles Bowling Systems</div>
+    </div>
+
+  </div>
+
+  <div class="modalBackdrop" id="pickerBackdrop" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-label="Pick bowler">
+      <div class="mhd">
+        <div>
+          <div class="ttl">Select Bowler</div>
+          <div class="hint">Loaded from <span class="mono">data/bowlers.csv</span>, sorted by last name.</div>
+        </div>
+        <button class="x" id="pickerClose" type="button">Close</button>
+      </div>
+
+      <div class="mbd">
+        <div class="row" style="margin-bottom:10px">
+          <input class="w-md" id="pickerSearch" placeholder="Search name…" />
+          <button class="btn" id="pickerReload" type="button">Reload CSV</button>
+          <div class="spacer"></div>
+          <span class="pillSm" id="pickerCount">0 bowlers</span>
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="row" style="margin-bottom:10px">
+          <input class="w-md" id="pickerManualName" placeholder="Add bowler not listed (type name here)" />
+          <input type="number" id="pickerManualHcp" placeholder="Handicap" />
+          <button class="btn good" id="pickerUseManual" type="button">Use New Bowler</button>
+          <span class="hint" id="manualHint"></span>
+        </div>
+
+        <div class="list" id="pickerList"></div>
+      </div>
+
+      <div class="mft">
+        <button class="btn" id="pickerClear" type="button">Clear Selection</button>
+        <button class="btn primary" id="pickerUseSelected" type="button">Use Selected</button>
+      </div>
+    </div>
+  </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<script>
+
+(() => {
+  // ====== EXPORT LOGOS (FIXED: Main = Vista, Powered = Myles) ======
+  const EXPORT_MAIN_LOGO    = "assets/9AB9725D-AD71-4DDC-BE9B-03328F663643.png";// Vista Lanes
+  const EXPORT_POWERED_LOGO =  "assets/68D8CA4C-741E-41E1-ABBC-8B57D7FD0A57.png";   // Myles Bowling Systems
+
+
+  // Auto year in footer (WEB)
+  try{
+    const y = document.getElementById("copyrightYear");
+    if(y) y.textContent = new Date().getFullYear();
+  }catch(e){}
+  const state = { bowlers: new Map(), brackets: [], roster: [], rosterLoaded:false, selectedRoster:null };
+  const BRACKET_SIZE = 8;
+
+  const $ = (id)=>document.getElementById(id);
+  const money = (n)=>"$"+Number(n||0).toLocaleString(undefined,{maximumFractionDigits:2});
+  const normalizeName = (name)=>String(name||"").trim().replace(/\s+/g," ");
+  const escapeHtml = (s)=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const escapeAttr = (s)=>escapeHtml(s).replace(/"/g,'&quot;');
+
+  // ---- Local save (persists brackets across refresh on this device/browser) ----
+  const LS_KEY = "mbs_brackets_state_v1";
+  let _persistReady = false;
+  let _persistT = null;
+
+  function persistSnapshot(){
+    return {
+      brackets: state.brackets,
+      bowlers: Array.from(state.bowlers.values())
+    };
+  }
+
+  function persistRestore(obj){
+    if(!obj) return false;
+
+    // Restore bowlers (scores + hcp) first
+    try{
+      state.bowlers = new Map();
+      if(Array.isArray(obj.bowlers)){
+        for(const b of obj.bowlers){
+          if(!b || !b.name) continue;
+          if(!b.scores || typeof b.scores!=="object") b.scores = {};
+          if(!Number.isFinite(Number(b.hcp))) b.hcp = Number(b.hcp||0);
+          state.bowlers.set(String(b.name), b);
+        }
+      }
+    }catch(e){
+      state.bowlers = new Map();
+    }
+
+    if(!Array.isArray(obj.brackets)) return false;
+
+    state.brackets = obj.brackets.map((b,i)=>{
+      if(!b) b = makeBracket(i+1, "scratch");
+      b.id = Number(b.id || (i+1));
+      if(!Array.isArray(b.slots)) b.slots = Array(BRACKET_SIZE).fill(null);
+
+      // Ensure match arrays exist; if missing, rebuild from slots.
+      if(!Array.isArray(b.r1) || b.r1.length!==4 ||
+         !Array.isArray(b.r2) || b.r2.length!==2 ||
+         !Array.isArray(b.r3) || b.r3.length!==1){
+        b.r1 = Array.from({length:4}, makeMatch);
+        b.r2 = Array.from({length:2}, makeMatch);
+        b.r3 = Array.from({length:1}, makeMatch);
+        rebuildMatchesFromSlots(b);
+      }
+
+      if(typeof b.payout1!=="number") b.payout1 = Number(b.payout1||0);
+      if(typeof b.payout2!=="number") b.payout2 = Number(b.payout2||0);
+
+      // Ensure any slotted names exist in bowlers map so scores can be entered after refresh
+      for(const nm of (b.slots||[])){
+        if(!nm) continue;
+        const key = String(nm);
+        if(!state.bowlers.has(key)){
+          // try roster lookup for hcp
+          let hcp = 0;
+          const r = (state.roster||[]).find(x=>x && x.name===key);
+          if(r && r.hcp!==undefined) hcp = Number(r.hcp||0);
+          state.bowlers.set(key, {name:key, hcp:hcp, scores:{}});
+        }
+      }
+
+      return b;
+    });
+
+    // normalize ids sequential
+    state.brackets.forEach((b,i)=>b.id=i+1);
+    return true;
+  }
+
+  function loadLocal(){
+    try{
+      const raw = localStorage.getItem(LS_KEY);
+      if(!raw) return false;
+      const obj = JSON.parse(raw);
+      return persistRestore(obj);
+    }catch(e){
+      return false;
+    }
+  }
+
+  function saveLocalNow(){
+    if(!_persistReady) return;
+    try{
+      localStorage.setItem(LS_KEY, JSON.stringify(persistSnapshot()));
+    }catch(e){}
+  }
+
+  function saveLocalDebounced(){
+    if(!_persistReady) return;
+    if(_persistT) clearTimeout(_persistT);
+    _persistT = setTimeout(saveLocalNow, 250);
+  }
+
+  function makeMatch(){ return {a:null,b:null,winner:null,loser:null,tie:false,tieNeedsRound:null,finalSplit:false,splitEach:0,splitWith:[]}; }
+  function makeBracket(id, type="scratch"){
+    return { id, type, payout1:0, payout2:0, slots:Array(BRACKET_SIZE).fill(null),
+      r1:Array.from({length:4}, makeMatch), r2:Array.from({length:2}, makeMatch), r3:Array.from({length:1}, makeMatch),
+      champion:null, runnerUp:null
+    };
+  }
+  function rebuildMatchesFromSlots(br){
+    const pairs=[[0,1],[2,3],[4,5],[6,7]];
+    br.r1.forEach((m,i)=>{ const [p,q]=pairs[i]; Object.assign(m, makeMatch()); m.a=br.slots[p]||null; m.b=br.slots[q]||null; });
+    br.r2.forEach(m=>Object.assign(m, makeMatch()));
+    br.r3.forEach(m=>Object.assign(m, makeMatch()));
+    br.champion=null; br.runnerUp=null;
+  }
+
+  function openSpotsCount(){
+    let open=0; for(const b of state.brackets){ for(const s of b.slots) if(!s) open++; }
+    return open;
+  }
+  function addBracket(type="scratch"){
+    const id = state.brackets.length+1;
+    const br = makeBracket(id,type);
+    state.brackets.push(br);
+    renderAll();
+    return br;
+  }
+
+  function ensureBowler(name, hcp){
+    const key = normalizeName(name);
+    if(!key) return null;
+    if(!state.bowlers.has(key)) state.bowlers.set(key,{name:key,hcp:Number(hcp||0),scores:{}});
+    else{
+      const b = state.bowlers.get(key);
+      if(hcp!=="" && hcp!==null && hcp!==undefined && !Number.isNaN(Number(hcp))) b.hcp = Number(hcp);
+    }
+    return state.bowlers.get(key);
+  }
+
+  function bracketAlreadyHasBowler(br, name){ return br.slots.includes(name); }
+
+  function ensureOneOpenBracketForType(type){
+    if(!state.brackets.some(b=>b.type===type)) addBracket(type);
+    const anyOpen = state.brackets.some(b=>b.type===type && b.slots.some(s=>!s));
+    if(!anyOpen) addBracket(type);
+  }
+
+  // place into one bracket (same type) where not already present
+  function placeBowlerOncePerBracket(name, type){
+    name = normalizeName(name);
+    if(!name) return {ok:false,msg:"Name is blank"};
+
+    ensureOneOpenBracketForType(type);
+
+    const candidates = [];
+    state.brackets.forEach(br=>{
+      if(br.type!==type) return;
+      if(bracketAlreadyHasBowler(br, name)) return;
+      const openSlots = br.slots.map((s,i)=>({s,i})).filter(x=>!x.s);
+      if(openSlots.length) candidates.push({br, openSlots});
+    });
+
+    if(!candidates.length){
+      const br = addBracket(type);
+      const si = br.slots.findIndex(s=>!s);
+      br.slots[si]=name;
+      rebuildMatchesFromSlots(br);
+      return {ok:true,msg:""};
+    }
+
+    const pick = candidates[Math.floor(Math.random()*candidates.length)];
+    const si = pick.openSlots[Math.floor(Math.random()*pick.openSlots.length)].i;
+    pick.br.slots[si]=name;
+    rebuildMatchesFromSlots(pick.br);
+    return {ok:true,msg:""};
+  }
+
+  // ---- scoring / advancement ----
+  function scoreForMatch(br, bowlerName, game){
+    if(!bowlerName) return null;
+    const bowler = state.bowlers.get(bowlerName);
+    if(!bowler) return null;
+    const base = bowler.scores[game];
+    if(base===undefined||base===null||base==="") return null;
+    const val = Number(base);
+    if(Number.isNaN(val)) return null;
+    return br.type==="handicap" ? (val + Number(bowler.hcp||0)) : val;
+  }
+
+  function decideMatchWinner(br, match, baseGame){
+    match.winner=null; match.loser=null; match.tie=false; match.tieNeedsRound=null;
+    match.finalSplit=false; match.splitEach=0; match.splitWith=[];
+    if(!match.a || !match.b) return;
+
+    const sA=scoreForMatch(br,match.a,baseGame);
+    const sB=scoreForMatch(br,match.b,baseGame);
+    if(sA===null || sB===null) return;
+
+    if(sA!==sB){
+      match.winner = (sA>sB)?match.a:match.b;
+      match.loser  = (sA>sB)?match.b:match.a;
+      return;
+    }
+
+    match.tie=true;
+
+    if(baseGame===3){
+      const totalPot = Number(br.payout1||0)+Number(br.payout2||0);
+      match.finalSplit=true;
+      match.splitEach=totalPot/2;
+      match.splitWith=[match.a,match.b];
+      return;
+    }
+
+    const tbGame = baseGame+1;
+    match.tieNeedsRound = tbGame;
+
+    const tA=scoreForMatch(br,match.a,tbGame);
+    const tB=scoreForMatch(br,match.b,tbGame);
+    if(tA===null || tB===null) return;
+
+    if(tA!==tB){
+      match.winner = (tA>tB)?match.a:match.b;
+      match.loser  = (tA>tB)?match.b:match.a;
+      match.tie=false;
+      match.tieNeedsRound=null;
+      return;
+    }
+
+    const pickA = Math.random()<0.5;
+    match.winner = pickA?match.a:match.b;
+    match.loser  = pickA?match.b:match.a;
+    match.tie=false;
+    match.tieNeedsRound=null;
+  }
+
+  function advanceBracketIfReady(br){
+    br.r1.forEach(m=>decideMatchWinner(br,m,1));
+    br.r2.forEach((m,i)=>{
+      const w1=br.r1[i*2]?.winner||null;
+      const w2=br.r1[i*2+1]?.winner||null;
+      m.a=w1; m.b=w2;
+      decideMatchWinner(br,m,2);
+    });
+    br.r3[0].a = br.r2[0]?.winner||null;
+    br.r3[0].b = br.r2[1]?.winner||null;
+    decideMatchWinner(br, br.r3[0], 3);
+
+    const fin = br.r3[0];
+    if(fin.finalSplit){ br.champion=null; br.runnerUp=null; return; }
+    if(fin.winner && fin.loser){ br.champion=fin.winner; br.runnerUp=fin.loser; }
+    else { br.champion=null; br.runnerUp=null; }
+  }
+
+  function matchNeededGame(br, match, baseGame, name){
+    if(!match.a || !match.b) return null;
+    if(!(match.a===name || match.b===name)) return null;
+    if(match.winner || match.loser || match.finalSplit) return null;
+
+    const sA=scoreForMatch(br,match.a,baseGame);
+    const sB=scoreForMatch(br,match.b,baseGame);
+    if(sA===null || sB===null) return baseGame;
+
+    if(sA===sB && baseGame<3){
+      const tb=baseGame+1;
+      const tA=scoreForMatch(br,match.a,tb);
+      const tB=scoreForMatch(br,match.b,tb);
+      if(tA===null || tB===null) return tb;
+    }
+    return null;
+  }
+
+  function neededGameForBowler(name){
+    let needed=null;
+    for(const br of state.brackets){
+      if(!br.slots.includes(name)) continue;
+      advanceBracketIfReady(br);
+
+      const eliminated =
+        br.r1.some(m=>m.loser===name) ||
+        br.r2.some(m=>m.loser===name) ||
+        br.r3.some(m=>m.loser===name);
+
+      if(eliminated) continue;
+
+      for(const m of br.r1){ const g=matchNeededGame(br,m,1,name); if(g) needed = needed===null?g:Math.min(needed,g); }
+      for(const m of br.r2){ const g=matchNeededGame(br,m,2,name); if(g) needed = needed===null?g:Math.min(needed,g); }
+      for(const m of br.r3){ const g=matchNeededGame(br,m,3,name); if(g) needed = needed===null?g:Math.min(needed,g); }
+    }
+    return needed;
+  }
+
+  function scoreUsesForName(name){
+    const uses=[];
+    for(const br of state.brackets){
+      if(!br.slots.includes(name)) continue;
+      uses.push(`#${br.id} ${br.type==="handicap"?"HCP":"SCR"}`);
+    }
+    return uses;
+  }
+
+  function winningsByBowler(){
+    const totals=new Map();
+    for(const br of state.brackets){
+      advanceBracketIfReady(br);
+      const p1=Number(br.payout1||0), p2=Number(br.payout2||0);
+
+      if(br.champion) totals.set(br.champion,(totals.get(br.champion)||0)+p1);
+      if(br.runnerUp) totals.set(br.runnerUp,(totals.get(br.runnerUp)||0)+p2);
+
+      const fin=br.r3[0];
+      if(fin.finalSplit && fin.splitWith.length===2){
+        totals.set(fin.splitWith[0], (totals.get(fin.splitWith[0])||0) + fin.splitEach);
+        totals.set(fin.splitWith[1], (totals.get(fin.splitWith[1])||0) + fin.splitEach);
+      }
+    }
+    return totals;
+  }
+
+  // ---- UI rendering ----
+  function showEntryWarn(msg){
+    const el=$("entryWarn");
+    if(!msg){ el.style.display="none"; el.textContent=""; return; }
+    el.style.display="block"; el.textContent=msg;
+  }
+
+  function renderKPIs(){
+    $("kpiBrackets").textContent=String(state.brackets.length);
+    $("kpiBowlers").textContent=String(state.bowlers.size);
+
+    let done=0;
+    state.brackets.forEach(br=>{
+      advanceBracketIfReady(br);
+      const fin=br.r3[0];
+      if((br.champion && br.runnerUp) || (fin && fin.finalSplit)) done++;
+    });
+    $("kpiDone").textContent=String(done);
+
+    const open=openSpotsCount();
+    $("openSpots").textContent=String(open);
+    $("chipOpen").classList.toggle("on", open>0);
+  }
+
+  function renderTotals(){
+    const totals=winningsByBowler();
+    const filter=($("filterName").value||"").trim().toLowerCase();
+    const mode=$("sortMode").value;
+
+    let items=Array.from(totals.entries()).map(([name,amt])=>({name,amt}));
+    if(filter) items=items.filter(x=>x.name.toLowerCase().includes(filter));
+
+    items.sort((a,b)=>{
+      if(mode==="high") return b.amt-a.amt;
+      if(mode==="low") return a.amt-b.amt;
+      if(mode==="az") return a.name.localeCompare(b.name);
+      if(mode==="za") return b.name.localeCompare(a.name);
+      return 0;
+    });
+
+    const root=$("payoutList");
+    root.innerHTML="";
+    if(!items.length){
+      root.innerHTML=`<div class="hint">No payouts yet. Finish a bracket final and set payouts.</div>`;
+    } else {
+      for(const it of items){
+        const row=document.createElement("div");
+        row.className="winnerline";
+        row.innerHTML=`
+          <div class="who">
+            <span class="pill">W</span>
+            <div class="nm">${escapeHtml(it.name)}</div>
+          </div>
+          <div class="amt">${money(it.amt)}</div>`;
+        root.appendChild(row);
+      }
+    }
+
+    const totalPaid=items.reduce((s,x)=>s+x.amt,0);
+    $("kpiTotalPaid").textContent=money(totalPaid);
+    $("kpiWinners").textContent=String(items.length);
+  }
+
+  function renderScoreSections(){
+    const root=$("scoreSections");
+    root.innerHTML="";
+
+    const byGame={1:[],2:[],3:[]};
+    for(const [name] of state.bowlers.entries()){
+      const g=neededGameForBowler(name);
+      if(g===1||g===2||g===3) byGame[g].push(name);
+    }
+    byGame[1].sort((a,b)=>a.localeCompare(b));
+    byGame[2].sort((a,b)=>a.localeCompare(b));
+    byGame[3].sort((a,b)=>a.localeCompare(b));
+
+    const titles={1:"Game 1 (Round 1)",2:"Game 2 (Round 2 / R1 Tiebreak)",3:"Game 3 (Final / R2 Tiebreak)"};
+
+    [1,2,3].forEach(game=>{
+      const names=byGame[game];
+      const sec=document.createElement("div");
+      sec.className="score-section";
+      sec.innerHTML=`
+        <div class="shd">
+          <div class="ttl">${titles[game]}</div>
+          <div class="meta">${names.length} bowler${names.length===1?"":"s"} need this score</div>
+        </div>
+        <div class="sbd">
+          <div class="score-list" id="scoreList_${game}">
+            ${names.length ? "" : `<div class="hint">No active bowlers needing Game ${game} right now.</div>`}
+          </div>
+        </div>`;
+      root.appendChild(sec);
+
+      const list=sec.querySelector(`#scoreList_${game}`);
+      if(!names.length) return;
+
+      names.forEach(name=>{
+        const bowler=state.bowlers.get(name);
+        const val=bowler?.scores?.[game] ?? "";
+        const uses=scoreUsesForName(name);
+        const item=document.createElement("div");
+        item.className="score-item";
+        item.innerHTML=`
+          <div>
+            <div style="font-weight:900">${escapeHtml(name)}</div>
+            <div class="muted" style="font-size:12px">HCP: <span class="mono">${Number(bowler?.hcp||0)}</span></div>
+          </div>
+          <input type="number" class="scoreInput" data-game="${game}" data-name="${escapeAttr(name)}" placeholder="Score" value="${escapeAttr(val)}" />
+          <div class="tag">${uses.length ? uses.join(" • ") : "—"}</div>
+          <button class="btn" data-clear="${escapeAttr(name)}" data-clear-game="${game}" type="button">Clear</button>
+        `;
+        list.appendChild(item);
+      });
+    });
+
+    root.querySelectorAll("[data-clear]").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const name=btn.getAttribute("data-clear");
+        const game=Number(btn.getAttribute("data-clear-game"));
+        const b=state.bowlers.get(name);
+        if(!b) return;
+        delete b.scores[game];
+        renderAll();
+      });
+    });
+  }
+
+  function formatNameTwoLines(name){
+    if(!name) return "";
+    const parts=String(name).trim().split(/\s+/).filter(Boolean);
+    if(parts.length<=1) return escapeHtml(name);
+    const first=parts[0];
+    const rest=parts.slice(1).join(" ");
+    return `<span class="nm1">${escapeHtml(first)}</span><span class="nm2">${escapeHtml(rest)}</span>`;
+  }
+
+  function renderSlotHTML(br, name, match, baseGame){
+    const raw = name ? (state.bowlers.get(name)?.scores?.[baseGame] ?? "") : "";
+    const adj = scoreForMatch(br, name, baseGame);
+    const showAdj = (br.type==="handicap" && name && raw!=="")
+      ? ` +HCP ${Number(state.bowlers.get(name)?.hcp||0)} = <b class="mono">${adj ?? "—"}</b>`
+      : "";
+
+    const winner=match.winner, loser=match.loser;
+    let cls="";
+    if(name && winner && name===winner) cls="winner";
+    if(name && loser && name===loser) cls="loser";
+
+    let tiePill="";
+    if(match.finalSplit) tiePill=`<span class="pill">FINAL SPLIT</span>`;
+    else if(match.tie && !match.winner) tiePill = match.tieNeedsRound ? `<span class="pill">TIE → G${match.tieNeedsRound}</span>` : `<span class="pill">TIE</span>`;
+
+    return `
+      <div class="slot">
+        <div class="left">
+          <div class="nm ${cls}">${name ? formatNameTwoLines(name) : `<span class="muted">— empty —</span>`}</div>
+          <div class="sc">${name ? `G${baseGame}: <span class="mono">${raw===""?"—":raw}</span>${showAdj}` : `<span class="muted">Add bowlers to fill slots</span>`}</div>
+        </div>
+        <div class="right">
+          ${tiePill}
+          ${name && winner && name===winner ? `<span class="pill">W</span>` : ``}
+          ${name && loser && name===loser ? `<span class="pill">L</span>` : ``}
+        </div>
+      </div>`;
+  }
+
+  function renderMatchCard(br, m, baseGame){
+    return `<div class="match">${renderSlotHTML(br,m.a,m,baseGame)}${renderSlotHTML(br,m.b,m,baseGame)}</div>`;
+  }
+
+  function renderFinalResults(br){
+    const p1=Number(br.payout1||0), p2=Number(br.payout2||0);
+    const fin=br.r3[0];
+
+    if(fin.finalSplit && fin.splitWith.length===2){
+      const each=fin.splitEach;
+      return `
+        <div class="winnerline">
+          <div class="who">
+            <span class="badge gold">≡</span>
+            <div style="min-width:0">
+              <div class="nm" style="color:var(--warn)">Final tied — split pot</div>
+              <div class="muted" style="font-size:12px">(${money(p1)} + ${money(p2)}) ÷ 2 = <b>${money(each)}</b> each</div>
+            </div>
+          </div>
+          <div class="amt">${money(each)}</div>
+        </div>`;
+    }
+
+    if(!br.champion || !br.runnerUp){
+      return `<div class="hint">Final results will appear here after the final matchup has both scores (and payouts are set).</div>`;
+    }
+
+    return `
+      <div class="winnerline">
+        <div class="who">
+          <span class="badge gold">1</span>
+          <div style="min-width:0">
+            <div class="nm" style="color:var(--success)">${escapeHtml(br.champion)}</div>
+            <div class="muted" style="font-size:12px">1st place</div>
+          </div>
+        </div>
+        <div class="amt">${money(p1)}</div>
+      </div>
+
+      <div class="winnerline">
+        <div class="who">
+          <span class="badge silver">2</span>
+          <div style="min-width:0">
+            <div class="nm" style="color:var(--silver)">${escapeHtml(br.runnerUp)}</div>
+            <div class="muted" style="font-size:12px">2nd place</div>
+          </div>
+        </div>
+        <div class="amt">${money(p2)}</div>
+      </div>`;
+  }
+
+  
+  // ===========================
+  // jsPDF EXPORT (single-page Letter) - consistent on iOS/Mac/Windows
+  // ===========================
+  async function _renderExportToPdf(pageEl, filename){
+    // Ensure element is in DOM (offscreen) so layout computes
+    const host = document.createElement("div");
+    host.style.position = "fixed";
+    host.style.left = "-10000px";
+    host.style.top = "0";
+    host.style.width = "816px";   // 8.5in @ 96dpi
+    host.style.height = "1056px"; // 11in @ 96dpi
+    host.style.background = "#fff";
+    host.style.zIndex = "-1";
+    host.appendChild(pageEl);
+    document.body.appendChild(host);
+
+    // wait for images
+    const imgs = Array.from(host.querySelectorAll("img"));
+    await Promise.all(imgs.map(img => new Promise(res=>{
+      if(img.complete) return res();
+      img.onload = ()=>res();
+      img.onerror = ()=>res();
+    })));
+
+    // Wait a tick for fonts/layout
+    await new Promise(r=>setTimeout(r, 80));
+
+    const canvas = await html2canvas(pageEl, {
+      backgroundColor: "#ffffff",
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
+      logging: false,
+      width: 816,
+      height: 1056,
+      windowWidth: 816,
+      windowHeight: 1056
+    });
+
+    const imgData = canvas.toDataURL("image/png");
+
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ orientation:"portrait", unit:"pt", format:"letter" }); // 612x792 pt
+
+    // Add as full-page image (Letter)
+    pdf.addImage(imgData, "PNG", 0, 0, 612, 792, undefined, "FAST");
+    pdf.save(filename);
+
+    host.remove();
+  }
+
+  function _buildExportShell({titleText, mainLogoSrc, poweredLogoSrc, centerNode, fitSlack=0.98, fitOverflow="hidden"}){
+    const page = document.createElement("div");
+    page.className = "pdfPage";
+    page.style.width = "816px";
+    page.style.height = "1056px";
+    page.style.background = "#fff";
+    page.style.display = "flex";
+    page.style.flexDirection = "column";
+    page.style.padding = "24px 28px 18px";
+    page.style.boxSizing = "border-box";
+    page.style.fontFamily = "ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial";
+
+    
+    page.style.color = "#000";
+// Fix iOS canvas text clipping in bracket slots
+    const fixStyle = document.createElement("style");
+    fixStyle.textContent = `
+      /* Export-only: prevent overlaps/clipping + increase contrast on white paper */
+      *{ transition:none !important; animation:none !important; }
+      .tree{ overflow:visible !important; --matchH: 140px !important; --matchGap: 16px !important; }
+      .col{ overflow:visible !important; }
+      .match{ overflow:hidden !important; } /* keep slots inside their card */
+
+      /* Make bracket cards readable on white */
+      .match{
+        border-color: rgba(0,0,0,.25) !important;
+        background: rgba(0,0,0,.04) !important;
+      }
+      .slot{
+        background: rgba(0,0,0,.06) !important;
+        border-color: rgba(0,0,0,.18) !important;
+        align-items:flex-start !important;
+        padding-top:8px !important;
+        padding-bottom:8px !important;
+      }
+      .slot .nm{ overflow:visible !important; line-height:1.18 !important; }
+      .slot .sc{
+        overflow:visible !important;
+        line-height:1.28 !important;
+        color:#222 !important;
+        opacity:1 !important;
+        -webkit-text-fill-color:#222 !important;
+      }
+      .slot .wl{
+        color:#222 !important;
+        opacity:1 !important;
+        -webkit-text-fill-color:#222 !important;
+      }
+      .top .small, .treeHead h3{
+        color:#333 !important;
+        opacity:1 !important;
+        -webkit-text-fill-color:#333 !important;
+      }
+    `;
+    page.appendChild(fixStyle);
+
+    // Header
+    const header = document.createElement("div");
+    header.style.display = "flex";
+    header.style.flexDirection = "column";
+    header.style.alignItems = "center";
+    header.style.gap = "8px";
+    header.style.padding = "0";
+    header.style.margin = "0";
+
+    const logo = document.createElement("img");
+    logo.src = mainLogoSrc;
+    logo.alt = "Logo";
+    logo.style.maxHeight = "92px";
+    logo.style.width = "auto";
+    logo.style.display = "block";
+    logo.style.margin = "0";
+    logo.crossOrigin = "anonymous";
+
+    const h1 = document.createElement("div");
+    h1.textContent = titleText;
+    h1.style.fontSize = "22px";
+    h1.style.fontWeight = "900";
+    
+    h1.style.color = "#000";
+h1.style.letterSpacing = ".2px";
+    h1.style.margin = "0";
+
+    header.appendChild(logo);
+    header.appendChild(h1);
+
+    // Center (content)
+    const center = document.createElement("div");
+    center.style.flex = "1";
+    center.style.minHeight = "0";
+    center.style.display = "flex";
+    center.style.alignItems = "center";
+    center.style.justifyContent = "center";
+    center.style.padding = "10px 0 8px";
+
+    // Fit box so we keep footer on same page
+    const fitBox = document.createElement("div");
+    fitBox.style.width = "100%";
+    fitBox.style.maxWidth = "100%";
+    fitBox.style.height = "100%";
+    fitBox.style.display = "flex";
+    fitBox.style.alignItems = "center";
+    fitBox.style.justifyContent = "center";
+    fitBox.className = "fitBox";
+    fitBox.style.overflow = fitOverflow;
+
+    const fitInner = document.createElement("div");
+    fitInner.className = "fitInner";
+    fitInner.style.transformOrigin = "center center";
+    fitInner.style.display = "inline-block";
+
+    fitInner.appendChild(centerNode);
+    fitBox.appendChild(fitInner);
+    center.appendChild(fitBox);
+
+    // Footer
+    const footer = document.createElement("div");
+    footer.style.display = "flex";
+    footer.style.flexDirection = "column";
+    footer.style.alignItems = "center";
+    footer.style.gap = "6px";
+
+    const powered = document.createElement("div");
+    powered.style.display = "flex";
+    powered.style.alignItems = "center";
+    powered.style.gap = "10px";
+
+    const pLbl = document.createElement("div");
+    pLbl.textContent = "Powered By";
+    pLbl.style.fontSize = "12px";
+    pLbl.style.fontWeight = "900";
+    pLbl.style.color = "#333";
+
+    const pLogo = document.createElement("img");
+    pLogo.src = poweredLogoSrc;
+    pLogo.alt = "Powered By";
+    pLogo.style.height = "48px";
+    pLogo.style.width = "auto";
+    pLogo.style.display = "block";
+    pLogo.crossOrigin = "anonymous";
+
+    powered.appendChild(pLbl);
+    powered.appendChild(pLogo);
+
+    const meta = document.createElement("div");
+    meta.style.width = "100%";
+    meta.style.display = "flex";
+    meta.style.justifyContent = "space-between";
+    meta.style.fontSize = "11px";
+    meta.style.color = "#555";
+    meta.style.fontWeight = "800";
+
+    const ts = document.createElement("div");
+    const d = new Date();
+    ts.textContent = d.toLocaleString(undefined, {year:"numeric", month:"2-digit", day:"2-digit", hour:"2-digit", minute:"2-digit"});
+    const pn = document.createElement("div");
+    pn.textContent = "Page 1 of 1";
+
+    meta.appendChild(ts);
+    meta.appendChild(pn);
+
+    footer.appendChild(powered);
+    footer.appendChild(meta);
+
+    page.appendChild(header);
+    page.appendChild(center);
+    page.appendChild(footer);
+
+    // After added to DOM, compute scaling to fit available center area
+    setTimeout(()=>{
+      try{
+        const availW = fitBox.clientWidth;
+        const availH = fitBox.clientHeight;
+        // measure inner
+        fitInner.style.transform = "scale(1)";
+        const cw = fitInner.scrollWidth || fitInner.getBoundingClientRect().width;
+        const ch = fitInner.scrollHeight || fitInner.getBoundingClientRect().height;
+        if(cw && ch && availW && availH){
+          const s = Math.min(availW / cw, availH / ch, 1) * fitSlack;
+          fitInner.style.transform = "scale(" + s + ")";
+        }
+      }catch(e){}
+    }, 30);
+
+    return page;
+  }
+
+// ===========================
+  // EXPORT (SINGLE FILE) - opens a print window with full CSS + white background
+  // ===========================
+  function buildPrintHTML(brId){
+    const el = document.getElementById(`bracket_${brId}`);
+    if(!el) return null;
+
+    const clone = el.cloneNode(true);
+
+    // Remove interactive controls only (keep the bracket tree!)
+    clone.querySelectorAll("select, input, button").forEach(n => n.remove());
+
+    // Prevent blank exports
+    const hasTree = !!clone.querySelector(".tree");
+    const hasAnyMatch = !!clone.querySelector(".match");
+    if(!hasTree || !hasAnyMatch) return null;
+
+    const css = `@page { size: letter; margin: 0.25in; }
+:root{
+  --bg:#fff;
+  --border: rgba(0,0,0,.10);
+  --text:#111;
+  --muted:#444;
+  --success:#148a49;
+  --danger:#c62828;
+
+  --radius: 18px;
+
+  --matchH: 136px;
+  --matchGap: 10px;
+  --conn: rgba(0,0,0,.18);
+
+  --treePadX: 10px;
+  --treeGap: 10px;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+  background:#fff;
+  color:#111;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+  overflow:hidden;
+}
+
+/* Full-viewport export layout (screen) */
+.page{
+      width:100%;
+      height:100vh;
+      display:flex;
+      flex-direction:column;
+      padding:0;
+      box-sizing:border-box;
+      gap:0;
+      background:transparent;
+    }
+.header{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:2px;
+  padding:0;
+  margin:0;
+  flex:0 0 auto;
+}
+.mainLogo{
+  width:min(480px, 96vw);
+  max-height:120px;
+  object-fit:contain;
+  height:auto;
+  display:block;
+  margin:0;
+}
+.brTitle{
+  margin:0;
+  font-weight:900;
+  font-size:16px;
+  line-height:1.08;
+}
+
+/* Area that gets scaled to fit screen */
+#fitWrap{
+  /* Bracket area is capped so results/footer always show */
+  flex:0 0 auto;
+  height:55vh;
+  max-height:55vh;
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+  overflow:hidden;
+  padding:0 6px;
+}
+#fitInner{ transform-origin: top left; }
+
+.bracket{
+  border:1px solid var(--border);
+  background:#fff;
+  border-radius: 18px;
+  overflow:hidden;
+}
+.bracket .top{
+  padding:6px 8px 4px;
+  border-bottom:1px solid var(--border);
+  display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;
+}
+.bracket .top .meta{display:flex;flex-direction:column;gap:4px;}
+.bracket .top .meta .name{font-weight:900;letter-spacing:.2px;}
+.bracket .top .meta .small{font-size:11px;color:var(--muted);}
+
+.treeHead{
+  display:grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap:var(--treeGap);
+  padding: 0 var(--treePadX) 4px;
+}
+.treeHead h3{
+  margin:0;
+  font-size:11px;
+  color:var(--muted);
+  letter-spacing:.35px;
+  text-transform:uppercase;
+}
+
+.tree{
+  position:relative;
+  display:grid;
+  grid-template-columns: repeat(3, minmax(0,1fr));
+  gap:var(--treeGap);
+  padding:8px var(--treePadX) 10px;
+  width:100%;
+  min-width:0;
+  background:#fff;
+}
+.col{display:flex;flex-direction:column;gap: var(--matchGap);min-width:0;}
+.col.r2{padding-top: calc((var(--matchH) + var(--matchGap)) / 2);}
+.r2Spacer{height: var(--matchH);}
+.col.final{justify-content:center;}
+
+.match{
+  width:100%;
+  height: var(--matchH);
+  border:1px solid var(--border);
+  border-radius:16px;
+  background:#fff;
+  padding:7px;
+  position:relative;
+  overflow:visible;
+  min-width:0;
+}
+
+.slot{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:6px 9px 8px;border-radius: 12px;
+  background:#fff;
+  border:1px solid rgba(0,0,0,.10);
+  margin-bottom:6px;gap:8px;min-width:0;
+}
+.slot:last-child{margin-bottom:0}
+.slot .left{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1 1 auto;}
+.slot .nm{
+  font-weight:900;line-height:1.08;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+  overflow:hidden;word-break:normal;overflow-wrap:break-word;
+  font-size: 15px;
+}
+.slot .nm .nm1,.slot .nm .nm2{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+.slot .nm.winner{color: var(--success)}
+.slot .nm.loser{color: var(--danger)}
+.slot .sc{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2;margin-top:1px;}
+.slot .right{font-size:11px;color:var(--muted);display:flex;gap:6px;align-items:center;white-space:nowrap;flex:0 0 auto;}
+
+.foot{
+  border-top:1px solid var(--border);
+  padding:8px 10px;
+  display:grid;
+  gap:6px;
+  background:#fff;
+}
+
+/* Powered by footer (screen) */
+.powered{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  padding:0;
+  margin:0;
+  flex:0 0 auto;
+}
+.powered .label{
+  font-weight:900;
+  font-size:11px;
+}
+.powered img{
+  width:90px;
+  height:auto;
+  display:block;
+}
+.copy{
+  width:100%;
+  text-align:center;
+  font-size:11px;
+  color:#555;
+  margin-top:2px;
+  font-weight:700;
+}
+
+
+/* Payout export list */
+.payoutList{display:flex; flex-direction:column; gap:12px; margin-top:14px;}
+.rowItem{
+  display:flex; justify-content:space-between; align-items:center;
+  border:1px solid rgba(0,0,0,.14);
+  border-radius:18px;
+  padding:14px 16px;
+  background:#fff;
+}
+.rowItem .who{font-weight:900; font-size:16px; color:#111;}
+.rowItem .amt{font-weight:900; font-size:18px; color:#111;}
+/* Print */
+@media print{
+  body{overflow:visible;}
+  @page{size:letter; margin:0.35in;}
+  .page{height:auto; min-height:0; padding:0; gap:8px;}
+  /* Keep bracket + results on one page */
+  #fitWrap{height:6.1in; max-height:6.1in; overflow:hidden;}
+  #fitInner{transform-origin: top left;}
+  .mainLogo{max-height:0.85in;width:auto;}
+  .brandFooter{padding:4px 10px 2px;}
+  .metaLine{font-size:10px;}
+}
+
+/* Small screens */
+@media (max-width: 520px){
+  .page{height:auto; padding:0; gap:8px;}
+  #fitWrap{height:auto; max-height:none; overflow:visible;}
+  #fitInner{transform:none !important;}
+}
+`;
+
+    return `
+      <!doctype html>
+      <html>
+      <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+        <title>Bracket #${brId}</title>
+        <style>${css}</style>
+      </head>
+      <body>
+        <div class="page">
+          <div class="header">
+            <img class="mainLogo" src="${escapeAttr(EXPORT_MAIN_LOGO)}" alt="Logo">
+            <h1 class="brTitle">Bracket #${brId}</h1>
+          </div>
+
+          <div id="fitWrap"><div id="fitInner">${clone.outerHTML}
+
+          <div class="brandFooter">
+            <div class="powered">
+              <div class="label">Powered By</div>
+              <img src="${escapeAttr(EXPORT_POWERED_LOGO)}" alt="Powered By">
+            </div>
+            <div class="copy">&copy; <span id="yr"></span> Myles Bowling Systems</div>
+            <div class="sitepill">vista-lanes.com</div>
+          </div>
+        </div></div>
+
+        <script>
+          (function(){
+            function fit(){
+              var wrap=document.getElementById('fitWrap');
+              var inner=document.getElementById('fitInner');
+              if(!wrap||!inner) return;
+
+              inner.style.transform='scale(1)';
+              inner.style.transformOrigin='top center';
+
+              var cw = inner.scrollWidth;
+              var ch = inner.scrollHeight;
+              var w  = wrap.clientWidth;
+              var h  = wrap.clientHeight;
+              if(!cw||!ch||!w||!h) return;
+
+              var s = Math.min(w/cw, h/ch, 1) * 0.995;
+              inner.style.transform = 'scale(' + s + ')';
+            }
+            function doPrint(){
+              fit();
+              setTimeout(function(){ window.focus(); window.print(); }, 150);
+            }
+            // year
+            try{ var y=document.getElementById('yr'); if(y) y.textContent=(new Date()).getFullYear(); }catch(e){}
+            window.addEventListener('resize', fit);
+            window.addEventListener('load', function(){ fit(); }, {once:true});
+
+            var imgs = Array.prototype.slice.call(document.images||[]);
+            var left = imgs.length;
+            if(!left) return doPrint();
+            imgs.forEach(function(img){
+              if(img.complete){ left--; if(left<=0) doPrint(); }
+              else{
+                img.addEventListener('load', function(){ left--; if(left<=0) doPrint(); });
+                img.addEventListener('error', function(){ left--; if(left<=0) doPrint(); });
+              }
+            });
+          })();
+        <\/script>
+      </body>
+      </html>
+    `;
+  }
+
+  function saveBracket(brId){
+
+    // Save current state (local) and export a single-page Letter PDF using jsPDF
+    saveLocalDebounced();
+
+    const el = document.getElementById(`bracket_${brId}`);
+    if(!el){
+      alert("Bracket not found.");
+      return;
+    }
+
+    // Clone bracket (remove inputs/buttons)
+    const clone = el.cloneNode(true);
+    clone.querySelectorAll("select, input, button").forEach(n=>n.remove());
+
+    // Force white background & full-width behavior for clean capture
+    clone.style.background = "transparent";
+    clone.style.boxShadow = "none";
+    clone.style.border = "none";
+    clone.style.width = "100%";
+
+    // Make the scroll areas visible for export
+    clone.querySelectorAll(".treeScroll").forEach(sc=>{
+      sc.style.overflow = "visible";
+      sc.style.maxHeight = "none";
+    });
+
+    // Cap bracket portion visually by shrinking within the PDF shell (the fitter handles it)
+    clone.style.paddingBottom = "14px"; // breathing room to avoid bottom clipping
+
+    const page = _buildExportShell({
+      titleText: "Brackets",
+      mainLogoSrc: EXPORT_MAIN_LOGO,
+      poweredLogoSrc: EXPORT_POWERED_LOGO,
+      centerNode: clone,
+      fitOverflow: "visible",
+      fitSlack: 0.94
+    });
+
+    _renderExportToPdf(page, `VistaLanes_Brackets_${brId}_${new Date().toISOString().slice(0,10)}.pdf`);
+
+  }
+
+
+  // ===========================
+  // EXPORT PAYOUTS (SUMMARY)
+  // ===========================
+  function buildPayoutsPrintHTML(){
+    const totals = winningsByBowler();
+    const items = Array.from(totals.entries()).map(([name,amt])=>({name,amt:Number(amt||0)}))
+      .filter(x=>x.amt>0)
+      .sort((a,b)=>b.amt-a.amt);
+
+    const rows = items.length
+      ? items.map(x=>`
+          <div class="rowItem">
+            <div class="who">${escapeHtml(x.name)}</div>
+            <div class="amt">${money(x.amt)}</div>
+          </div>`).join("")
+      : `<div class="hint">No payouts yet.</div>`;
+
+    const totalPaid = items.reduce((s,x)=>s+x.amt,0);
+
+    const css = `
+@page{ size: letter; margin: 0.35in; }
+*{ box-sizing:border-box; }
+html,body{ margin:0; padding:0; }
+body{ font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; background:#fff; color:#111; }
+.page{
+  position:relative;
+  width:100%;
+  min-height:100vh;
+  padding:0 0 150px; /* reserve footer space so it never overlaps */
+}
+.header{ display:flex; flex-direction:column; align-items:center; justify-content:center; padding:0; margin:0; }
+.mainLogo{ width:min(340px, 60vw); height:auto; display:block; margin:0; }
+.h1{ margin:10px 0 10px; font-size:28px; font-weight:900; letter-spacing:.2px; }
+
+.card{
+  max-width:920px;
+  margin:0 auto;
+  border:1px solid rgba(0,0,0,.14);
+  border-radius:22px;
+  overflow:hidden;
+}
+.top{ padding:12px 14px; border-bottom:1px solid rgba(0,0,0,.10); }
+.kpi{ display:flex; gap:12px; }
+.box{
+  flex:1;
+  border:1px solid rgba(0,0,0,.14);
+  border-radius:16px;
+  padding:10px 12px;
+  font-weight:900;
+  font-size:18px;
+  text-align:center;
+}
+.list{ padding:14px; display:flex; flex-direction:column; gap:12px; }
+.row{
+  border:1px solid rgba(0,0,0,.14);
+  border-radius:18px;
+  padding:14px 16px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  font-weight:900;
+  font-size:20px;
+}
+.row .name{ font-weight:900; }
+.row .amt{ font-weight:900; ; white-space:nowrap; margin-left:16px; }
+
+.footer{
+  position:absolute;
+  left:0; right:0; bottom:0;
+  padding:12px 14px 6px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:6px;
+}
+.powered{ display:flex; align-items:center; gap:10px; }
+.powered .label{ font-weight:900; color:#444; }
+.powered img{ height:56px; width:auto; display:block; }
+.copy{ color:#444; font-weight:900; }
+.meta{
+  width:100%;
+  max-width:920px;
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  font-size:11px;
+  color:#666;
+  font-weight:800;
+}
+
+@media print{
+  .page{ min-height:auto; padding-bottom:150px; }
+  }
+`;
+
+    return `<!doctype html><html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Payouts</title><style>${css}</style></head>
+<body>
+  <div class="page">
+    <div class="header">
+      <img class="mainLogo" src="${escapeAttr(EXPORT_MAIN_LOGO)}" alt="Logo">
+      <h1 class="h1">Payout Summary</h1>
+    </div>
+
+    <div class="card">
+      <div class="top">
+        <div class="kpi">
+          <div class="box">Winners: ${items.length}</div>
+          <div class="box">Total Paid: ${money(totalPaid)}</div>
+        </div>
+      </div>
+      <div class="list">${rows}</div>
+    </div>
+
+    <div class="footer">
+      <div class="powered">
+        <div class="label">Powered By</div>
+        <img src="${escapeAttr(EXPORT_POWERED_LOGO)}" alt="Powered By">
+      </div>
+      <div class="copy">&copy; <span id="yr"></span> Myles Bowling Systems</div>
+      <div class="meta">
+        <div id="ts"></div>
+        <div class="pagenum" id="pn"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      try{ var d=new Date(); var y=document.getElementById('yr'); if(y) y.textContent=d.getFullYear(); var ts=document.getElementById('ts'); if(ts){ ts.textContent = d.toLocaleString(undefined,{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}); }
+        var pn=document.getElementById('pn'); if(pn){ pn.textContent = 'P1/1'; }
+      }catch(e){}
+      setTimeout(function(){ window.focus(); window.print(); }, 150);
+    })();
+  <\/script>
+</body></html>`;
+  }
+
+  function cleanName(s){
+  return String(s ?? "").replace(/\s+/g," ").trim();
+}
+
+function exportPayouts(){
+  try{
+
+    // Export a single-page Letter PDF payout summary using jsPDF
+    const totals = winningsByBowler();
+    const items = Array.from(totals.entries())
+      .map(([name,amt])=>({name:cleanName(name), amt:Number(amt||0)}))
+      .filter(x=>x.amt>0)
+      .sort((a,b)=>b.amt-a.amt);
+
+    if(!items.length){
+      alert("No payouts to export yet.");
+      return;
+    }
+
+    // Build payout card (outlined rows, amount right)
+    const card = document.createElement("div");
+    card.style.width = "100%";
+    card.style.maxWidth = "720px";
+    card.style.border = "1px solid rgba(0,0,0,.70)";
+    card.style.borderRadius = "18px";
+    card.style.overflow = "hidden";
+
+    
+
+    card.style.color = "#000";
+const body = document.createElement("div");
+    body.style.padding = "14px";
+    body.style.display = "flex";
+    body.style.flexDirection = "column";
+    body.style.gap = "10px";
+
+    
+    body.style.color = "#000";
+items.forEach(x=>{
+      const row = document.createElement("div");
+      row.style.border = "1px solid rgba(0,0,0,.70)";
+      row.style.borderRadius = "14px";
+      row.style.padding = "12px 14px";
+      row.style.display = "flex";
+      row.style.alignItems = "center";
+      row.style.justifyContent = "space-between";
+      row.style.fontWeight = "900";
+      row.style.fontSize = "18px";
+      row.style.gap = "12px";
+
+      
+      row.style.color = "#000";
+const nm = document.createElement("div");
+      nm.textContent = x.name;
+      nm.style.flex = "1";
+      nm.style.minWidth = "0";
+
+      
+      nm.style.color = "#000";
+const amt = document.createElement("div");
+      amt.textContent = money(x.amt);
+      amt.style.whiteSpace = "nowrap";
+
+      
+      amt.style.color = "#000";
+row.appendChild(nm);
+      row.appendChild(amt);
+      body.appendChild(row);
+    });
+
+    card.appendChild(body);
+
+    const page = _buildExportShell({
+      titleText: "Payout Summary",
+      mainLogoSrc: EXPORT_MAIN_LOGO,
+      poweredLogoSrc: EXPORT_POWERED_LOGO,
+      centerNode: card
+    });
+
+    _renderExportToPdf(page, `VistaLanes_Payouts_${new Date().toISOString().slice(0,10)}.pdf`);
+
+  
+  } catch(e){
+    console.error(e);
+    alert('Payout export failed: ' + (e && e.message ? e.message : e));
+  }
+}
+  function deleteBracketById(brId){
+    state.brackets = state.brackets.filter(b=>b.id!==brId);
+    state.brackets.forEach((b,i)=>b.id=i+1);
+    renderAll();
+  }
+
+  // ---- brackets render (SAVE + DELETE split + confirm) ----
+  function renderBrackets(){
+    const root=$("brackets");
+    root.innerHTML="";
+
+    for(const br of state.brackets){
+      advanceBracketIfReady(br);
+
+      const card=document.createElement("div");
+      card.className="bracket";
+      card.id=`bracket_${br.id}`;
+      card.innerHTML=`
+        <div class="top">
+          <div class="meta">
+            <div class="name">Bracket #${br.id}</div>
+            <div class="small">
+              Type: <b>${br.type==="handicap"?"Handicap":"Scratch"}</b> •
+              Slots: <b>${br.slots.filter(Boolean).length}/8</b>
+            </div>
+          </div>
+          <div class="tools">
+            <select data-type="${br.id}">
+              <option value="scratch" ${br.type==="scratch"?"selected":""}>Scratch</option>
+              <option value="handicap" ${br.type==="handicap"?"selected":""}>Handicap</option>
+            </select>
+            <input type="number" class="w-sm" data-p1="${br.id}" placeholder="1st payout" value="${escapeAttr(br.payout1||"")}" />
+            <input type="number" class="w-sm" data-p2="${br.id}" placeholder="2nd payout" value="${escapeAttr(br.payout2||"")}" />
+
+            <button class="btn primary" data-save="${br.id}" type="button">Save</button>
+            <button class="btn danger" data-del="${br.id}" type="button">Delete</button>
+          </div>
+        </div>
+
+        <div class="treeHead">
+          <h3>Round 1</h3>
+          <h3>Round 2</h3>
+          <h3>Final</h3>
+        </div>
+
+        <div class="treeScroll">
+          <div class="tree">
+            <div class="col r1">
+              ${renderMatchCard(br, br.r1[0], 1)}
+              ${renderMatchCard(br, br.r1[1], 1)}
+              ${renderMatchCard(br, br.r1[2], 1)}
+              ${renderMatchCard(br, br.r1[3], 1)}
+            </div>
+
+            <div class="col r2">
+              ${renderMatchCard(br, br.r2[0], 2)}
+              <div class="r2Spacer"></div>
+              ${renderMatchCard(br, br.r2[1], 2)}
+            </div>
+
+            <div class="col final">
+              ${renderMatchCard(br, br.r3[0], 3)}
+            </div>
+          </div>
+        </div>
+
+        <div class="foot">
+          ${renderFinalResults(br)}
+        </div>
+      `;
+      root.appendChild(card);
+    }
+
+    root.querySelectorAll("[data-type]").forEach(sel=>{
+      sel.addEventListener("change", ()=>{
+        const id=Number(sel.getAttribute("data-type"));
+        const br=state.brackets.find(b=>b.id===id);
+        if(!br) return;
+        br.type=sel.value;
+        renderAll();
+      });
+    });
+
+    root.querySelectorAll("[data-p1]").forEach(inp=>{
+      inp.addEventListener("input", ()=>{
+        const id=Number(inp.getAttribute("data-p1"));
+        const br=state.brackets.find(b=>b.id===id);
+        if(!br) return;
+        br.payout1=Number(inp.value||0);
+        renderTotals(); renderKPIs();
+      });
+    });
+    root.querySelectorAll("[data-p2]").forEach(inp=>{
+      inp.addEventListener("input", ()=>{
+        const id=Number(inp.getAttribute("data-p2"));
+        const br=state.brackets.find(b=>b.id===id);
+        if(!br) return;
+        br.payout2=Number(inp.value||0);
+        renderTotals(); renderKPIs();
+      });
+    });
+
+    root.querySelectorAll("[data-save]").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const id=Number(btn.getAttribute("data-save"));
+        saveBracket(id);
+      });
+    });
+
+    root.querySelectorAll("[data-del]").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const id=Number(btn.getAttribute("data-del"));
+        if(confirm(`Delete Bracket #${id}? This cannot be undone.`)){
+          deleteBracketById(id);
+        }
+      });
+    });
+  }
+
+  function applyScoresFromInputs(){
+    document.querySelectorAll(".scoreInput").forEach(inp=>{
+      const name=inp.getAttribute("data-name");
+      const game=Number(inp.getAttribute("data-game"));
+      const b=state.bowlers.get(name);
+      if(!b) return;
+
+      const v=inp.value;
+      if(v===""||v===null||v===undefined) return;
+      const n=Number(v);
+      if(!Number.isNaN(n)) b.scores[game]=n;
+    });
+    state.brackets.forEach(br=>advanceBracketIfReady(br));
+  }
+
+  // ---- CSV roster / picker ----
+  function splitCSVLine(line){
+    const res=[]; let cur=""; let q=false;
+    for(let i=0;i<line.length;i++){
+      const c=line[i];
+      if(c === '"' ){
+        if(q && line[i+1]==='"'){ cur+='"'; i++; }
+        else q=!q;
+      } else if(c === ',' && !q){
+        res.push(cur); cur="";
+      } else cur+=c;
+    }
+    res.push(cur);
+    return res;
+  }
+  function parseCSV(text){
+    const lines = text.replace(/\r\n/g,"\n").replace(/\r/g,"\n").split("\n").filter(l=>l.trim()!=="");
+    if(!lines.length) return [];
+    const header = splitCSVLine(lines[0]).map(h=>h.trim());
+    const out=[];
+    for(let i=1;i<lines.length;i++){
+      const cols = splitCSVLine(lines[i]);
+      const obj = {};
+      header.forEach((h,idx)=> obj[h]= (cols[idx]??"").trim());
+      out.push(obj);
+    }
+    return out;
+  }
+  function lastNameKey(name){
+    const parts = normalizeName(name).split(" ").filter(Boolean);
+    if(parts.length<=1) return parts[0] || "";
+    return parts[parts.length-1] + ", " + parts.slice(0,-1).join(" ");
+  }
+  function sortByLastName(a,b){
+    const la = lastNameKey(a);
+    const lb = lastNameKey(b);
+    if(la !== lb) return la.localeCompare(lb);
+    return a.localeCompare(b);
+  }
+  function normalizeRosterRow(r){
+    const keys = Object.keys(r).map(k=>k.toLowerCase());
+    const get = (name) => {
+      const idx = keys.indexOf(name);
+      if(idx<0) return "";
+      return r[Object.keys(r)[idx]];
+    };
+
+    let name = "";
+    const first = get("first") || get("firstname") || get("first_name");
+    const last  = get("last")  || get("lastname")  || get("last_name");
+    if(first || last) name = normalizeName([first,last].filter(Boolean).join(" "));
+    else name = normalizeName(get("name") || get("bowler") || get("bowlername") || get("player"));
+
+    let h = get("handicap") || get("hcp") || get("hdcp");
+    h = h==="" ? "" : String(h);
+    const handicap = h==="" ? null : (Number.isNaN(Number(h)) ? null : Number(h));
+    return {name, handicap};
+  }
+  async function loadRoster(){
+    try{
+      const res = await fetch("data/bowlers.csv", {cache:"no-store"});
+      if(!res.ok) throw new Error("HTTP "+res.status);
+      const text = await res.text();
+      const rows = parseCSV(text);
+      const roster = rows.map(r => normalizeRosterRow(r)).filter(r => r && r.name).sort((a,b)=> sortByLastName(a.name,b.name));
+      state.roster = roster;
+      state.rosterLoaded = true;
+      renderPickerList();
+    }catch(e){
+      state.roster = [];
+      state.rosterLoaded = false;
+      renderPickerList();
+    }
+  }
+
+  function openPicker(){
+    $("pickerBackdrop").style.display="flex";
+    $("pickerBackdrop").setAttribute("aria-hidden","false");
+    $("pickerSearch").value = "";
+    $("pickerManualName").value = "";
+    $("pickerManualHcp").value = "";
+    state.selectedRoster = null;
+    renderPickerList();
+    updateManualHint();
+  }
+  function closePicker(){
+    $("pickerBackdrop").style.display="none";
+    $("pickerBackdrop").setAttribute("aria-hidden","true");
+  }
+  function renderPickerList(){
+    const list = $("pickerList");
+    const q = ($("pickerSearch").value||"").trim().toLowerCase();
+    list.innerHTML = "";
+
+    const roster = (state.roster||[]).filter(r=>{
+      if(!q) return true;
+      return r.name.toLowerCase().includes(q);
+    });
+
+    $("pickerCount").textContent = `${roster.length} bowlers`;
+
+    if(!state.rosterLoaded){
+      const div = document.createElement("div");
+      div.className = "hint";
+      div.innerHTML = `Could not load <span class="mono">data/bowlers.csv</span>. You can still type a new bowler above.`;
+      list.appendChild(div);
+      return;
+    }
+    if(!roster.length){
+      const div = document.createElement("div");
+      div.className = "hint";
+      div.textContent = "No matches. You can add a new bowler above.";
+      list.appendChild(div);
+      return;
+    }
+
+    roster.forEach(r=>{
+      const row = document.createElement("div");
+      row.className = "rowPick";
+      row.innerHTML = `
+        <div style="min-width:0">
+          <div class="nm">${escapeHtml(r.name)}</div>
+          <div class="hc">${r.handicap==null ? "HCP: —" : `HCP: <span class="mono">${r.handicap}</span>`}</div>
+        </div>
+        <div class="pillSm">${escapeHtml(lastNameKey(r.name))}</div>
+      `;
+      row.addEventListener("click", ()=>{
+        state.selectedRoster = r;
+        document.querySelectorAll(".rowPick").forEach(x=>x.style.outline="none");
+        row.style.outline = "2px solid rgba(106,167,255,.45)";
+        row.style.outlineOffset = "2px";
+      });
+      list.appendChild(row);
+    });
+  }
+
+  function applyPickedBowler(name, handicap){
+    $("bowlerName").value = normalizeName(name);
+    if(handicap!==null && handicap!==undefined && handicap!=="" && !Number.isNaN(Number(handicap))){
+      $("bowlerHcp").value = String(Number(handicap));
+    }
+    updateHcpVisibility();
+  }
+  function updateHcpVisibility(){
+    const type = $("entryType").value;
+    $("bowlerHcp").style.display = (type==="handicap") ? "" : "none";
+    $("bowlerHcp").disabled = (type!=="handicap");
+    $("pickerManualHcp").style.display = (type==="handicap") ? "" : "none";
+    $("pickerManualHcp").disabled = (type!=="handicap");
+  }
+  function updateManualHint(){
+    const type = $("entryType").value;
+    $("manualHint").textContent = (type==="handicap")
+      ? "If the bowler isn't listed, enter a name + handicap here."
+      : "Scratch entry: handicap is hidden/ignored.";
+  }
+
+  // ---- events ----
+  $("btnAddBracket").addEventListener("click", ()=>addBracket("scratch"));
+
+  $("btnReset").addEventListener("click", ()=>{
+    state.bowlers.clear();
+    state.brackets = [];
+    $("entryQty").value = "1";
+    showEntryWarn("");
+    renderAll();
+  });
+
+  $("filterName").addEventListener("input", renderTotals);
+  $("sortMode").addEventListener("change", renderTotals);
+
+  $("btnExportPayouts").addEventListener("click", exportPayouts);
+
+  $("btnApplyScores").addEventListener("click", ()=>{ applyScoresFromInputs(); renderAll(); });
+
+  $("setupForm").addEventListener("submit", (e)=>{
+    e.preventDefault();
+    showEntryWarn("");
+
+    const name = normalizeName($("bowlerName").value || "");
+    const type = $("entryType").value;
+    const qty  = Math.max(1, Math.min(50, Number($("entryQty").value || 1)));
+
+    if(!name){
+      showEntryWarn("Pick a bowler first.");
+      return;
+    }
+
+    const hcp = (type==="handicap") ? $("bowlerHcp").value : "";
+    ensureBowler(name, hcp);
+
+    for(let i=0;i<qty;i++){
+      const res = placeBowlerOncePerBracket(name, type);
+      if(!res.ok){
+        showEntryWarn(res.msg || "Could not place bowler.");
+        break;
+      }
+    }
+
+    $("entryQty").value="1";
+    renderAll();
+  });
+
+  $("entryType").addEventListener("change", ()=>{
+    updateHcpVisibility();
+    updateManualHint();
+    if($("entryType").value==="scratch") $("bowlerHcp").value="";
+  });
+
+  $("bowlerName").addEventListener("click", openPicker);
+  $("btnPickBowler").addEventListener("click", openPicker);
+  $("pickerClose").addEventListener("click", closePicker);
+  $("pickerBackdrop").addEventListener("click", (e)=>{ if(e.target === $("pickerBackdrop")) closePicker(); });
+  document.addEventListener("keydown", (e)=>{ if(e.key==="Escape" && $("pickerBackdrop").style.display==="flex") closePicker(); });
+
+  $("pickerSearch").addEventListener("input", renderPickerList);
+  $("pickerReload").addEventListener("click", async ()=>{ await loadRoster(); });
+
+  $("pickerUseSelected").addEventListener("click", ()=>{
+    if(!state.selectedRoster){ closePicker(); return; }
+    applyPickedBowler(state.selectedRoster.name, state.selectedRoster.handicap);
+    closePicker();
+    setTimeout(()=>{ $("entryQty").focus(); }, 0);
+  });
+  $("pickerClear").addEventListener("click", ()=>{
+    $("bowlerName").value="";
+    $("bowlerHcp").value="";
+    closePicker();
+  });
+  $("pickerUseManual").addEventListener("click", ()=>{
+    const name=normalizeName($("pickerManualName").value);
+    if(!name) return;
+    const type=$("entryType").value;
+    const hcp = (type==="handicap") ? $("pickerManualHcp").value : "";
+    applyPickedBowler(name, hcp);
+    closePicker();
+    setTimeout(()=>{ $("entryQty").focus(); }, 0);
+  });
+
+  // ---- render ----
+  function renderAll(){
+    state.brackets.forEach(br=>advanceBracketIfReady(br));
+    renderKPIs();
+    renderScoreSections();
+    renderBrackets();
+    renderTotals();
+    updateHcpVisibility();
+    updateManualHint();
+    saveLocalDebounced();
+  }
+
+  async function init(){
+    updateHcpVisibility();
+    updateManualHint();
+    await loadRoster();
+
+    // Restore brackets from local storage (if present)
+    loadLocal();
+    _persistReady = true;
+
+    renderAll();
+  }
+  init();
+})();
+
+</script>
+</body>
+</html>
