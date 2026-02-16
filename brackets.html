@@ -1274,7 +1274,12 @@
         useCORS: true,
         onclone: function(clonedDoc) {
           const root = clonedDoc.querySelector(".exportPage") || clonedDoc.body;
+
           root.querySelectorAll("*").forEach(el => {
+            // Keep win/loss colors (green/red) for names and W/L marks
+            if (el.classList && (el.classList.contains("winner") || el.classList.contains("loser"))) return;
+            if (el.closest && el.closest(".winner, .loser")) return;
+
             el.style.color = "#000000";
             el.style.webkitTextFillColor = "#000000";
             el.style.opacity = "1";
