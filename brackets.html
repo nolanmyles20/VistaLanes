@@ -842,7 +842,27 @@
     return state.bowlers.get(key);
   }
 
-  function bracketAlreadyHasBowler(br, name){ return br.slots.includes(name); }
+  
+  function rosterHandicapFor(name){
+    const key = normalizeName(name);
+    if(!key) return null;
+    const r = (state.roster||[]).find(x => normalizeName(x.name) === key);
+    if(!r) return null;
+    const h = r.handicap;
+    if(h===null || h===undefined || h==="") return null;
+    const n = Number(h);
+    return Number.isFinite(n) ? n : null;
+  }
+
+  function refreshBracketHandicaps(br){
+    if(!br) return;
+    br.slots.filter(Boolean).forEach(n=>{
+      const h = rosterHandicapFor(n);
+      if(h!==null) ensureBowler(n, h);
+    });
+  }
+
+function bracketAlreadyHasBowler(br, name){ return br.slots.includes(name); }
 
   function ensureOneOpenBracketForType(type){
     if(!state.brackets.some(b=>b.type===type)) addBracket(type);
@@ -2257,16 +2277,25 @@ row.appendChild(nm);
     }
 
     root.querySelectorAll("[data-type]").forEach(sel=>{
-      sel.addEventListener("change", ()=>{
+      sel.addEventListener("change", async ()=>{
         const id=Number(sel.getAttribute("data-type"));
         const br=state.brackets.find(b=>b.id===id);
         if(!br) return;
         br.type=sel.value;
+
+        // If a bracket is changed from Scratch -> Handicap, refresh bowler handicaps from data/bowlers.csv
+        if(br.type==="handicap"){
+          try{
+            if(!state.rosterLoaded) await loadRoster();
+            refreshBracketHandicaps(br);
+          }catch(_e){}
+        }
+
         renderAll();
       });
     });
 
-    root.querySelectorAll("[data-p1]").forEach(inp=>{
+root.querySelectorAll("[data-p1]").forEach(inp=>{
       inp.addEventListener("input", ()=>{
         const id=Number(inp.getAttribute("data-p1"));
         const br=state.brackets.find(b=>b.id===id);
