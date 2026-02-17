@@ -109,6 +109,7 @@
       background: linear-gradient(180deg, rgba(255,255,255,.03), transparent);
     }
     .panel .hd .right{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+    .panel .hd .left{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
 
     input{
       background: rgba(255,255,255,.03);
@@ -137,6 +138,21 @@
       white-space:nowrap;
     }
     .pill b{color:var(--text)}
+    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;}
+
+    /* League dropdown styled like pill */
+    .leagueSelect{
+      font-size:12px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.03);
+      color: var(--text);
+      outline:none;
+      max-width: 520px;
+    }
+    .leagueSelect option{background:#111;color:#fff;}
+
     .btn{
       border:1px solid rgba(255,255,255,.14);
       background: rgba(106,167,255,.18);
@@ -198,7 +214,6 @@
     }
     tbody tr:hover td{background: rgba(255,255,255,.03);}
 
-    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;}
     .nameCell{font-weight:900}
     .numCell{font-weight:800}
 
@@ -266,13 +281,19 @@
     <header>
       <div>
         <h1>Bowlers</h1>
-        <div class="sub">Loaded from <span class="mono">data/bowlers.csv</span></div>
+        <div class="sub">Loaded from <span class="mono" id="loadedPath">data/bowlers_32170.csv</span></div>
       </div>
     </header>
 
     <div class="panel">
       <div class="hd">
-        <div class="pill"><b id="count">0</b> bowlers</div>
+        <div class="left">
+          <div class="pill"><b id="count">0</b> bowlers</div>
+
+          <!-- NEW: league dropdown -->
+          <select id="leagueSelect" class="leagueSelect" title="Select league"></select>
+        </div>
+
         <div class="right">
           <input id="search" placeholder="Search bowler…" />
           <button class="btn" id="reload" type="button">Reload CSV</button>
@@ -296,11 +317,12 @@
 
 <script>
 (() => {
-  const CSV_PATH = "data/bowlers.csv";
+  const LEAGUES_PATH = "data/leagues.csv"; // your repo file
+  const DEFAULT_LEAGUE_ID = "32170";
+  const STORAGE_KEY = "vista_selected_league_id";
 
   // Set this to your Raspberry Pi HTTPS endpoint (Cloudflare Tunnel recommended)
-  // Example: const SAVE_URL = "https://vista-lanes-api.example.com/save-bowlers";
-  const SAVE_URL = ""; // <-- set me
+  const SAVE_URL = ""; // <-- set me (optional)
 
   const $ = (id) => document.getElementById(id);
 
@@ -391,6 +413,20 @@
     return an.localeCompare(bn);
   }
 
+  function getSelectedLeagueId(){
+    const v = $("leagueSelect").value || "";
+    return v || DEFAULT_LEAGUE_ID;
+  }
+
+  function currentCsvPath(){
+    const leagueId = getSelectedLeagueId();
+    return `data/bowlers_${leagueId}.csv`;
+  }
+
+  function updateLoadedPathLabel(){
+    $("loadedPath").textContent = currentCsvPath();
+  }
+
   function render(){
     const q = ($("search").value || "").trim().toLowerCase();
 
@@ -452,7 +488,10 @@
     showStatus("", "");
     $("err").style.display = "none";
     try{
-      const res = await fetch(CSV_PATH, {cache:"no-store"});
+      const path = currentCsvPath();
+      updateLoadedPathLabel();
+
+      const res = await fetch(path, {cache:"no-store"});
       if(!res.ok) throw new Error("HTTP " + res.status);
       const text = await res.text();
       const parsed = parseCSV(text);
@@ -469,7 +508,7 @@
       setTimeout(()=>showStatus("", ""), 1200);
     }catch(e){
       headers = ["Error"];
-      rows = [{ "Error": `Could not load ${CSV_PATH}. Make sure it exists in your repo and GitHub Pages can serve it.` }];
+      rows = [{ "Error": `Could not load ${currentCsvPath()}. Make sure it exists in your repo.` }];
       render();
       $("err").style.display = "block";
       $("err").textContent = String(e && e.message ? e.message : e);
@@ -490,7 +529,7 @@
         method: "POST",
         headers: {"Content-Type":"application/json"},
         body: JSON.stringify({
-          file: "data/bowlers.csv",
+          file: currentCsvPath(), // save back to the selected league file
           csvText
         })
       });
@@ -511,17 +550,11 @@
     }
   }
 
-  function pad2(n){ return String(n).padStart(2,"0"); }
   function exportCSV(){
     try{
       const csvText = toCSV(headers, rows);
-
-      const d = new Date();
-      const stamp =
-        d.getFullYear() + "-" + pad2(d.getMonth()+1) + "-" + pad2(d.getDate()) + "_" +
-        pad2(d.getHours()) + pad2(d.getMinutes()) + pad2(d.getSeconds());
-
-      const filename = `bowlers.csv`;
+      const leagueId = getSelectedLeagueId();
+      const filename = `bowlers_${leagueId}.csv`;
 
       const blob = new Blob([csvText], {type: "text/csv;charset=utf-8"});
       const url = URL.createObjectURL(blob);
@@ -544,12 +577,69 @@
     }
   }
 
+  function setLeagueOptions(options, selectedId){
+    const sel = $("leagueSelect");
+    sel.innerHTML = "";
+
+    options.forEach(o => {
+      const opt = document.createElement("option");
+      opt.value = o.league_id;
+      opt.textContent = `${o.league_id} — ${o.name}`;
+      sel.appendChild(opt);
+    });
+
+    // pick selection
+    const exists = options.some(o => String(o.league_id) === String(selectedId));
+    sel.value = exists ? selectedId : (options[0]?.league_id || DEFAULT_LEAGUE_ID);
+  }
+
+  async function loadLeagues(){
+    // Try leagues.csv, else fallback
+    const saved = localStorage.getItem(STORAGE_KEY) || DEFAULT_LEAGUE_ID;
+
+    try{
+      const res = await fetch(LEAGUES_PATH, {cache:"no-store"});
+      if(!res.ok) throw new Error("HTTP " + res.status);
+      const text = await res.text();
+      const parsed = parseCSV(text);
+
+      const h = parsed.headers.map(x => x.toLowerCase());
+      const idxId = h.indexOf("league_id");
+      const idxName = h.indexOf("name");
+
+      if(idxId < 0 || idxName < 0) throw new Error("leagues.csv missing league_id or name headers");
+
+      // rebuild options from raw rows
+      const options = parsed.rows
+        .map(r => ({
+          league_id: (r[parsed.headers[idxId]] || "").trim(),
+          name: (r[parsed.headers[idxName]] || "").trim()
+        }))
+        .filter(o => o.league_id);
+
+      if(!options.length) throw new Error("No leagues found in leagues.csv");
+
+      setLeagueOptions(options, saved);
+
+    }catch(_e){
+      // fallback only
+      setLeagueOptions([{league_id: DEFAULT_LEAGUE_ID, name: "Wednesday Mixed League"}], saved);
+    }
+
+    $("leagueSelect").addEventListener("change", () => {
+      localStorage.setItem(STORAGE_KEY, getSelectedLeagueId());
+      $("search").value = "";
+      load();
+    });
+  }
+
   $("search").addEventListener("input", render);
   $("reload").addEventListener("click", load);
   $("save").addEventListener("click", save);
   $("export").addEventListener("click", exportCSV);
 
-  load();
+  // init
+  loadLeagues().then(load);
 })();
 </script>
 </body>
