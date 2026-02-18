@@ -190,7 +190,8 @@
 
     .tableWrap{
       width:100%;
-      overflow:auto;
+      overflow-y:auto;
+      overflow-x:hidden; /* no side-to-side scrolling */
       border-radius:16px;
       border:1px solid rgba(255,255,255,.08);
       background: rgba(0,0,0,.10);
@@ -199,7 +200,7 @@
       width:100%;
       border-collapse:separate;
       border-spacing:0;
-      min-width: 860px;
+      table-layout:fixed; /* force columns to fit */
     }
     thead th{
       position:sticky;
@@ -212,24 +213,20 @@
       color:var(--muted);
       background: rgba(20,20,20,.98);
       border-bottom:1px solid rgba(255,255,255,.10);
-      padding:12px 12px;
-      white-space:nowrap;
+      padding:12px 10px;
+      white-space:normal;           /* allow wrapping */
+      overflow-wrap:anywhere;       /* prevent overflow */
     }
     tbody td{
-      padding:12px 12px;
+      padding:12px 10px;
       border-bottom:1px solid rgba(255,255,255,.06);
       color:var(--text);
       vertical-align:top;
+      white-space:normal;           /* allow wrapping */
+      overflow-wrap:anywhere;       /* prevent overflow */
     }
     tbody tr:hover td{background: rgba(255,255,255,.03);}
-
-    .rowPaid td{ background: var(--paidBg); }
-    .rowPaid td:first-child{ border-left: 3px solid var(--paidBd); }
-    .rowUnpaid td{ background: var(--unpaidBg); }
-    .rowUnpaid td:first-child{ border-left: 3px solid var(--unpaidBd); }
-
-    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;}
-    .err{margin-top:10px;color:#ffd57a;font-size:13px;line-height:1.4;}
+.err{margin-top:10px;color:#ffd57a;font-size:13px;line-height:1.4;}
 
     .checkWrap{
       display:flex;align-items:center;gap:8px;
@@ -254,6 +251,8 @@
     @media (max-width: 520px){
       .menubar a{min-width: 96px; padding: 9px 12px;}
       input{min-width: 180px;}
+      thead th{padding:10px 8px;font-size:11px;}
+      tbody td{padding:10px 8px;}
     }
   </style>
 </head>
