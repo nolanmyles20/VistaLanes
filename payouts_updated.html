@@ -1,0 +1,828 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Vista Lanes • Payouts</title>
+  <style>
+    :root{
+      --bg:#000;
+      --panel: rgba(255,255,255,.04);
+      --panel2: rgba(255,255,255,.02);
+      --border: rgba(255,255,255,.10);
+      --text:#d8e1ee;
+      --muted:#8ea0b5;
+      --btn:#d9d9d9;
+      --btnText:#111;
+      --btnBorder:#bdbdbd;
+      --activeShadow: inset 0 3px 10px rgba(0,0,0,.35);
+      --shadow: 0 10px 30px rgba(0,0,0,.45);
+      --radius:18px;
+      --accent:#6aa7ff;
+
+      --paidBg: rgba(42, 167, 122, .12);
+      --paidBd: rgba(42, 167, 122, .32);
+
+      --unpaidBg: rgba(255, 75, 75, .10);
+      --unpaidBd: rgba(255, 75, 75, .28);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      background: var(--bg);
+      color: var(--text);
+      min-height:100vh;
+    }
+    .wrap{max-width:1200px;margin:0 auto;padding:14px 14px 60px;}
+
+    .brandbar{display:flex;justify-content:center;align-items:center;padding:8px 0 8px;}
+    .brandbar img{
+      width:min(340px, 86vw);
+      height:auto;
+      display:block;
+      filter: drop-shadow(0 10px 22px rgba(0,0,0,.55));
+      opacity:.98;
+    }
+
+    .menubar{
+      display:flex;gap:10px;flex-wrap:wrap;justify-content:center;align-items:center;
+      margin: 6px 0 14px;
+    }
+    .menubar a{
+      text-decoration:none;
+      background: var(--btn);
+      color: var(--btnText);
+      border: 1px solid var(--btnBorder);
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-weight: 800;
+      letter-spacing:.2px;
+      box-shadow: 0 3px 0 rgba(255,255,255,.15);
+      transition: .12s ease;
+      user-select:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width: 104px;
+    }
+    .menubar a:hover{transform: translateY(-1px);}
+    .menubar a:active{transform: translateY(0px);}
+    .menubar a.active{
+      background: #cfcfcf;
+      box-shadow: var(--activeShadow);
+      transform: translateY(1px);
+      border-color:#a9a9a9;
+    }
+
+    header{
+      display:flex;justify-content:space-between;gap:10px;align-items:flex-end;flex-wrap:wrap;
+      margin: 6px 0 12px;
+    }
+    h1{margin:0;font-size:22px;font-weight:900;letter-spacing:.3px;}
+    .sub{color:var(--muted);font-size:13px;}
+
+    .panel{
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .panel .hd{
+      padding:12px 14px;
+      display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      background: linear-gradient(180deg, rgba(255,255,255,.03), transparent);
+    }
+    .panel .hd .right{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+    .panel .hd .left{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+
+    input, select{
+      background: rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.12);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius: 14px;
+      outline:none;
+      transition:.15s ease;
+      max-width:100%;
+      min-width:220px;
+    }
+    input::placeholder{color:rgba(216,225,238,.35)}
+    input:focus, select:focus{border-color: rgba(106,167,255,.5);box-shadow: 0 0 0 3px rgba(106,167,255,.15);}
+
+    .pill{
+      font-size:12px;
+      padding:6px 10px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.03);
+      color:var(--muted);
+      display:inline-flex;gap:8px;align-items:center;white-space:nowrap;
+    }
+    .pill b{color:var(--text)}
+
+    .leagueSelect{
+      font-size:12px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.03);
+      color: var(--text);
+      outline:none;
+      max-width: 520px;
+      min-width: unset;
+    }
+    .leagueSelect option{background:#111;color:#fff;}
+
+    .btn{
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(106,167,255,.18);
+      color: var(--text);
+      padding:10px 13px;
+      border-radius: 999px;
+      cursor:pointer;
+      transition:.15s ease;
+      display:inline-flex;gap:8px;align-items:center;
+      user-select:none;
+      font-weight:800;
+      white-space:nowrap;
+    }
+    .btn:hover{transform: translateY(-1px);}
+    .btn:active{transform: translateY(0px);}
+
+    .btnGhost{
+      background: rgba(255,255,255,.08);
+      border-color: rgba(255,255,255,.18);
+    }
+
+    .bd{padding:14px;}
+
+    .formRow{
+      margin-bottom:12px;
+      padding:12px;
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:16px;
+      background: rgba(255,255,255,.03);
+      display:none;
+    }
+    .formRow .grid{
+      display:grid;
+      grid-template-columns: 1.4fr .9fr .7fr auto;
+      gap:10px;
+      align-items:center;
+    }
+    .formRow label{
+      font-size:12px;
+      color: var(--muted);
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+    .formRow select, .formRow input{
+      min-width: 0;
+      width: 100%;
+    }
+    @media (max-width: 860px){
+      .formRow .grid{grid-template-columns: 1fr; }
+      .formRow .actions{display:flex;gap:10px;justify-content:flex-start;}
+    }
+
+    .tableWrap{
+      width:100%;
+      overflow-y:auto;
+      overflow-x:hidden; /* no side-to-side scrolling */
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.10);
+    }
+    table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      table-layout:fixed; /* force columns to fit */
+    }
+    thead th{
+      position:sticky;
+      top:0;
+      z-index:2;
+      text-align:left;
+      font-size:12px;
+      letter-spacing:.35px;
+      text-transform:uppercase;
+      color:var(--muted);
+      background: rgba(20,20,20,.98);
+      border-bottom:1px solid rgba(255,255,255,.10);
+      padding:12px 10px;
+      white-space:normal;           /* allow wrapping */
+      overflow-wrap:anywhere;       /* prevent overflow */
+    }
+    tbody td{
+      padding:12px 10px;
+      border-bottom:1px solid rgba(255,255,255,.06);
+      color:var(--text);
+      vertical-align:top;
+      white-space:normal;           /* allow wrapping */
+      overflow-wrap:anywhere;       /* prevent overflow */
+    }
+    tbody tr:hover td{background: rgba(255,255,255,.03);}
+.err{margin-top:10px;color:#ffd57a;font-size:13px;line-height:1.4;}
+
+    .checkWrap{
+      display:flex;align-items:center;gap:8px;
+    }
+    .checkWrap input[type="checkbox"]{
+      width:18px;height:18px;min-width:auto;
+      accent-color: #31d38b;
+    }
+    .amt{font-weight:900;}
+    .typeTag{
+      display:inline-flex;
+      padding:5px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.04);
+      color: var(--text);
+      font-size:12px;
+      font-weight:800;
+      white-space:nowrap;
+    }
+
+    @media (max-width: 520px){
+      .menubar a{min-width: 96px; padding: 9px 12px;}
+      input{min-width: 180px;}
+      thead th{padding:10px 8px;font-size:11px;}
+      tbody td{padding:10px 8px;}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="brandbar">
+      <img src="assets/9AB9725D-AD71-4DDC-BE9B-03328F663643.png" alt="Vista Lanes" />
+    </div>
+
+    <nav class="menubar" aria-label="Main menu">
+      <a href="index.html">Home</a>
+      <a href="bowlers.html">Bowlers</a>
+      <a href="leagues.html">Leagues</a>
+      <a href="teams.html">Teams</a>
+      <a href="lanes.html">Lanes</a>
+      <a href="brackets.html">Brackets</a>
+      <a class="active" href="payouts.html" aria-current="page">Payouts</a>
+      <a href="tournaments.html">Tournaments</a>
+    </nav>
+
+    <header>
+      <div>
+        <h1>Payouts</h1>
+        <div class="sub">Loaded from <span class="mono" id="loadedPath">data/payouts_32170.csv</span></div>
+      </div>
+    </header>
+
+    <div class="panel">
+      <div class="hd">
+        <div class="left">
+          <div class="pill"><b id="count">0</b> payouts</div>
+          <select id="leagueSelect" class="leagueSelect" title="Select league"></select>
+        </div>
+
+        <div class="right">
+          <input id="search" placeholder="Search payout…" />
+          <button class="btn btnGhost" id="addToggle" type="button">+ Add Payout</button>
+          <button class="btn" id="reload" type="button">Reload CSV</button>
+          <button class="btn" id="export" type="button">Export CSV</button>
+        </div>
+      </div>
+
+      <div class="bd">
+        <!-- Add payout form -->
+        <div class="formRow" id="addForm">
+          <div class="grid">
+            <label>
+              Bowler
+              <select id="addBowler"></select>
+            </label>
+
+            <label>
+              Type
+              <select id="addType">
+                <option value="brackets">Brackets</option>
+                <option value="handicap">Handicap</option>
+                <option value="tournament">Tournament</option>
+              </select>
+            </label>
+
+            <label>
+              Amount
+              <input id="addAmount" type="number" step="0.01" min="0" placeholder="0.00" />
+            </label>
+
+            <div class="actions" style="display:flex;gap:10px;align-items:flex-end;">
+              <button class="btn" id="addConfirm" type="button">Add</button>
+              <button class="btn btnGhost" id="addCancel" type="button">Cancel</button>
+            </div>
+          </div>
+          <div class="err" id="addErr" style="display:none;margin-top:10px;"></div>
+        </div>
+
+        <div class="tableWrap">
+          <table id="tbl" aria-label="Payouts table">
+            <thead><tr id="theadRow"></tr></thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+
+        <div class="err" id="err" style="display:none"></div>
+      </div>
+    </div>
+  </div>
+
+<script>
+(() => {
+  const LEAGUES_PATH = "data/leagues.csv";
+  const DEFAULT_LEAGUE_ID = "32170";
+  const STORAGE_KEY = "vista_selected_league_id"; // same as your other pages
+
+  // Files
+  const payoutsPathFor = (leagueId) => `data/payouts_${leagueId}.csv`;
+  const bowlersPathFor = (leagueId) => `data/bowlers_${leagueId}.csv`;
+  const FALLBACK_PAYOUTS = "data/payouts.csv";   // optional fallback (if you ever add it)
+  const FALLBACK_BOWLERS = "data/bowlers.csv";
+
+  const $ = (id) => document.getElementById(id);
+
+  // Column detection (supports a few header variants)
+  const COLS = {
+    name: ["bowler_name","name","bowler","player","full_name"],
+    amount: ["amount","owed","value_owed","value","payout","winnings"],
+    paid: ["paid","paid_out","is_paid","payout_status"],
+    type: ["type","source","category","reason"],
+    bowler_id: ["bowler_id","id"]
+  };
+
+  let rows = [];
+  let headers = [];
+  let bowlerOptions = []; // {id, name}
+  let filteredIdx = [];
+
+  function escapeHtml(s){
+    return String(s ?? "").replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+  function norm(s){ return String(s ?? "").trim().toLowerCase(); }
+
+  function splitCSVLine(line){
+    const res=[]; let cur=""; let q=false;
+    for(let i=0;i<line.length;i++){
+      const c=line[i];
+      if(c === '"'){
+        if(q && line[i+1] === '"'){ cur+='"'; i++; }
+        else q=!q;
+      } else if(c === ',' && !q){
+        res.push(cur); cur="";
+      } else cur+=c;
+    }
+    res.push(cur);
+    return res;
+  }
+
+  function parseCSV(text){
+    const lines = text.replace(/\r\n/g,"\n").replace(/\r/g,"\n").split("\n").filter(l=>l.trim()!=="");
+    if(!lines.length) return {headers:[], rows:[]};
+
+    const header = splitCSVLine(lines[0]).map(h=>h.trim());
+    const out=[];
+    for(let i=1;i<lines.length;i++){
+      const cols = splitCSVLine(lines[i]);
+      const obj = {};
+      header.forEach((h,idx)=> obj[h] = (cols[idx] ?? "").trim());
+      out.push(obj);
+    }
+    return {headers: header, rows: out};
+  }
+
+  function csvEscape(val){
+    const s = String(val ?? "");
+    if(/[",\n\r]/.test(s)) return '"' + s.replace(/"/g,'""') + '"';
+    return s;
+  }
+  function toCSV(headers, rows){
+    const head = headers.map(csvEscape).join(",");
+    const body = rows.map(r => headers.map(h => csvEscape(r[h] ?? "")).join(",")).join("\n");
+    return head + "\n" + body + "\n";
+  }
+
+  function findHeaderKey(candidates){
+    const lowered = headers.map(h => norm(h));
+    for(const c of candidates){
+      const i = lowered.indexOf(norm(c));
+      if(i >= 0) return headers[i];
+    }
+    return null;
+  }
+
+  function ensureHeader(h){
+    const lowered = headers.map(x=>norm(x));
+    if(!lowered.includes(norm(h))) headers.push(h);
+  }
+
+  function isPaidValue(v){
+    const t = norm(v);
+    return t === "1" || t === "true" || t === "yes" || t === "y" || t === "paid" || t === "x";
+  }
+
+  function setPaidValue(row, paidKey, isPaid){
+    row[paidKey] = isPaid ? "1" : "0";
+  }
+
+  function getSelectedLeagueId(){
+    return ($("leagueSelect").value || DEFAULT_LEAGUE_ID).trim() || DEFAULT_LEAGUE_ID;
+  }
+  function currentPayoutsPath(){
+    return payoutsPathFor(getSelectedLeagueId());
+  }
+  function updateLoadedPathLabel(){
+    $("loadedPath").textContent = currentPayoutsPath();
+  }
+
+  function formatMoney(v){
+    const n = Number(String(v ?? "").trim());
+    if(!isFinite(n)) return String(v ?? "");
+    return n.toFixed(2);
+  }
+
+  function setAddFormVisible(show){
+    const box = $("addForm");
+    box.style.display = show ? "block" : "none";
+    $("addErr").style.display = "none";
+    $("addErr").textContent = "";
+    if(show){
+      // defaults
+      $("addAmount").value = "";
+      $("addType").value = "brackets";
+      if($("addBowler").options.length) $("addBowler").selectedIndex = 0;
+    }
+  }
+
+  function populateBowlerDropdown(){
+    const sel = $("addBowler");
+    sel.innerHTML = "";
+    bowlerOptions.forEach(b => {
+      const opt = document.createElement("option");
+      opt.value = b.id || "";
+      opt.textContent = b.name || "";
+      sel.appendChild(opt);
+    });
+  }
+
+  async function loadBowlersForLeague(){
+    const leagueId = getSelectedLeagueId();
+
+    async function tryFetch(path){
+      const res = await fetch(path, {cache:"no-store"});
+      if(!res.ok) throw new Error("HTTP " + res.status);
+      return await res.text();
+    }
+
+    let text = "";
+    try{
+      text = await tryFetch(bowlersPathFor(leagueId));
+    }catch(_e){
+      text = await tryFetch(FALLBACK_BOWLERS);
+    }
+
+    const parsed = parseCSV(text);
+    const h = parsed.headers.map(x=>norm(x));
+
+    // try to detect standard bowler columns
+    const idxId = h.indexOf("bowler_id");
+    const idxFirst = h.indexOf("first_name");
+    const idxLast = h.indexOf("last_name");
+    const idxName = h.indexOf("bowler_name") >= 0 ? h.indexOf("bowler_name") : h.indexOf("name");
+
+    bowlerOptions = parsed.rows.map(r => {
+      const id = idxId >= 0 ? (r[parsed.headers[idxId]] || "").trim() : "";
+      let name = "";
+      if(idxFirst >= 0 || idxLast >= 0){
+        const first = idxFirst >= 0 ? (r[parsed.headers[idxFirst]] || "").trim() : "";
+        const last  = idxLast  >= 0 ? (r[parsed.headers[idxLast]]  || "").trim() : "";
+        name = `${first} ${last}`.trim();
+      }else if(idxName >= 0){
+        name = (r[parsed.headers[idxName]] || "").trim();
+      }else{
+        // fallback: best effort from any columns
+        name = (Object.values(r)[0] || "").trim();
+      }
+      // skip blanks
+      return {id, name};
+    }).filter(b => b.name);
+
+    // Keep list stable / alphabetical
+    bowlerOptions.sort((a,b)=> a.name.localeCompare(b.name));
+
+    populateBowlerDropdown();
+  }
+
+  function render(){
+    const q = norm($("search").value);
+
+    // Canonical headers we want available
+    ensureHeader("bowler_name");
+    ensureHeader("amount");
+    ensureHeader("type");
+    ensureHeader("paid");
+    // optional
+    // ensureHeader("bowler_id");
+
+    const nameKey = findHeaderKey(COLS.name) || "bowler_name";
+    const amtKey  = findHeaderKey(COLS.amount) || "amount";
+    const paidKey = findHeaderKey(COLS.paid) || "paid";
+    const typeKey = findHeaderKey(COLS.type) || "type";
+
+    // filter
+    filteredIdx = [];
+    for(let i=0;i<rows.length;i++){
+      const r = rows[i];
+      if(!q){ filteredIdx.push(i); continue; }
+      const blob = norm(JSON.stringify(r));
+      if(blob.includes(q)) filteredIdx.push(i);
+    }
+    $("count").textContent = String(filteredIdx.length);
+
+    // header row
+    const thead = $("theadRow");
+    thead.innerHTML = "";
+    ["bowler_name","amount","type","paid"].forEach((label) => {
+      const th = document.createElement("th");
+      th.textContent = label;
+      thead.appendChild(th);
+    });
+
+    // body
+    const tbody = $("tbody");
+    tbody.innerHTML = "";
+
+    filteredIdx.forEach((ri) => {
+      const r = rows[ri];
+
+      const tr = document.createElement("tr");
+
+      const paidNow = isPaidValue(r[paidKey]);
+      tr.className = paidNow ? "rowPaid" : "rowUnpaid";
+
+      // name
+      const tdName = document.createElement("td");
+      tdName.innerHTML = escapeHtml(r[nameKey] ?? "");
+      tr.appendChild(tdName);
+
+      // amount
+      const tdAmt = document.createElement("td");
+      tdAmt.className = "amt mono";
+      tdAmt.innerHTML = escapeHtml(r[amtKey] ?? "");
+      tr.appendChild(tdAmt);
+
+      // type tag
+      const tdType = document.createElement("td");
+      const t = (r[typeKey] ?? "").trim();
+      tdType.innerHTML = t ? `<span class="typeTag">${escapeHtml(t)}</span>` : `<span class="typeTag">—</span>`;
+      tr.appendChild(tdType);
+
+      // paid checkbox
+      const tdPaid = document.createElement("td");
+      const wrap = document.createElement("div");
+      wrap.className = "checkWrap";
+
+      const cb = document.createElement("input");
+      cb.type = "checkbox";
+      cb.checked = paidNow;
+
+      const lbl = document.createElement("span");
+      lbl.textContent = cb.checked ? "Paid" : "Unpaid";
+
+      cb.addEventListener("change", () => {
+        setPaidValue(r, paidKey, cb.checked);
+        tr.className = cb.checked ? "rowPaid" : "rowUnpaid";
+        lbl.textContent = cb.checked ? "Paid" : "Unpaid";
+      });
+
+      wrap.appendChild(cb);
+      wrap.appendChild(lbl);
+      tdPaid.appendChild(wrap);
+      tr.appendChild(tdPaid);
+
+      tbody.appendChild(tr);
+    });
+  }
+
+  async function loadPayouts(){
+    $("err").style.display = "none";
+    try{
+      updateLoadedPathLabel();
+      const path = currentPayoutsPath();
+
+      const res = await fetch(path, {cache:"no-store"});
+      if(!res.ok) throw new Error("HTTP " + res.status);
+
+      const text = await res.text();
+      const parsed = parseCSV(text);
+
+      headers = parsed.headers;
+      rows = parsed.rows;
+
+      // allow empty files: create starter headers
+      if(!headers.length){
+        headers = ["bowler_name","amount","type","paid"];
+        rows = [];
+      }else{
+        // ensure required headers exist for export
+        ensureHeader("bowler_name"); ensureHeader("amount"); ensureHeader("type"); ensureHeader("paid");
+      }
+
+      render();
+    }catch(e){
+      // Try optional fallback payouts.csv if present
+      try{
+        const res2 = await fetch(FALLBACK_PAYOUTS, {cache:"no-store"});
+        if(!res2.ok) throw new Error("HTTP " + res2.status);
+        const text2 = await res2.text();
+        const parsed2 = parseCSV(text2);
+        headers = parsed2.headers.length ? parsed2.headers : ["bowler_name","amount","type","paid"];
+        rows = parsed2.rows || [];
+        ensureHeader("bowler_name"); ensureHeader("amount"); ensureHeader("type"); ensureHeader("paid");
+        render();
+      }catch(_e2){
+        headers = ["Error"];
+        rows = [{ "Error": `Could not load ${currentPayoutsPath()}. Make sure it exists in your repo.` }];
+        render();
+        $("err").style.display = "block";
+        $("err").textContent = String(e && e.message ? e.message : e);
+      }
+    }
+  }
+
+  function exportCSV(){
+    try{
+      // Ensure canonical headers exist (export includes everything currently in headers)
+      ensureHeader("bowler_name"); ensureHeader("amount"); ensureHeader("type"); ensureHeader("paid");
+
+      const csvText = toCSV(headers, rows);
+      const leagueId = getSelectedLeagueId();
+      const filename = `payouts_${leagueId}.csv`;
+
+      const blob = new Blob([csvText], {type:"text/csv;charset=utf-8"});
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+
+      URL.revokeObjectURL(url);
+    }catch(e){
+      $("err").style.display = "block";
+      $("err").textContent = String(e && e.message ? e.message : e);
+    }
+  }
+
+  function addPayout(){
+    $("addErr").style.display = "none";
+    $("addErr").textContent = "";
+
+    const bowlerId = $("addBowler").value || "";
+    const bowlerName = ($("addBowler").selectedOptions[0]?.textContent || "").trim();
+    const type = ($("addType").value || "").trim();
+    const amountRaw = ($("addAmount").value || "").trim();
+
+    if(!bowlerName){
+      $("addErr").style.display = "block";
+      $("addErr").textContent = "Pick a bowler first.";
+      return;
+    }
+
+    const amountNum = Number(amountRaw);
+    if(!isFinite(amountNum) || amountNum < 0){
+      $("addErr").style.display = "block";
+      $("addErr").textContent = "Enter a valid amount (0 or more).";
+      return;
+    }
+
+    // Ensure headers
+    ensureHeader("bowler_name");
+    ensureHeader("amount");
+    ensureHeader("type");
+    ensureHeader("paid");
+
+    // Optional: include bowler_id if you want it in the file
+    // (uncomment to always include it)
+    // ensureHeader("bowler_id");
+
+    const nameKey = findHeaderKey(COLS.name) || "bowler_name";
+    const amtKey  = findHeaderKey(COLS.amount) || "amount";
+    const paidKey = findHeaderKey(COLS.paid) || "paid";
+    const typeKey = findHeaderKey(COLS.type) || "type";
+    const idKey   = findHeaderKey(COLS.bowler_id) || "bowler_id";
+
+    const row = {};
+    // Initialize all known headers so export has consistent columns
+    headers.forEach(h => row[h] = "");
+
+    row[nameKey] = bowlerName;
+    row[amtKey] = formatMoney(amountNum);
+    row[typeKey] = type;
+    row[paidKey] = "0";
+
+    // If payouts file already has bowler_id column, populate it.
+    if(headers.map(h=>norm(h)).includes("bowler_id")){
+      row[idKey] = bowlerId;
+    }
+
+    rows.push(row);
+    setAddFormVisible(false);
+    render();
+  }
+
+  function setLeagueOptions(options, selectedId){
+    const sel = $("leagueSelect");
+    sel.innerHTML = "";
+
+    options.forEach(o => {
+      const opt = document.createElement("option");
+      opt.value = o.league_id;
+      opt.textContent = `${o.league_id} — ${o.name}`;
+      sel.appendChild(opt);
+    });
+
+    const exists = options.some(o => String(o.league_id) === String(selectedId));
+    sel.value = exists ? selectedId : (options[0]?.league_id || DEFAULT_LEAGUE_ID);
+  }
+
+  async function loadLeagues(){
+    const saved = localStorage.getItem(STORAGE_KEY) || DEFAULT_LEAGUE_ID;
+
+    try{
+      const res = await fetch(LEAGUES_PATH, {cache:"no-store"});
+      if(!res.ok) throw new Error("HTTP " + res.status);
+      const text = await res.text();
+      const parsed = parseCSV(text);
+
+      const h = parsed.headers.map(x => x.toLowerCase());
+      const idxId = h.indexOf("league_id");
+      const idxName = h.indexOf("name");
+      if(idxId < 0 || idxName < 0) throw new Error("leagues.csv missing league_id or name headers");
+
+      const options = parsed.rows
+        .map(r => ({
+          league_id: (r[parsed.headers[idxId]] || "").trim(),
+          name: (r[parsed.headers[idxName]] || "").trim()
+        }))
+        .filter(o => o.league_id);
+
+      if(!options.length) throw new Error("No leagues found in leagues.csv");
+
+      setLeagueOptions(options, saved);
+    }catch(_e){
+      setLeagueOptions([{league_id: DEFAULT_LEAGUE_ID, name: "Wednesday Mixed League"}], saved);
+    }
+
+    $("leagueSelect").addEventListener("change", async () => {
+      localStorage.setItem(STORAGE_KEY, getSelectedLeagueId());
+      $("search").value = "";
+      setAddFormVisible(false);
+
+      // reload both bowlers + payouts for selected league
+      await loadBowlersForLeague();
+      await loadPayouts();
+    });
+  }
+
+  // UI events
+  $("search").addEventListener("input", render);
+  $("reload").addEventListener("click", loadPayouts);
+  $("export").addEventListener("click", exportCSV);
+
+  $("addToggle").addEventListener("click", async () => {
+    const visible = $("addForm").style.display === "block";
+    if(visible){
+      setAddFormVisible(false);
+    }else{
+      // Make sure bowler list is loaded
+      if(!bowlerOptions.length) await loadBowlersForLeague();
+      setAddFormVisible(true);
+    }
+  });
+  $("addCancel").addEventListener("click", () => setAddFormVisible(false));
+  $("addConfirm").addEventListener("click", addPayout);
+
+  // init
+  (async () => {
+    await loadLeagues();
+    await loadBowlersForLeague();
+    await loadPayouts();
+  })();
+})();
+</script>
+</body>
+</html>
