@@ -545,6 +545,7 @@
         <div class="hd">
           <h2>Setup</h2>
           <div class="row">
+            <select class="w-md" id="leagueSelect" aria-label="League"></select>
             <button class="btn primary" id="btnAddBracket" type="button">+ Add Bracket</button>
           </div>
         </div>
@@ -652,7 +653,7 @@
       <div class="mhd">
         <div>
           <div class="ttl">Select Bowler</div>
-          <div class="hint">Loaded from <span class="mono">data/bowlers.csv</span>, sorted by last name.</div>
+          <div class="hint">Loaded from <span class="mono" id="rosterPathLabel">data/bowlers.csv</span>, sorted by last name.</div>
         </div>
         <button class="x" id="pickerClose" type="button">Close</button>
       </div>
@@ -700,7 +701,87 @@
     const y = document.getElementById("copyrightYear");
     if(y) y.textContent = new Date().getFullYear();
   }catch(e){}
-  const state = { bowlers: new Map(), brackets: [], roster: [], rosterLoaded:false, selectedRoster:null };
+  const state = { bowlers: new Map(), brackets: [], roster: [], rosterLoaded:false, selectedRoster:null, leagueId: null, leagues: [] };
+
+  const LEAGUES_CSV = "data/leagues.csv";
+  const DEFAULT_ROSTER = "data/bowlers.csv";
+  const LEAGUE_KEY = "vista_selected_league";
+
+  function getRosterPath(){
+    const id = String(state.leagueId || "").trim();
+    return id ? `data/bowlers_${id}.csv` : DEFAULT_ROSTER;
+  }
+
+  function setRosterLabel(){
+    const el = $("rosterPathLabel");
+    if(el) el.textContent = getRosterPath();
+  }
+
+  async function loadLeagues(){
+    const sel = $("leagueSelect");
+    if(!sel) return;
+
+    // default option
+    sel.innerHTML = "";
+    const opt0 = document.createElement("option");
+    opt0.value = "";
+    opt0.textContent = "All Leagues";
+    sel.appendChild(opt0);
+
+    try{
+      const res = await fetch(LEAGUES_CSV, {cache:"no-store"});
+      if(res.ok){
+        const text = await res.text();
+        const rows = parseCSV(text);
+        // Expected headers: league_id,name,season,cutoff_week (others ok)
+        const leagues = rows
+          .map(r => ({
+            league_id: String(r.league_id || r.LEAGUE_ID || "").trim(),
+            name: String(r.name || r.NAME || "").trim()
+          }))
+          .filter(x => x.league_id && x.name);
+
+        // sort by name
+        leagues.sort((a,b)=>a.name.localeCompare(b.name));
+        state.leagues = leagues;
+
+        for(const lg of leagues){
+          const o = document.createElement("option");
+          o.value = lg.league_id;
+          o.textContent = `${lg.name} (${lg.league_id})`;
+          sel.appendChild(o);
+        }
+      }
+    }catch(_e){
+      // ok: keep only "All Leagues"
+    }
+
+    // restore last selection if present
+    const saved = localStorage.getItem(LEAGUE_KEY) || "";
+    if(saved){
+      sel.value = saved;
+      state.leagueId = saved;
+    }else{
+      state.leagueId = sel.value || "";
+    }
+    setRosterLabel();
+
+    sel.addEventListener("change", async () => {
+      state.leagueId = sel.value || "";
+      localStorage.setItem(LEAGUE_KEY, state.leagueId);
+
+      // force roster reload next time picker opens (and refresh if already open)
+      state.rosterLoaded = false;
+      state.roster = [];
+      setRosterLabel();
+
+      // if picker is open, reload roster immediately
+      const pickerOpen = $("pickerBackdrop") && $("pickerBackdrop").style.display === "flex";
+      if(pickerOpen){
+        await loadRoster();
+      }
+    });
+  }
   const BRACKET_SIZE = 8;
 
   const $ = (id)=>document.getElementById(id);
@@ -2283,7 +2364,7 @@ row.appendChild(nm);
         if(!br) return;
         br.type=sel.value;
 
-        // If a bracket is changed from Scratch -> Handicap, refresh bowler handicaps from data/bowlers.csv
+        // If a bracket is changed from Scratch -> Handicap, refresh bowler handicaps from the selected league roster CSV
         if(br.type==="handicap"){
           try{
             if(!state.rosterLoaded) await loadRoster();
@@ -2405,8 +2486,9 @@ root.querySelectorAll("[data-p1]").forEach(inp=>{
     return {name, handicap};
   }
   async function loadRoster(){
+    setRosterLabel();
     try{
-      const res = await fetch("data/bowlers.csv", {cache:"no-store"});
+      const res = await fetch(getRosterPath(), {cache:"no-store"});
       if(!res.ok) throw new Error("HTTP "+res.status);
       const text = await res.text();
       const rows = parseCSV(text);
@@ -2450,7 +2532,7 @@ root.querySelectorAll("[data-p1]").forEach(inp=>{
     if(!state.rosterLoaded){
       const div = document.createElement("div");
       div.className = "hint";
-      div.innerHTML = `Could not load <span class="mono">data/bowlers.csv</span>. You can still type a new bowler above.`;
+      div.innerHTML = `Could not load <span class="mono">${getRosterPath()}</span>. You can still type a new bowler above.`;
       list.appendChild(div);
       return;
     }
@@ -2600,6 +2682,7 @@ root.querySelectorAll("[data-p1]").forEach(inp=>{
   async function init(){
     updateHcpVisibility();
     updateManualHint();
+    await loadLeagues();
     await loadRoster();
 
     // Restore brackets from local storage (if present)
