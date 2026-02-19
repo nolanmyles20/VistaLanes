@@ -1,297 +1,280 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<title>Vista Lanes - Membership</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Vista Lanes - Membership</title>
+  <style>
+    :root{
+      --bg:#000;
+      --panel: rgba(255,255,255,.04);
+      --panel2: rgba(255,255,255,.02);
+      --border: rgba(255,255,255,.10);
+      --text:#d8e1ee;
+      --muted:#8ea0b5;
+      --btn:#d9d9d9;
+      --btnText:#111;
+      --btnBorder:#bdbdbd;
+      --activeShadow: inset 0 3px 10px rgba(0,0,0,.35);
+      --shadow: 0 10px 30px rgba(0,0,0,.45);
+      --radius:18px;
+      --accent:#6aa7ff;
+      --good:#2aa77a;
+      --warn:#ffd57a;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      background: var(--bg);
+      color: var(--text);
+      min-height:100vh;
+    }
+    .wrap{max-width:1200px;margin:0 auto;padding:14px 14px 60px;}
 
-<style>
-:root{
-  --bg:#000;
-  --border:rgba(255,255,255,.08);
-  --text:#d8e1ee;
-  --muted:#8ea0b5;
-  --shadow: 0 10px 30px rgba(0,0,0,.45);
-  --radius:18px;
+    .brandbar{
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      padding:8px 0 8px;
+    }
+    .brandbar img{
+      width:min(340px, 86vw);
+      height:auto;
+      display:block;
+      filter: drop-shadow(0 10px 22px rgba(0,0,0,.55));
+      opacity:.98;
+    }
 
-  --panelBg: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
-  --cardBg: rgba(255,255,255,.04);
-  --chipBg: rgba(255,255,255,.10);
+    .menubar{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:center;
+      align-items:center;
+      margin: 6px 0 14px;
+    }
+    .menubar a{
+      text-decoration:none;
+      background: var(--btn);
+      color: var(--btnText);
+      border: 1px solid var(--btnBorder);
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-weight: 800;
+      letter-spacing:.2px;
+      box-shadow: 0 3px 0 rgba(255,255,255,.15);
+      transition: .12s ease;
+      user-select:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width: 104px;
+    }
+    .menubar a:hover{transform: translateY(-1px);}
+    .menubar a:active{transform: translateY(0px);}
+    .menubar a.active{
+      background: #cfcfcf;
+      box-shadow: var(--activeShadow);
+      transform: translateY(1px);
+      border-color:#a9a9a9;
+    }
 
-  --good:#35d07f;
-  --bad:#ff4d4d;
-  --warn:#ffd166;
+    header{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:flex-end;
+      flex-wrap:wrap;
+      margin: 6px 0 12px;
+    }
+    h1{margin:0;font-size:22px;font-weight:900;letter-spacing:.3px;}
+    .sub{color:var(--muted);font-size:13px;}
 
-  --btnBg:#d9d9d9;
-  --btnText:#000;
-  --btnBorder:rgba(0,0,0,.18);
+    .panel{
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .panel .hd{
+      padding:12px 14px;
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      background: linear-gradient(180deg, rgba(255,255,255,.03), transparent);
+    }
+    .panel .hd .right{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+    .panel .hd .left{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
 
-  --accent:#3aa3ff;
-}
+    input{
+      background: rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.12);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius: 14px;
+      outline:none;
+      transition:.15s ease;
+      max-width:100%;
+      min-width:220px;
+    }
+    input::placeholder{color:rgba(216,225,238,.35)}
+    input:focus{border-color: rgba(106,167,255,.5);box-shadow: 0 0 0 3px rgba(106,167,255,.15);}
 
-*{box-sizing:border-box}
-html,body{height:100%}
+    .pill{
+      font-size:12px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.03);
+      color:var(--muted);
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      white-space:nowrap;
+    }
+    .pill b{color:var(--text)}
+    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;}
 
-body{
-  margin:0;
-  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-  background:var(--bg);
-  color:var(--text);
+    /* League dropdown styled like pill */
+    .leagueSelect{
+      font-size:12px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.03);
+      color: var(--text);
+      outline:none;
+      max-width: 520px;
+    }
+    .leagueSelect option{background:#111;color:#fff;}
 
-  height:100svh;
-  height:100dvh;
-  overflow:hidden;            /* page does not scroll */
-  display:flex;
-  flex-direction:column;
-}
+    .btn{
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(106,167,255,.18);
+      color: var(--text);
+      padding:10px 13px;
+      border-radius: 999px;
+      cursor:pointer;
+      transition:.15s ease;
+      display:inline-flex;gap:8px;align-items:center;
+      user-select:none;
+      font-weight:800;
+    }
+    .btn:hover{transform: translateY(-1px);}
+    .btn:active{transform: translateY(0px);}
 
-.wrap{
-  width:100%;
-  max-width:980px;
-  margin:0 auto;
-  padding:0 14px env(safe-area-inset-bottom);
-  flex:1;
-  display:flex;
-  flex-direction:column;
-  min-height:0;
-}
+    .btnSave{
+      background: rgba(106,167,255,.30);
+      border-color: rgba(106,167,255,.55);
+    }
+    .btnExport{
+      background: rgba(255,255,255,.10);
+      border-color: rgba(255,255,255,.20);
+    }
 
-/* ================= LOGO ================= */
+    .bd{padding:14px;}
 
-.brandArea{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  line-height:0;
-  flex:0 0 auto;
-}
+    .tableWrap{
+      width:100%;
+      overflow:auto;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.10);
+    }
+    table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      min-width: 720px;
+    }
+    thead th{
+      position:sticky;
+      top:0;
+      z-index:2;
+      text-align:left;
+      font-size:12px;
+      letter-spacing:.35px;
+      text-transform:uppercase;
+      color:var(--muted);
+      background: rgba(20,20,20,.98);
+      border-bottom:1px solid rgba(255,255,255,.10);
+      padding:12px 12px;
+      white-space:nowrap;
+    }
+    tbody td{
+      padding:10px 12px;
+      border-bottom:1px solid rgba(255,255,255,.06);
+      color:var(--text);
+      vertical-align:top;
+    }
+    tbody tr:hover td{background: rgba(255,255,255,.03);}
 
-.brandCrop{
-  width:min(720px,96vw);
-  height:clamp(190px,26svh,260px);
-  overflow:hidden;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-}
+    .nameCell{font-weight:900}
+    .numCell{font-weight:800}
 
-.brandMain{
-  width:100%;
-  height:auto;
-  display:block;
-  object-fit:contain;
-  transform: translateY(8px) scale(1);
-  transform-origin:center;
-  filter: drop-shadow(0 14px 28px rgba(0,0,0,.60));
-}
+    .cellInput{
+      width:100%;
+      min-width: 120px;
+      padding:8px 10px;
+      border-radius:12px;
+      background: rgba(255,255,255,.02);
+      border:1px solid rgba(255,255,255,.10);
+      color: var(--text);
+      outline:none;
+      transition:.12s ease;
+      font: inherit;
+    }
+    .cellInput:focus{
+      border-color: rgba(106,167,255,.55);
+      box-shadow: 0 0 0 3px rgba(106,167,255,.12);
+      background: rgba(255,255,255,.03);
+    }
 
-/* ================= PANEL ================= */
+    .status{
+      margin-left:6px;
+      font-size:12px;
+      color: var(--muted);
+      padding:6px 10px;
+      border-radius: 999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.03);
+      display:none;
+      white-space:nowrap;
+    }
+    .status.ok{color:#a8f3d5;border-color: rgba(42,167,122,.35); background: rgba(42,167,122,.12);}
+    .status.bad{color: #ffd57a; border-color: rgba(255,213,122,.35); background: rgba(255,213,122,.10);}
 
-.panel{
-  margin-top:4px;
-  background:var(--panelBg);
-  border:1px solid var(--border);
-  border-radius:var(--radius);
-  box-shadow:var(--shadow);
-  overflow:hidden;
-  flex:1 1 auto;
-  min-height:0;
-  display:flex;
-  flex-direction:column;
-}
+    .err{
+      margin-top:10px;
+      color:#ffd57a;
+      font-size:13px;
+      line-height:1.4;
+    }
 
-.hd{
-  padding:12px 16px 10px;
-  border-bottom:1px solid var(--border);
-  display:flex;
-  align-items:flex-start;
-  justify-content:space-between;
-  gap:12px;
-}
-
-.hdLeft{ display:flex; flex-direction:column; gap:8px; min-width:0; }
-
-.hd h1{
-  margin:0;
-  font-size:20px;
-  font-weight:900;
-}
-
-.subRow{
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-  align-items:center;
-}
-
-.sub{
-  color:var(--muted);
-  font-size:13px;
-}
-
-.backBtn{
-  flex:0 0 auto;
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  padding:10px 14px;
-  border-radius:999px;
-  border:1px solid rgba(255,255,255,.12);
-  background: rgba(255,255,255,.06);
-  color: var(--text);
-  text-decoration:none;
-  font-weight:900;
-  font-size:14px;
-  user-select:none;
-}
-.backBtn:active{ transform: translateY(1px); }
-
-/* Body scrolls */
-.bd{
-  padding:12px;
-  flex:1 1 auto;
-  min-height:0;
-  overflow:auto;
-  -webkit-overflow-scrolling:touch;
-}
-
-/* ================= CONTROLS ================= */
-
-.controls{
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-  align-items:center;
-  justify-content:space-between;
-  margin:2px 0 12px;
-}
-
-.ctrlLeft{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
-.ctrlRight{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
-
-.select{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  padding:10px 12px;
-  border-radius:12px;
-  border:1px solid rgba(255,255,255,.12);
-  background: rgba(255,255,255,.06);
-  color: var(--text);
-  font-weight:900;
-  font-size:13px;
-}
-
-.select label{ color:var(--muted); font-weight:900; }
-.select select{
-  background:transparent;
-  color:var(--text);
-  border:none;
-  outline:none;
-  font-weight:900;
-  font-size:13px;
-  max-width:240px;
-}
-
-.btn{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
-  padding:10px 12px;
-  border-radius:12px;
-  border:1px solid rgba(255,255,255,.14);
-  background: rgba(255,255,255,.08);
-  color: var(--text);
-  text-decoration:none;
-  font-weight:950;
-  font-size:13px;
-  user-select:none;
-  white-space:nowrap;
-}
-.btn:active{ transform: translateY(1px); }
-
-.btnPrimary{
-  background: rgba(58,163,255,.18);
-  border-color: rgba(58,163,255,.35);
-}
-
-.btnDanger{
-  background: rgba(255,77,77,.14);
-  border-color: rgba(255,77,77,.28);
-}
-
-/* ================= TABLE ================= */
-
-.tableWrap{
-  border:1px solid rgba(255,255,255,.10);
-  background: var(--cardBg);
-  border-radius:16px;
-  overflow:hidden;
-}
-
-table{
-  width:100%;
-  border-collapse:collapse;
-  table-layout:fixed; /* prevents sideways scroll */
-}
-
-thead th{
-  text-align:left;
-  font-size:12px;
-  color:var(--muted);
-  font-weight:950;
-  padding:10px 10px;
-  border-bottom:1px solid rgba(255,255,255,.08);
-  background: rgba(255,255,255,.02);
-}
-
-tbody td{
-  padding:10px 10px;
-  border-bottom:1px solid rgba(255,255,255,.06);
-  vertical-align:middle;
-  font-size:13px;
-}
-
-tbody tr:last-child td{ border-bottom:none; }
-
+    @media (max-width: 520px){
+      .menubar a{min-width: 96px; padding: 9px 12px;}
+      input{min-width: 180px;}
+    }
+  
+/* ===== Membership columns ===== */
 .colName{ width:34%; }
 .colOwed{ width:18%; }
 .colUpcoming{ width:18%; }
 .colCredits{ width:18%; }
 .colActions{ width:12%; text-align:right; }
+.money{ font-variant-numeric: tabular-nums; font-weight:950; }
+.good{ color:#35d07f; }
+.bad{ color:#ff4d4d; }
+.warn{ color:#ffd166; }
 
-.money{
-  font-variant-numeric: tabular-nums;
-  font-weight:950;
-}
-
-.bad{ color: var(--bad); }
-.good{ color: var(--good); }
-.warn{ color: var(--warn); }
-
-.smallBtn{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:6px;
-  padding:8px 10px;
-  border-radius:12px;
-  border:1px solid rgba(255,255,255,.14);
-  background: rgba(255,255,255,.08);
-  color: var(--text);
-  text-decoration:none;
-  font-weight:950;
-  font-size:12px;
-  user-select:none;
-}
-.smallBtn:active{ transform: translateY(1px); }
-
-/* ================= MODAL ================= */
-
+/* ===== Modal ===== */
 .modalBackdrop{
-  position:fixed;
-  inset:0;
+  position:fixed; inset:0;
   background: rgba(0,0,0,.65);
   display:none;
   align-items:center;
@@ -299,7 +282,6 @@ tbody tr:last-child td{ border-bottom:none; }
   padding:16px;
   z-index:999;
 }
-
 .modal{
   width:min(720px, 96vw);
   border-radius:18px;
@@ -308,7 +290,6 @@ tbody tr:last-child td{ border-bottom:none; }
   box-shadow: 0 18px 50px rgba(0,0,0,.70);
   overflow:hidden;
 }
-
 .modalHd{
   padding:12px 14px;
   border-bottom:1px solid rgba(255,255,255,.10);
@@ -317,13 +298,7 @@ tbody tr:last-child td{ border-bottom:none; }
   justify-content:space-between;
   gap:10px;
 }
-
-.modalHd h3{
-  margin:0;
-  font-size:15px;
-  font-weight:950;
-}
-
+.modalHd h3{ margin:0; font-size:15px; font-weight:950; }
 .xBtn{
   width:38px; height:38px;
   border-radius:12px;
@@ -333,27 +308,14 @@ tbody tr:last-child td{ border-bottom:none; }
   font-weight:950;
   cursor:pointer;
 }
-
 .modalBd{ padding:14px; }
-
 .formGrid{
   display:grid;
   grid-template-columns: 1fr 1fr;
   gap:12px;
 }
-
-.field{
-  display:flex;
-  flex-direction:column;
-  gap:6px;
-}
-
-.field label{
-  color:var(--muted);
-  font-size:12px;
-  font-weight:950;
-}
-
+.field{ display:flex; flex-direction:column; gap:6px; }
+.field label{ color:var(--muted); font-size:12px; font-weight:950; }
 .field input, .field select{
   padding:10px 12px;
   border-radius:12px;
@@ -363,16 +325,7 @@ tbody tr:last-child td{ border-bottom:none; }
   font-weight:900;
   outline:none;
 }
-
 .fieldFull{ grid-column: 1 / -1; }
-
-.note{
-  color:var(--muted);
-  font-size:12px;
-  line-height:1.35;
-  margin:0;
-}
-
 .modalFt{
   padding:12px 14px;
   border-top:1px solid rgba(255,255,255,.10);
@@ -380,109 +333,54 @@ tbody tr:last-child td{ border-bottom:none; }
   gap:10px;
   justify-content:flex-end;
 }
-
-@media (max-width:640px){
-  .formGrid{ grid-template-columns: 1fr; }
-}
-
-/* ================= BOTTOM ================= */
-
-.bottomArea{
-  flex:0 0 auto;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:8px;
-  padding:10px 0 0;
-}
-
-.poweredByWrap{
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-
-.poweredByText{
-  color:var(--muted);
-  font-size:12px;
-  font-weight:800;
-  text-transform:uppercase;
-}
-
-.poweredByLogo{
-  width:118px;
-  height:auto;
-  filter:drop-shadow(0 8px 18px rgba(0,0,0,.55));
-}
-
-footer{
-  width:100%;
-  text-align:center;
-  font-size:12px;
-  color:var(--muted);
-  padding:6px 0 10px;
-  border-top:1px solid var(--border);
-}
-
-/* Tighten for shorter screens */
-@media (max-height:760px){
-  .brandCrop{ height:clamp(165px,24svh,220px); }
-  .brandMain{ transform: translateY(6px) scale(1); }
-  .poweredByLogo{ width:100px; }
-}
-@media (max-height:700px){
-  .brandCrop{ height:clamp(145px,22svh,200px); }
-}
+@media (max-width:640px){ .formGrid{ grid-template-columns: 1fr; } }
 </style>
 </head>
 
 <body>
-<div class="wrap">
-
-  <!-- LOGO -->
-  <div class="brandArea">
-    <div class="brandCrop">
-      <img
-        class="brandMain"
-        src="assets/9AB9725D-AD71-4DDC-BE9B-03328F663643.png"
-        alt="Vista Lanes"
-      />
+  <div class="wrap">
+    <div class="brandbar">
+      <img src="assets/9AB9725D-AD71-4DDC-BE9B-03328F663643.png" alt="Vista Lanes" />
     </div>
-  </div>
 
-  <!-- PANEL -->
-  <div class="panel">
-    <div class="hd">
-      <div class="hdLeft">
+    <nav class="menubar" aria-label="Main menu">
+      <a href="index.html">Home</a>
+      <a class="active" href="bowlers.html" aria-current="page">Membership</a>
+      <a href="leagues.html">Leagues</a>
+      <a href="teams.html">Teams</a>
+      <a href="lanes.html">Lanes</a>
+      <a href="brackets.html">Brackets</a>
+      <a href="payouts.html">Payouts</a>
+      <a href="tournaments.html">Tournaments</a>
+    </nav>
+
+    <header>
+      <div>
         <h1>Membership</h1>
-        <div class="subRow">
-          <div class="sub">Loaded from <span style="font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace;" id="fileLabel">data/membership_?.csv</span></div>
+        <div class="sub">Loaded from <span class="mono" id="loadedPath">data/bowlers_32170.csv</span></div>
+      </div>
+    </header>
+
+    <div class="panel">
+      <div class="hd">
+        <div class="left">
+          <div class="pill"><b id="count">0</b> bowlers</div>
+
+          <!-- NEW: league dropdown -->
+          <select id="leagueSelect" class="leagueSelect" title="Select league"></select>
+        </div>
+
+        <div class="right">
+          <input id="search" placeholder="Search bowler…" />
+          <button class="btn" id="reload" type="button">Reload CSV</button>
+          <button class="btn btnSave" id="save" type="button" title="Send edits to the server">Save</button>
+          <button class="btn btnExport" id="export" type="button" title="Download a new CSV from your current edits">Export</button>
+          <span class="status" id="status"></span>
         </div>
       </div>
 
-      <a class="backBtn" href="index.html">← Back</a>
-    </div>
-
-    <div class="bd">
-
-      <div class="controls">
-        <div class="ctrlLeft">
-          <div class="select">
-            <label for="leagueSelect">League:</label>
-            <select id="leagueSelect"></select>
-          </div>
-</div>
-
-        <div class="ctrlRight">
-          <a class="btn btnPrimary" href="#" id="addBowlerBtn">➕ Add Bowler</a>
-          <a class="btn" href="#" id="exportBtn">⬇️ Export CSV</a>
-          <a class="btn btnDanger" href="#" id="resetBtn">🗑️ Reset Local Changes</a>
-        </div>
-      </div>
-
-      <div id="err" style="display:none; margin:8px 0 12px; padding:10px 12px; border-radius:14px; border:1px solid rgba(255,77,77,.35); background: rgba(255,77,77,.10); color: var(--text); font-weight:900; font-size:13px;"></div>
-
-      <div class="tableWrap">
+      <div class="bd">
+        <div class="tableWrap">
         <table>
           <thead>
             <tr>
@@ -498,30 +396,353 @@ footer{
       </div>
 
       <p class="note" style="margin-top:10px;">
-        This page is offline/static-friendly: payments update the table and are saved in your browser (localStorage).
+        Loaded from <b id="fileLabel">data/membership_?.csv</b>. Payments update the table in your browser.
         Use <b>Export CSV</b> to download the updated membership file and replace it on the Pi.
       </p>
-
+        <div class="err" id="err" style="display:none"></div>
+      </div>
     </div>
   </div>
 
-  <!-- BOTTOM -->
-  <div class="bottomArea">
-    <div class="poweredByWrap">
-      <div class="poweredByText">Powered By</div>
-      <img
-        class="poweredByLogo"
-        src="assets/68D8CA4C-741E-41E1-ABBC-8B57D7FD0A57.png"
-        alt="Myles Bowling Systems"
-      />
-    </div>
+<script>
+(() => {
+  const LEAGUES_PATH = "data/leagues.csv";
+  const DEFAULT_LEAGUE_ID = "32170";
+  const STORAGE_KEY = "vista_selected_league_id";
 
-    <footer>
-      © <span id="year"></span> Vista Lanes. All Rights Reserved.
-    </footer>
-  </div>
+  const COLS = ["bowler_name","dues_owed_to_date","upcoming_dues","credits"];
+  const $ = (id) => document.getElementById(id);
 
-</div>
+  function splitCSVLine(line){
+    const res=[]; let cur=""; let q=false;
+    for(let i=0;i<line.length;i++){
+      const c=line[i];
+      if(c === '"'){
+        if(q && line[i+1] === '"'){ cur+='"'; i++; }
+        else q=!q;
+      } else if(c === ',' && !q){
+        res.push(cur); cur="";
+      } else cur+=c;
+    }
+    res.push(cur);
+    return res;
+  }
+
+  function parseCSV(text){
+    const lines = text.replace(/
+/g,"
+").replace(//g,"
+").split("
+").filter(l=>l.trim()!=="");
+    if(!lines.length) return {headers:[], rows:[]};
+    const header = splitCSVLine(lines[0]).map(h=>h.trim());
+    const out=[];
+    for(let i=1;i<lines.length;i++){
+      const cols = splitCSVLine(lines[i]);
+      const obj = {};
+      header.forEach((h,idx)=> obj[h] = (cols[idx] ?? "").trim());
+      out.push(obj);
+    }
+    return {headers: header, rows: out};
+  }
+
+  function clampMoney(n){
+    const x = Number(n || 0);
+    if(!isFinite(x)) return 0;
+    return Math.round(x * 100) / 100;
+  }
+  function money(n){ return clampMoney(n).toFixed(2); }
+
+  function getSelectedLeagueId(){
+    const v = $("leagueSelect")?.value || "";
+    return v || DEFAULT_LEAGUE_ID;
+  }
+  function membershipPathForLeague(leagueId){
+    return `data/membership_${leagueId}.csv`;
+  }
+
+  function csvEscape(val){
+    const s = String(val ?? "");
+    if(/[",
+]/.test(s)) return '"' + s.replace(/"/g,'""') + '"';
+    return s;
+  }
+  function toCSV(headers, rows){
+    const head = headers.map(csvEscape).join(",");
+    const body = rows.map(r => headers.map(h => csvEscape(r[h] ?? "")).join(",")).join("
+");
+    return head + "
+" + body + "
+";
+  }
+
+  let data = [];
+  let activeIdx = -1;
+
+  function moneyClassForOwed(v){
+    const n = clampMoney(v);
+    if(n > 0.01) return "bad";
+    return "good";
+  }
+
+  function render(){
+    const tbody = $("rows");
+    tbody.innerHTML = "";
+    data.forEach((r, idx) => {
+      const tr = document.createElement("tr");
+
+      const tdName = document.createElement("td");
+      tdName.className = "colName";
+      tdName.textContent = r.bowler_name || "";
+      tr.appendChild(tdName);
+
+      const tdOwed = document.createElement("td");
+      tdOwed.className = "colOwed money " + moneyClassForOwed(r.dues_owed_to_date);
+      tdOwed.textContent = `$${money(r.dues_owed_to_date)}`;
+      tr.appendChild(tdOwed);
+
+      const tdUpcoming = document.createElement("td");
+      tdUpcoming.className = "colUpcoming money warn";
+      tdUpcoming.textContent = `$${money(r.upcoming_dues)}`;
+      tr.appendChild(tdUpcoming);
+
+      const tdCredits = document.createElement("td");
+      tdCredits.className = "colCredits money " + (clampMoney(r.credits) > 0 ? "good" : "muted");
+      tdCredits.textContent = `$${money(r.credits)}`;
+      tr.appendChild(tdCredits);
+
+      const tdAct = document.createElement("td");
+      tdAct.className = "colActions";
+
+      const btn = document.createElement("a");
+      btn.href = "#";
+      btn.className = "smallBtn";
+      btn.textContent = "💳 Pay";
+      btn.addEventListener("click", (e)=>{ e.preventDefault(); openModal(idx); });
+
+      tdAct.appendChild(btn);
+      tr.appendChild(tdAct);
+
+      tbody.appendChild(tr);
+    });
+  }
+
+  async function loadMembership(){
+    const leagueId = getSelectedLeagueId();
+    const path = membershipPathForLeague(leagueId);
+    const fileLabel = document.getElementById("fileLabel");
+    if(fileLabel) fileLabel.textContent = path;
+
+    try{
+      const res = await fetch(path, {cache:"no-store"});
+      if(!res.ok) throw new Error(`HTTP ${res.status} for ${path}`);
+      const text = await res.text();
+      const parsed = parseCSV(text);
+
+      const fileHeaders = parsed.headers.length ? parsed.headers : COLS;
+      const lower = fileHeaders.map(h => (h||"").toLowerCase());
+      const idx = {
+        bowler_name: lower.indexOf("bowler_name"),
+        dues_owed_to_date: lower.indexOf("dues_owed_to_date"),
+        upcoming_dues: lower.indexOf("upcoming_dues"),
+        credits: lower.indexOf("credits"),
+      };
+
+      data = parsed.rows.map(obj => ({
+        bowler_name: (idx.bowler_name >= 0 ? (obj[fileHeaders[idx.bowler_name]]||"") : "").trim(),
+        dues_owed_to_date: clampMoney(idx.dues_owed_to_date >= 0 ? obj[fileHeaders[idx.dues_owed_to_date]] : 0),
+        upcoming_dues: clampMoney(idx.upcoming_dues >= 0 ? obj[fileHeaders[idx.upcoming_dues]] : 0),
+        credits: clampMoney(idx.credits >= 0 ? obj[fileHeaders[idx.credits]] : 0),
+      })).filter(r => r.bowler_name);
+
+      data.sort((a,b)=> (a.bowler_name||"").localeCompare(b.bowler_name||""));
+      render();
+    }catch(e){
+      data = [{bowler_name:`Missing file: ${path}`, dues_owed_to_date:0, upcoming_dues:0, credits:0}];
+      render();
+      alert(`Membership load failed:
+${String(e && e.message ? e.message : e)}`);
+    }
+  }
+
+  function setLeagueOptions(options, selectedId){
+    const sel = $("leagueSelect");
+    sel.innerHTML = "";
+    options.forEach(o => {
+      const opt = document.createElement("option");
+      opt.value = o.league_id;
+      opt.textContent = `${o.league_id} — ${o.name}`;
+      sel.appendChild(opt);
+    });
+    const exists = options.some(o => String(o.league_id) === String(selectedId));
+    sel.value = exists ? selectedId : (options[0]?.league_id || DEFAULT_LEAGUE_ID);
+  }
+
+  async function loadLeagues(){
+    const saved = localStorage.getItem(STORAGE_KEY) || DEFAULT_LEAGUE_ID;
+    const res = await fetch(LEAGUES_PATH, {cache:"no-store"});
+    if(!res.ok) throw new Error("HTTP " + res.status);
+    const text = await res.text();
+    const parsed = parseCSV(text);
+
+    const h = parsed.headers.map(x => x.toLowerCase());
+    const idxId = h.indexOf("league_id");
+    const idxName = h.indexOf("name");
+    if(idxId < 0 || idxName < 0) throw new Error("leagues.csv missing league_id or name headers");
+
+    const options = parsed.rows.map(r => ({
+      league_id: (r[parsed.headers[idxId]] || "").trim(),
+      name: (r[parsed.headers[idxName]] || "").trim()
+    })).filter(o => o.league_id);
+
+    if(!options.length) throw new Error("No leagues found in leagues.csv");
+
+    setLeagueOptions(options, saved);
+
+    $("leagueSelect").addEventListener("change", () => {
+      localStorage.setItem(STORAGE_KEY, getSelectedLeagueId());
+      loadMembership();
+    });
+  }
+
+  // Modal logic
+  const modalBackdrop = document.getElementById("modalBackdrop");
+  const closeModalBtn = document.getElementById("closeModalBtn");
+  const cancelBtn = document.getElementById("cancelBtn");
+  const savePaymentBtn = document.getElementById("savePaymentBtn");
+  const mBowler = document.getElementById("mBowler");
+  const mType = document.getElementById("mType");
+  const mAmount = document.getElementById("mAmount");
+  const methodWrap = document.getElementById("methodWrap");
+  const mMethod = document.getElementById("mMethod");
+  const methodNote = document.getElementById("methodNote");
+
+  function openModal(idx){
+    activeIdx = idx;
+    const r = data[idx];
+    mBowler.value = r.bowler_name || "";
+    mType.value = "dues";
+    mAmount.value = Math.max(0, clampMoney(r.dues_owed_to_date || 0)).toFixed(2);
+    mMethod.value = "use_credit";
+    updateMethodVisibility();
+    updateMethodNote();
+    modalBackdrop.style.display = "flex";
+    modalBackdrop.setAttribute("aria-hidden","false");
+  }
+  function closeModal(){
+    modalBackdrop.style.display = "none";
+    modalBackdrop.setAttribute("aria-hidden","true");
+    activeIdx = -1;
+  }
+  function updateMethodVisibility(){
+    methodWrap.style.display = (mType.value === "dues") ? "block" : "none";
+  }
+  function updateMethodNote(){
+    if(activeIdx < 0) return;
+    const r = data[activeIdx];
+    const credits = clampMoney(r.credits || 0);
+    if(mType.value !== "dues"){
+      methodNote.textContent = "Adding credit increases the bowler’s available credit balance.";
+      return;
+    }
+    if(mMethod.value === "use_credit"){
+      methodNote.textContent = credits > 0
+        ? `This bowler has $${money(credits)} credit available. We'll apply as much as needed.`
+        : "This bowler has $0.00 credit available.";
+    }else if(mMethod.value === "cash"){
+      methodNote.textContent = "Cash payment reduces dues owed.";
+    }else{
+      methodNote.textContent = "Card payment reduces dues owed.";
+    }
+  }
+
+  closeModalBtn.addEventListener("click", (e)=>{ e.preventDefault(); closeModal(); });
+  cancelBtn.addEventListener("click", (e)=>{ e.preventDefault(); closeModal(); });
+  modalBackdrop.addEventListener("click", (e)=>{ if(e.target === modalBackdrop) closeModal(); });
+  mType.addEventListener("change", ()=>{ updateMethodVisibility(); updateMethodNote(); });
+  mMethod.addEventListener("change", updateMethodNote);
+
+  savePaymentBtn.addEventListener("click", (e)=>{
+    e.preventDefault();
+    if(activeIdx < 0) return;
+    const r = data[activeIdx];
+    const type = mType.value;
+    const amt = clampMoney(mAmount.value);
+    if(!(amt > 0)){
+      alert("Enter an amount greater than 0.");
+      return;
+    }
+    if(type === "credit"){
+      r.credits = clampMoney((r.credits||0) + amt);
+    }else{
+      if(mMethod.value === "use_credit"){
+        const avail = clampMoney(r.credits || 0);
+        const apply = Math.min(avail, amt);
+        r.credits = clampMoney(avail - apply);
+        r.dues_owed_to_date = clampMoney((r.dues_owed_to_date||0) - amt);
+      }else{
+        r.dues_owed_to_date = clampMoney((r.dues_owed_to_date||0) - amt);
+      }
+    }
+    closeModal();
+    render();
+  });
+
+  // Template buttons
+  const addBtn = document.getElementById("addBowlerBtn");
+  if(addBtn){
+    addBtn.textContent = "➕ Add Member";
+    addBtn.addEventListener("click", (e)=>{
+      e.preventDefault();
+      const name = prompt("Enter bowler name:");
+      if(!name) return;
+      const clean = name.trim();
+      if(!clean) return;
+      if(data.some(x => (x.bowler_name||"").toLowerCase() === clean.toLowerCase())){
+        alert("That bowler already exists in this membership file.");
+        return;
+      }
+      data.push({bowler_name:clean, dues_owed_to_date:0, upcoming_dues:0, credits:0});
+      data.sort((a,b)=> (a.bowler_name||"").localeCompare(b.bowler_name||""));
+      render();
+    });
+  }
+
+  const exportBtn = document.getElementById("exportBtn");
+  if(exportBtn){
+    exportBtn.addEventListener("click", (e)=>{
+      e.preventDefault();
+      const leagueId = getSelectedLeagueId();
+      const filename = `membership_${leagueId}.csv`;
+      const csvText = toCSV(COLS, data.map(r => ({
+        bowler_name: r.bowler_name || "",
+        dues_owed_to_date: money(r.dues_owed_to_date || 0),
+        upcoming_dues: money(r.upcoming_dues || 0),
+        credits: money(r.credits || 0),
+      })));
+      const blob = new Blob([csvText], {type:"text/csv;charset=utf-8"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    });
+  }
+
+  // year
+  const y = document.getElementById("year");
+  if(y) y.textContent = new Date().getFullYear();
+
+  loadLeagues().then(loadMembership).catch(e => {
+    alert(`League load failed:
+${String(e && e.message ? e.message : e)}`);
+    loadMembership();
+  });
+})();
+</script>
 
 <!-- PAYMENT MODAL -->
 <div class="modalBackdrop" id="modalBackdrop" aria-hidden="true">
@@ -574,454 +795,6 @@ footer{
     </div>
   </div>
 </div>
-
-
-<script>
-(() => {
-  const LEAGUES_PATH = "data/leagues.csv"; // same as bowlers.html
-  const DEFAULT_LEAGUE_ID = "32170";       // change if you want a different default league
-  const STORAGE_KEY = "vista_selected_league_id";
-
-  const $ = (id) => document.getElementById(id);
-
-  async function fetchTextWithFallback(paths){
-    let lastErr = null;
-    for(const p of paths){
-      try{
-        const res = await fetch(p, {cache:"no-store"});
-        if(!res.ok) throw new Error(`HTTP ${res.status} for ${p}`);
-        return await res.text();
-      }catch(e){
-        lastErr = e;
-      }
-    }
-    throw lastErr || new Error("Fetch failed");
-  }
-
-  const COLS = ["bowler_name","dues_owed_to_date","upcoming_dues","credits"];
-
-  let rows = [];      // array of objects
-  let headers = COLS; // fixed for membership files
-
-  function splitCSVLine(line){
-    const res=[]; let cur=""; let q=false;
-    for(let i=0;i<line.length;i++){
-      const c=line[i];
-      if(c === '"'){
-        if(q && line[i+1] === '"'){ cur+='"'; i++; }
-        else q=!q;
-      } else if(c === ',' && !q){
-        res.push(cur); cur="";
-      } else cur+=c;
-    }
-    res.push(cur);
-    return res;
-  }
-
-  function parseCSV(text){
-    const lines = text.replace(/
-/g,"
-").replace(/
-/g,"
-").split("
-").filter(l=>l.trim()!=="");
-    if(!lines.length) return {headers:[], rows:[]};
-
-    const header = splitCSVLine(lines[0]).map(h=>h.trim());
-    const out=[];
-    for(let i=1;i<lines.length;i++){
-      const cols = splitCSVLine(lines[i]);
-      const obj = {};
-      header.forEach((h,idx)=> obj[h] = (cols[idx] ?? "").trim());
-      out.push(obj);
-    }
-    return {headers: header, rows: out};
-  }
-
-  function csvEscape(val){
-    const s = String(val ?? "");
-    if(/[",
-
-]/.test(s)){
-      return '"' + s.replace(/"/g,'""') + '"';
-    }
-    return s;
-  }
-
-  function toCSV(headers, rows){
-    const head = headers.map(csvEscape).join(",");
-    const body = rows.map(r => headers.map(h => csvEscape(r[h] ?? "")).join(",")).join("
-");
-    return head + "
-" + body + "
-";
-  }
-
-  function clampMoney(n){
-    const x = Number(n || 0);
-    if(!isFinite(x)) return 0;
-    return Math.round(x * 100) / 100;
-  }
-
-  function money(n){
-    const x = clampMoney(n);
-    return x.toFixed(2);
-  }
-
-  function getSelectedLeagueId(){
-    const v = $("leagueSelect").value || "";
-    return v || DEFAULT_LEAGUE_ID;
-  }
-
-  function currentCsvPath(){
-    const leagueId = getSelectedLeagueId();
-    return `data/membership_${leagueId}.csv`;
-  }
-
-  function updateLoadedPathLabel(){
-    const el = document.getElementById("fileLabel");
-    if(el) el.textContent = currentCsvPath();
-  }
-
-  /* =========================
-     RENDER TABLE
-  ========================= */
-
-  function moneyClassForOwed(v){
-    const n = clampMoney(v);
-    if(n > 0.01) return "bad";
-    return "good";
-  }
-
-  function render(){
-    const tbody = $("rows");
-    tbody.innerHTML = "";
-
-    rows.forEach((r, idx) => {
-      const tr = document.createElement("tr");
-
-      const tdName = document.createElement("td");
-      tdName.className = "colName";
-      tdName.textContent = r.bowler_name || "";
-      tr.appendChild(tdName);
-
-      const tdOwed = document.createElement("td");
-      tdOwed.className = "colOwed money " + moneyClassForOwed(r.dues_owed_to_date);
-      tdOwed.textContent = `$${money(r.dues_owed_to_date)}`;
-      tr.appendChild(tdOwed);
-
-      const tdUpcoming = document.createElement("td");
-      tdUpcoming.className = "colUpcoming money warn";
-      tdUpcoming.textContent = `$${money(r.upcoming_dues)}`;
-      tr.appendChild(tdUpcoming);
-
-      const tdCredits = document.createElement("td");
-      tdCredits.className = "colCredits money " + (clampMoney(r.credits) > 0 ? "good" : "muted");
-      tdCredits.textContent = `$${money(r.credits)}`;
-      tr.appendChild(tdCredits);
-
-      const tdAct = document.createElement("td");
-      tdAct.className = "colActions";
-
-      const btn = document.createElement("a");
-      btn.href = "#";
-      btn.className = "smallBtn";
-      btn.textContent = "💳 Pay";
-      btn.addEventListener("click", (e)=>{
-        e.preventDefault();
-        openModal(idx);
-      });
-
-      tdAct.appendChild(btn);
-      tr.appendChild(tdAct);
-
-      tbody.appendChild(tr);
-    });
-  }
-
-  /* =========================
-     LOAD MEMBERSHIP CSV
-  ========================= */
-
-  async function loadMembership(){
-    $("err")?.style && ($("err").style.display = "none");
-    updateLoadedPathLabel();
-
-    try{
-      const path = currentCsvPath();
-      const text = await fetchTextWithFallback([path, "./"+path, "/"+path]);
-      const parsed = parseCSV(text);
-
-      // If file is empty/missing header, fall back to fixed headers
-      const fileHeaders = parsed.headers.length ? parsed.headers : COLS;
-
-      // Map to our fixed columns
-      const lower = fileHeaders.map(h => (h||"").toLowerCase());
-      const idx = {
-        bowler_name: lower.indexOf("bowler_name"),
-        dues_owed_to_date: lower.indexOf("dues_owed_to_date"),
-        upcoming_dues: lower.indexOf("upcoming_dues"),
-        credits: lower.indexOf("credits"),
-      };
-
-      rows = parsed.rows.map(obj => {
-        const out = {
-          bowler_name: (idx.bowler_name >= 0 ? (obj[fileHeaders[idx.bowler_name]]||"") : "").trim(),
-          dues_owed_to_date: clampMoney(idx.dues_owed_to_date >= 0 ? obj[fileHeaders[idx.dues_owed_to_date]] : 0),
-          upcoming_dues: clampMoney(idx.upcoming_dues >= 0 ? obj[fileHeaders[idx.upcoming_dues]] : 0),
-          credits: clampMoney(idx.credits >= 0 ? obj[fileHeaders[idx.credits]] : 0),
-        };
-        return out;
-      }).filter(r => r.bowler_name);
-
-      // Sort by last name-ish
-      rows.sort((a,b)=> (a.bowler_name||"").localeCompare(b.bowler_name||""));
-
-      render();
-    }catch(e){
-      rows = [{
-        bowler_name: `Could not load ${currentCsvPath()}`,
-        dues_owed_to_date: 0,
-        upcoming_dues: 0,
-        credits: 0
-      }];
-      render();
-      const errEl = $("err");
-      if(errEl){
-        errEl.style.display = "block";
-        errEl.textContent = `Load error: ${String(e && e.message ? e.message : e)}`;
-      } else {
-        alert(String(e && e.message ? e.message : e));
-      }
-    }
-  }
-
-  /* =========================
-     PAYMENTS (modal)
-  ========================= */
-
-  let activeIdx = -1;
-
-  const modalBackdrop = document.getElementById("modalBackdrop");
-  const closeModalBtn = document.getElementById("closeModalBtn");
-  const cancelBtn = document.getElementById("cancelBtn");
-  const savePaymentBtn = document.getElementById("savePaymentBtn");
-
-  const mBowler = document.getElementById("mBowler");
-  const mType = document.getElementById("mType");
-  const mAmount = document.getElementById("mAmount");
-  const methodWrap = document.getElementById("methodWrap");
-  const mMethod = document.getElementById("mMethod");
-  const methodNote = document.getElementById("methodNote");
-  const mNote = document.getElementById("mNote");
-
-  function openModal(idx){
-    activeIdx = idx;
-    const r = rows[idx];
-    mBowler.value = r.bowler_name || "";
-    mType.value = "dues";
-    mAmount.value = Math.max(0, clampMoney(r.dues_owed_to_date || 0)).toFixed(2);
-    mMethod.value = "use_credit";
-    mNote.value = "";
-    updateMethodVisibility();
-    updateMethodNote();
-    modalBackdrop.style.display = "flex";
-    modalBackdrop.setAttribute("aria-hidden","false");
-  }
-
-  function closeModal(){
-    modalBackdrop.style.display = "none";
-    modalBackdrop.setAttribute("aria-hidden","true");
-    activeIdx = -1;
-  }
-
-  function updateMethodVisibility(){
-    const isDues = (mType.value === "dues");
-    methodWrap.style.display = isDues ? "block" : "none";
-  }
-
-  function updateMethodNote(){
-    if(activeIdx < 0) return;
-    const r = rows[activeIdx];
-    const credits = clampMoney(r.credits || 0);
-    if(mType.value !== "dues"){
-      methodNote.textContent = "Adding credit increases the bowler’s available credit balance.";
-      return;
-    }
-    if(mMethod.value === "use_credit"){
-      methodNote.textContent = credits > 0
-        ? `This bowler has $${money(credits)} credit available. We'll apply as much as needed.`
-        : "This bowler has $0.00 credit available. If you save, it will still reduce dues, but credit won't apply.";
-    }else if(mMethod.value === "cash"){
-      methodNote.textContent = "Cash payment reduces dues owed.";
-    }else{
-      methodNote.textContent = "Card payment reduces dues owed.";
-    }
-  }
-
-  closeModalBtn.addEventListener("click", (e)=>{ e.preventDefault(); closeModal(); });
-  cancelBtn.addEventListener("click", (e)=>{ e.preventDefault(); closeModal(); });
-  modalBackdrop.addEventListener("click", (e)=>{ if(e.target === modalBackdrop) closeModal(); });
-
-  mType.addEventListener("change", ()=>{ updateMethodVisibility(); updateMethodNote(); });
-  mMethod.addEventListener("change", updateMethodNote);
-
-  savePaymentBtn.addEventListener("click", (e)=>{
-    e.preventDefault();
-    if(activeIdx < 0) return;
-
-    const r = rows[activeIdx];
-    const type = mType.value;
-    const amount = clampMoney(mAmount.value);
-
-    if(!(amount > 0)){
-      alert("Enter an amount greater than 0.");
-      return;
-    }
-
-    if(type === "credit"){
-      r.credits = clampMoney((r.credits||0) + amount);
-    }else{
-      const method = mMethod.value;
-      if(method === "use_credit"){
-        const creditsAvail = clampMoney(r.credits || 0);
-        const apply = Math.min(creditsAvail, amount);
-        r.credits = clampMoney(creditsAvail - apply);
-        r.dues_owed_to_date = clampMoney((r.dues_owed_to_date||0) - amount);
-      }else{
-        r.dues_owed_to_date = clampMoney((r.dues_owed_to_date||0) - amount);
-      }
-    }
-
-    closeModal();
-    render();
-  });
-
-  /* =========================
-     EXPORT
-  ========================= */
-
-  document.getElementById("exportBtn").addEventListener("click", (e)=>{
-    e.preventDefault();
-    const csvText = toCSV(headers, rows.map(r => ({
-      bowler_name: r.bowler_name || "",
-      dues_owed_to_date: money(r.dues_owed_to_date || 0),
-      upcoming_dues: money(r.upcoming_dues || 0),
-      credits: money(r.credits || 0)
-    })));
-    const leagueId = getSelectedLeagueId();
-    const filename = `membership_${leagueId}.csv`;
-
-    const blob = new Blob([csvText], {type: "text/csv;charset=utf-8"});
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-
-    URL.revokeObjectURL(url);
-  });
-
-  /* =========================
-     ADD BOWLER
-  ========================= */
-
-  document.getElementById("addBowlerBtn").addEventListener("click", (e)=>{
-    e.preventDefault();
-    const name = prompt("Enter bowler name:");
-    if(!name) return;
-    const clean = name.trim();
-    if(!clean) return;
-    if(rows.some(x => (x.bowler_name||"").toLowerCase() === clean.toLowerCase())){
-      alert("That bowler already exists in this membership file.");
-      return;
-    }
-    rows.push({
-      bowler_name: clean,
-      dues_owed_to_date: 0,
-      upcoming_dues: 0,
-      credits: 0
-    });
-    rows.sort((a,b)=> (a.bowler_name||"").localeCompare(b.bowler_name||""));
-    render();
-  });
-
-  /* =========================
-     LEAGUE DROPDOWN (copied from bowlers.html logic)
-  ========================= */
-
-  function setLeagueOptions(options, selectedId){
-    const sel = $("leagueSelect");
-    sel.innerHTML = "";
-
-    options.forEach(o => {
-      const opt = document.createElement("option");
-      opt.value = o.league_id;
-      opt.textContent = `${o.league_id} — ${o.name}`;
-      sel.appendChild(opt);
-    });
-
-    const exists = options.some(o => String(o.league_id) === String(selectedId));
-    sel.value = exists ? selectedId : (options[0]?.league_id || DEFAULT_LEAGUE_ID);
-  }
-
-  async function loadLeagues(){
-    const saved = localStorage.getItem(STORAGE_KEY) || DEFAULT_LEAGUE_ID;
-
-    const errEl = $("err");
-    if(errEl){ errEl.style.display = "none"; errEl.textContent = ""; }
-
-    try{
-      const text = await fetchTextWithFallback([LEAGUES_PATH, "./"+LEAGUES_PATH, "/"+LEAGUES_PATH]);
-      const parsed = parseCSV(text);
-
-      const h = parsed.headers.map(x => x.toLowerCase());
-      const idxId = h.indexOf("league_id");
-      const idxName = h.indexOf("name");
-
-      if(idxId < 0 || idxName < 0) throw new Error("leagues.csv missing league_id or name headers");
-
-      const options = parsed.rows
-        .map(r => ({
-          league_id: (r[parsed.headers[idxId]] || "").trim(),
-          name: (r[parsed.headers[idxName]] || "").trim()
-        }))
-        .filter(o => o.league_id);
-
-      if(!options.length) throw new Error("No leagues found in leagues.csv");
-
-      setLeagueOptions(options, saved);
-
-    }catch(e){
-      setLeagueOptions([{league_id: DEFAULT_LEAGUE_ID, name: "League"}], saved);
-      if(errEl){
-        errEl.style.display = "block";
-        errEl.textContent = `Leagues load error: ${String(e && e.message ? e.message : e)} (check data/leagues.csv path + headers)`;
-      }
-    }
-
-    $("leagueSelect").addEventListener("change", () => {
-      localStorage.setItem(STORAGE_KEY, getSelectedLeagueId());
-      loadMembership();
-    });
-  }
-
-  document.getElementById("resetBtn").addEventListener("click", (e)=>{
-    e.preventDefault();
-    alert("This Membership page is file-based like bowlers.html. Use Export CSV after updates, then replace the file on the Pi.");
-  });
-
-  // year
-  document.getElementById("year").textContent = new Date().getFullYear();
-
-  // init
-  loadLeagues().then(loadMembership);
-})();
-</script>
-
 
 </body>
 </html>
