@@ -547,7 +547,7 @@
     </header>
 
     <div class="grid">
-      <div class="panel">
+      <div class="panel adminOnly">
         <div class="hd">
           <h2>Setup</h2>
           <div class="row">
@@ -2059,7 +2059,18 @@ body{
                 img.addEventListener('error', function(){ left--; if(left<=0) doPrint(); });
               }
             });
-          })();
+          
+// Apply login state from index.html
+document.addEventListener("DOMContentLoaded", () => {
+  if (typeof applyAuthUI === "function") applyAuthUI();
+});
+
+// Update if login/logout happens in another tab
+window.addEventListener("storage", () => {
+  if (typeof applyAuthUI === "function") applyAuthUI();
+});
+
+})();
         <\/script>
       </body>
       </html>
