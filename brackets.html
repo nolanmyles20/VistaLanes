@@ -834,6 +834,10 @@
     if (bp) bp.disabled = dis;
     if (bq) bq.disabled = dis;
     if (ba) ba.disabled = dis;
+
+    // Re-render so Round 1 slots become clickable only in Fixed mode
+    try{ renderAll(); }catch(e){}
+
   }
   const money = (n)=>"$"+Number(n||0).toLocaleString(undefined,{maximumFractionDigits:2});
   const normalizeName = (name)=>String(name||"").trim().replace(/\s+/g," ");
@@ -1327,7 +1331,7 @@ function bracketAlreadyHasBowler(br, name){ return br.slots.includes(name); }
     else if(match.tie && !match.winner) tiePill = match.tieNeedsRound ? `<span class="pill">TIE → G${match.tieNeedsRound}</span>` : `<span class="pill">TIE</span>`;
 
     return `
-      <div class="slot${(baseGame===1 && slotIndex!==null) ? " assign-slot" : ""}"${(baseGame===1 && slotIndex!==null) ? ` data-assign-slot="${slotIndex}" data-bracket-id="${br.id}"` : ""}>
+      <div class="slot${(baseGame===1 && slotIndex!==null && isAdmin() && getEntryMode()==="fixed") ? " assign-slot" : ""}"${(baseGame===1 && slotIndex!==null && isAdmin() && getEntryMode()==="fixed") ? ` data-assign-slot="${slotIndex}" data-bracket-id="${br.id}"` : ""}>
         <div class="left">
           <div class="nm ${cls}">${name ? formatNameTwoLines(name) : `<span class="muted">— empty —</span>`}</div>
           <div class="sc">${name ? `G${baseGame}: <span class="mono">${raw===""?"—":raw}</span>${showAdj}` : `<span class="muted">Add bowlers to fill slots</span>`}</div>
@@ -2612,7 +2616,7 @@ root.querySelectorAll("[data-p1]").forEach(inp=>{
     }
     br.slots[si] = bowlerName;
     rebuildMatchesFromSlots(br);
-    saveState();
+    saveLocalDebounced();
     renderAll();
   }
 function openPicker(){
