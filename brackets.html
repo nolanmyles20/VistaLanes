@@ -2380,7 +2380,7 @@ row.appendChild(nm);
             <input type="number" class="w-sm" data-p2="${br.id}" placeholder="2nd payout" value="${escapeAttr(br.payout2||"")}" />
 
             <button class="btn primary" data-save="${br.id}" type="button">Save</button>
-            <button class="btn danger" data-del="${br.id}" type="button">Delete</button>
+            <button class="btn danger adminOnly" data-del="${br.id}" type="button">Delete</button>
           </div>
         </div>
 
