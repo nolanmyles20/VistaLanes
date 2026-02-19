@@ -1132,26 +1132,25 @@ function bracketAlreadyHasBowler(br, name){ return br.slots.includes(name); }
 
   function neededGameForBowler(name){
     // Independent score entry:
-    // Don't wait for an opponent / pairing to start the next game's entry.
-    // For any bracket the bowler is in (and not eliminated), we require Game1 -> Game2 -> Game3 in order.
+    // Do NOT wait for opponent/pairing. A bowler can enter game 1/2/3 as soon as their prior game is entered.
+    // If they are in at least one bracket and not eliminated in that bracket, require next missing game in order.
     let needed = null;
 
     const bowler = state.bowlers.get(name);
-    if(!bowler) return 1;
+    if(!bowler) return null; // not in roster yet / not tracked
 
     const s = (bowler.scores || {});
     const has1 = !(s[1]===undefined || s[1]===null || s[1]==="");
     const has2 = !(s[2]===undefined || s[2]===null || s[2]==="");
     const has3 = !(s[3]===undefined || s[3]===null || s[3]==="");
 
-    // If the bowler isn't in any bracket, don't force anything.
     let inAny = false;
 
     for(const br of state.brackets){
       if(!br.slots.includes(name)) continue;
       inAny = true;
 
-      // Ensure we know if they are eliminated
+      // compute elimination status for this bracket
       advanceBracketIfReady(br);
       const eliminated =
         br.r1.some(m=>m.loser===name) ||
@@ -1159,7 +1158,6 @@ function bracketAlreadyHasBowler(br, name){ return br.slots.includes(name); }
         br.r3.some(m=>m.loser===name);
       if(eliminated) continue;
 
-      // Next missing game in order
       let g = null;
       if(!has1) g = 1;
       else if(!has2) g = 2;
