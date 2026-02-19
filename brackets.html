@@ -811,11 +811,6 @@
     document.body.classList.toggle("is-admin", isAdmin());
   }
 
-  // Apply auth immediately on page load (script may load after DOMContentLoaded)
-  applyAuthUI();
-  window.addEventListener("vl-login", applyAuthUI);
-
-
   // --- Entry mode (random vs fixed) ---
   const ENTRYMODE_LS_KEY = "vl_entry_mode";
   function getEntryMode(){
@@ -1136,7 +1131,7 @@ function bracketAlreadyHasBowler(br, name){ return br.slots.includes(name); }
   }
 
   function neededGameForBowler(name){
-    // Allow entering scores independently (do NOT wait for opponent).
+    // Allow entering scores independently (do NOT wait for opponent / pairing).
     // Show the next missing game for this bowler: 1 -> 2 -> 3.
     const bowler = state.bowlers.get(name);
     if(!bowler) return 1;
