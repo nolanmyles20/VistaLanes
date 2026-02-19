@@ -207,10 +207,171 @@ footer{
   .homeBtns{ gap:8px; }
   .homeBtn{ padding:9px 14px; font-size:15px; }
 }
+
+/* ================= LOGIN BUTTON + MODAL ================= */
+.loginBtn{
+  appearance:none;
+  border:1px solid rgba(255,255,255,.22);
+  background: rgba(255,255,255,.12);
+  color: var(--text);
+  padding:10px 14px;
+  border-radius:999px;
+  font-weight:900;
+  letter-spacing:.2px;
+  cursor:pointer;
+  box-shadow: 0 10px 22px rgba(0,0,0,.35);
+  user-select:none;
+  backdrop-filter: blur(8px);
+}
+.loginBtn:active{transform: translateY(1px);}
+
+.topActions{
+  position:fixed;
+  top: calc(env(safe-area-inset-top) + 12px);
+  right: 14px;
+  z-index: 999;
+}
+
+.modalOverlay{
+  position:fixed;
+  inset:0;
+  background: rgba(0,0,0,.65);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding: 18px;
+  z-index: 1000;
+}
+
+.modal{
+  width: min(420px, 92vw);
+  border-radius: 18px;
+  border:1px solid rgba(255,255,255,.14);
+  background: linear-gradient(180deg, rgba(30,30,30,.92), rgba(15,15,15,.92));
+  box-shadow: 0 20px 60px rgba(0,0,0,.65);
+  overflow:hidden;
+}
+
+.modalHd{
+  padding: 14px 16px 10px;
+  border-bottom:1px solid rgba(255,255,255,.10);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.modalHd h2{
+  margin:0;
+  font-size: 16px;
+  font-weight: 950;
+  letter-spacing: .3px;
+}
+
+.modalClose{
+  appearance:none;
+  border:1px solid rgba(255,255,255,.18);
+  background: rgba(255,255,255,.08);
+  color: var(--text);
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-weight: 900;
+  cursor:pointer;
+}
+
+.modalBd{ padding: 14px 16px 16px; }
+
+.modalRow{ display:flex; flex-direction:column; gap:6px; margin-bottom:12px; }
+.modalRow label{ font-size:12px; color: var(--muted); font-weight:800; letter-spacing:.2px; }
+.modalRow input{
+  width:100%;
+  min-width:0;
+  padding: 12px 12px;
+  border-radius: 12px;
+  border:1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.06);
+  color: var(--text);
+  outline:none;
+}
+.modalRow input:focus{
+  border-color: rgba(106,167,255,.55);
+  box-shadow: 0 0 0 3px rgba(106,167,255,.18);
+}
+
+.modalActions{
+  display:flex;
+  gap:10px;
+  justify-content:flex-end;
+  align-items:center;
+  margin-top: 10px;
+}
+
+.modalPrimary{
+  appearance:none;
+  border:1px solid rgba(255,255,255,.16);
+  background: rgba(106,167,255,.22);
+  color: var(--text);
+  padding: 10px 14px;
+  border-radius: 999px;
+  font-weight: 950;
+  cursor:pointer;
+}
+.modalSecondary{
+  appearance:none;
+  border:1px solid rgba(255,255,255,.16);
+  background: rgba(255,255,255,.08);
+  color: var(--text);
+  padding: 10px 14px;
+  border-radius: 999px;
+  font-weight: 900;
+  cursor:pointer;
+}
+
+.modalErr{
+  margin-top: 8px;
+  color: #ffd57a;
+  font-size: 13px;
+  line-height: 1.35;
+  display:none;
+}
+
 </style>
 </head>
 
 <body>
+
+  <!-- Top-right Login / Logout -->
+  <div class="topActions">
+    <button id="loginBtn" class="loginBtn" type="button">Login</button>
+  </div>
+
+  <!-- Login modal -->
+  <div id="loginOverlay" class="modalOverlay" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+    <div class="modal">
+      <div class="modalHd">
+        <h2 id="loginTitle">Admin Login</h2>
+        <button id="loginClose" class="modalClose" type="button" aria-label="Close">✕</button>
+      </div>
+      <div class="modalBd">
+        <div class="modalRow">
+          <label for="loginUser">Username</label>
+          <input id="loginUser" autocomplete="username" placeholder="Admin" />
+        </div>
+        <div class="modalRow">
+          <label for="loginPass">Password</label>
+          <input id="loginPass" type="password" autocomplete="current-password" placeholder="Password" />
+        </div>
+
+        <div class="modalActions">
+          <button id="loginCancel" class="modalSecondary" type="button">Cancel</button>
+          <button id="loginSubmit" class="modalPrimary" type="button">Login</button>
+        </div>
+
+        <div id="loginErr" class="modalErr"></div>
+      </div>
+    </div>
+  </div>
+
 <div class="wrap">
 
   <!-- LOGO -->
@@ -264,6 +425,112 @@ footer{
 
 <script>
 document.getElementById("year").textContent = new Date().getFullYear();
+</script>
+
+
+<script>
+(() => {
+  // Hardcoded creds (for now)
+  const AUTH_USER = "Admin";
+  const AUTH_PASS = "Password";
+
+  const LS_KEY = "vl_logged_in";
+  const LS_USER = "vl_user";
+
+  const $ = (id)=>document.getElementById(id);
+
+  const btn = $("loginBtn");
+  const overlay = $("loginOverlay");
+  const closeBtn = $("loginClose");
+  const cancelBtn = $("loginCancel");
+  const submitBtn = $("loginSubmit");
+  const userEl = $("loginUser");
+  const passEl = $("loginPass");
+  const errEl = $("loginErr");
+
+  function isLoggedIn(){
+    return localStorage.getItem(LS_KEY) === "1";
+  }
+
+  function setLoggedIn(username){
+    localStorage.setItem(LS_KEY, "1");
+    localStorage.setItem(LS_USER, username || AUTH_USER);
+    updateBtn();
+  }
+
+  function logout(){
+    localStorage.removeItem(LS_KEY);
+    localStorage.removeItem(LS_USER);
+    updateBtn();
+  }
+
+  function updateBtn(){
+    if(isLoggedIn()){
+      const u = localStorage.getItem(LS_USER) || AUTH_USER;
+      btn.textContent = `Logout (${u})`;
+    }else{
+      btn.textContent = "Login";
+    }
+  }
+
+  function openModal(){
+    errEl.style.display = "none";
+    errEl.textContent = "";
+    overlay.style.display = "flex";
+    userEl.value = userEl.value || AUTH_USER;
+    passEl.value = "";
+    setTimeout(()=>passEl.focus(), 0);
+  }
+
+  function closeModal(){
+    overlay.style.display = "none";
+  }
+
+  function showErr(msg){
+    errEl.textContent = msg;
+    errEl.style.display = "block";
+  }
+
+  btn.addEventListener("click", () => {
+    if(isLoggedIn()) logout();
+    else openModal();
+  });
+
+  submitBtn.addEventListener("click", () => {
+    const u = (userEl.value || "").trim();
+    const p = (passEl.value || "").trim();
+
+    if(u === AUTH_USER && p === AUTH_PASS){
+      setLoggedIn(u);
+      closeModal();
+      // optional: let other scripts/pages react
+      window.dispatchEvent(new Event("vl-login"));
+    }else{
+      showErr("Invalid username or password.");
+    }
+  });
+
+  [closeBtn, cancelBtn].forEach(el => el.addEventListener("click", closeModal));
+
+  overlay.addEventListener("click", (e) => {
+    if(e.target === overlay) closeModal();
+  });
+
+  window.addEventListener("keydown", (e) => {
+    if(overlay.style.display === "flex" && e.key === "Escape") closeModal();
+  });
+
+  // initial state
+  updateBtn();
+
+  // Expose helper for other pages if you want
+  window.vlAuth = {
+    isLoggedIn,
+    logout,
+    login: openModal,
+    user: () => localStorage.getItem(LS_USER) || ""
+  };
+})();
 </script>
 
 </body>
