@@ -2591,20 +2591,26 @@ root.querySelectorAll("[data-p1]").forEach(inp=>{
   }
 
   function assignBowlerToSlot(bracketId, slotIndex, bowlerName){
-    const br = state.brackets.find(b => b.id === bracketId);
+    // Be tolerant: ids from data-* attrs can be strings
+    const bid = Number(bracketId);
+    const si  = Number(slotIndex);
+    if(!Number.isFinite(bid) || !Number.isFinite(si)) return;
+
+    const br = state.brackets.find(b => Number(b.id) === bid);
     if (!br) return;
-    if (slotIndex < 0 || slotIndex >= br.slots.length) return;
+    if (si < 0 || si >= br.slots.length) return;
+
 
     const existing = br.slots.findIndex(n => (n||'').toLowerCase() === bowlerName.toLowerCase());
-    if (existing !== -1 && existing !== slotIndex){
+    if (existing !== -1 && existing !== si){
       alert(`"${bowlerName}" is already assigned in this bracket.`);
       return;
     }
-    const prev = br.slots[slotIndex];
+    const prev = br.slots[si];
     if (prev && prev !== bowlerName){
       if (!confirm(`Replace "${prev}" with "${bowlerName}"?`)) return;
     }
-    br.slots[slotIndex] = bowlerName;
+    br.slots[si] = bowlerName;
     rebuildMatchesFromSlots(br);
     saveState();
     renderAll();
