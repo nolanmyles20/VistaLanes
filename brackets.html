@@ -1310,7 +1310,7 @@ function bracketAlreadyHasBowler(br, name){ return br.slots.includes(name); }
     return `<span class="nm1">${escapeHtml(first)}</span><span class="nm2">${escapeHtml(rest)}</span>`;
   }
 
-  function renderSlotHTML(br, name, match, baseGame){
+  function renderSlotHTML(br, name, match, baseGame, slotIndex=null){
     const raw = name ? (state.bowlers.get(name)?.scores?.[baseGame] ?? "") : "";
     const adj = scoreForMatch(br, name, baseGame);
     const showAdj = (br.type==="handicap" && name && raw!=="")
@@ -1327,7 +1327,7 @@ function bracketAlreadyHasBowler(br, name){ return br.slots.includes(name); }
     else if(match.tie && !match.winner) tiePill = match.tieNeedsRound ? `<span class="pill">TIE → G${match.tieNeedsRound}</span>` : `<span class="pill">TIE</span>`;
 
     return `
-      <div class="slot">
+      <div class="slot${(baseGame===1 && slotIndex!==null) ? " assign-slot" : ""}"${(baseGame===1 && slotIndex!==null) ? ` data-assign-slot="${slotIndex}" data-bracket-id="${br.id}"` : ""}>
         <div class="left">
           <div class="nm ${cls}">${name ? formatNameTwoLines(name) : `<span class="muted">— empty —</span>`}</div>
           <div class="sc">${name ? `G${baseGame}: <span class="mono">${raw===""?"—":raw}</span>${showAdj}` : `<span class="muted">Add bowlers to fill slots</span>`}</div>
@@ -1341,6 +1341,12 @@ function bracketAlreadyHasBowler(br, name){ return br.slots.includes(name); }
   }
 
   function renderMatchCard(br, m, baseGame, matchIndex=null){
+    // In Fixed entry mode we allow assigning ONLY Round 1 slots (8 total)
+    if(baseGame===1 && matchIndex!==null){
+      const slotA = matchIndex*2;
+      const slotB = matchIndex*2+1;
+      return `<div class="match">${renderSlotHTML(br,m.a,m,baseGame,slotA)}${renderSlotHTML(br,m.b,m,baseGame,slotB)}</div>`;
+    }
     return `<div class="match">${renderSlotHTML(br,m.a,m,baseGame)}${renderSlotHTML(br,m.b,m,baseGame)}</div>`;
   }
 
@@ -2418,10 +2424,10 @@ row.appendChild(nm);
 
     // Fixed entry: enable slot assignment in Round 1 (Admin only)
     if (isAdmin() && getEntryMode()==='fixed'){
-      root.querySelectorAll('[data-assign-slot][data-bracket-id]').forEach(el=>{
+      card.querySelectorAll('[data-assign-slot][data-bracket-id]').forEach(el=>{
         el.addEventListener('click', (e)=>{
           e.preventDefault(); e.stopPropagation();
-          openSlotAssignPicker(el.getAttribute('data-bracket-id'), parseInt(el.getAttribute('data-assign-slot')||'0',10));
+          openSlotAssignPicker(el.getAttribute('data-bracket-id'), el.getAttribute('data-assign-slot'));
         });
       });
     }
@@ -2577,10 +2583,11 @@ root.querySelectorAll("[data-p1]").forEach(inp=>{
 
   
   function openSlotAssignPicker(bracketId, slotIndex){
+    // normalize types (data-* attrs are strings)
+    bracketId = parseInt(bracketId, 10);
+    slotIndex = parseInt(slotIndex, 10);
     pickerContext = { mode:'assignSlot', bracketId, slotIndex };
     openPicker();
-    const title = $("pickerTitle");
-    if (title) title.textContent = `Select bowler for Slot ${slotIndex+1}`;
   }
 
   function assignBowlerToSlot(bracketId, slotIndex, bowlerName){
