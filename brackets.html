@@ -1137,7 +1137,7 @@ function bracketAlreadyHasBowler(br, name){ return br.slots.includes(name); }
     let needed = null;
 
     const bowler = state.bowlers.get(name);
-    if(!bowler) return null; // not in roster yet / not tracked
+    if(!bowler) return null; // not tracked
 
     const s = (bowler.scores || {});
     const has1 = !(s[1]===undefined || s[1]===null || s[1]==="");
@@ -1150,27 +1150,25 @@ function bracketAlreadyHasBowler(br, name){ return br.slots.includes(name); }
       if(!br.slots.includes(name)) continue;
       inAny = true;
 
-      // compute elimination status for this bracket
+      // Ensure bracket advancement state is up to date for elimination checks
       advanceBracketIfReady(br);
+
       const eliminated =
         br.r1.some(m=>m.loser===name) ||
         br.r2.some(m=>m.loser===name) ||
         br.r3.some(m=>m.loser===name);
+
       if(eliminated) continue;
 
       let g = null;
       if(!has1) g = 1;
       else if(!has2) g = 2;
       else if(!has3) g = 3;
-      else g = null;
 
       if(g!==null) needed = (needed===null) ? g : Math.min(needed, g);
     }
 
     if(!inAny) return null;
-    return needed;
-  }
-
     return needed;
   }
 
