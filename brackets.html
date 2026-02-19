@@ -1131,22 +1131,48 @@ function bracketAlreadyHasBowler(br, name){ return br.slots.includes(name); }
   }
 
   function neededGameForBowler(name){
-    let needed=null;
+    // Independent score entry:
+    // Don't wait for an opponent / pairing to start the next game's entry.
+    // For any bracket the bowler is in (and not eliminated), we require Game1 -> Game2 -> Game3 in order.
+    let needed = null;
+
+    const bowler = state.bowlers.get(name);
+    if(!bowler) return 1;
+
+    const s = (bowler.scores || {});
+    const has1 = !(s[1]===undefined || s[1]===null || s[1]==="");
+    const has2 = !(s[2]===undefined || s[2]===null || s[2]==="");
+    const has3 = !(s[3]===undefined || s[3]===null || s[3]==="");
+
+    // If the bowler isn't in any bracket, don't force anything.
+    let inAny = false;
+
     for(const br of state.brackets){
       if(!br.slots.includes(name)) continue;
-      advanceBracketIfReady(br);
+      inAny = true;
 
+      // Ensure we know if they are eliminated
+      advanceBracketIfReady(br);
       const eliminated =
         br.r1.some(m=>m.loser===name) ||
         br.r2.some(m=>m.loser===name) ||
         br.r3.some(m=>m.loser===name);
-
       if(eliminated) continue;
 
-      for(const m of br.r1){ const g=matchNeededGame(br,m,1,name); if(g) needed = needed===null?g:Math.min(needed,g); }
-      for(const m of br.r2){ const g=matchNeededGame(br,m,2,name); if(g) needed = needed===null?g:Math.min(needed,g); }
-      for(const m of br.r3){ const g=matchNeededGame(br,m,3,name); if(g) needed = needed===null?g:Math.min(needed,g); }
+      // Next missing game in order
+      let g = null;
+      if(!has1) g = 1;
+      else if(!has2) g = 2;
+      else if(!has3) g = 3;
+      else g = null;
+
+      if(g!==null) needed = (needed===null) ? g : Math.min(needed, g);
     }
+
+    if(!inAny) return null;
+    return needed;
+  }
+
     return needed;
   }
 
