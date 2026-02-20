@@ -3,66 +3,38 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Vista Lanes • Membership</title>
+<title>Vista Lanes • Membership v2.0</title>
 
 <style>
-/* ==== SAME STYLING AS TEAMS ==== */
 :root{
   --bg:#000;
   --panel: rgba(255,255,255,.04);
-  --panel2: rgba(255,255,255,.02);
   --border: rgba(255,255,255,.10);
   --text:#d8e1ee;
   --muted:#8ea0b5;
-  --btn:#d9d9d9;
-  --btnText:#111;
-  --btnBorder:#bdbdbd;
-  --activeShadow: inset 0 3px 10px rgba(0,0,0,.35);
-  --shadow: 0 10px 30px rgba(0,0,0,.45);
-  --radius:18px;
   --accent:#6aa7ff;
   --danger:#ff4d4d;
   --success:#28c76f;
 }
 *{box-sizing:border-box}
 body{margin:0;font-family:ui-sans-serif,system-ui;background:var(--bg);color:var(--text);}
-.wrap{max-width:1200px;margin:0 auto;padding:14px 14px 60px;}
-.brandbar{display:flex;justify-content:center;padding:10px 0;}
-.brandbar img{width:min(340px,86vw);filter:drop-shadow(0 10px 22px rgba(0,0,0,.55));}
+.wrap{max-width:1200px;margin:0 auto;padding:14px;}
+.brandbar{text-align:center;margin-bottom:10px;}
+.brandbar img{width:min(340px,86vw);}
 .menubar{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:14px;}
-.menubar a{
-  text-decoration:none;background:var(--btn);color:#111;border-radius:999px;
-  padding:10px 14px;font-weight:800;border:1px solid #bbb;
-}
+.menubar a{text-decoration:none;background:#d9d9d9;color:#111;padding:10px 14px;border-radius:999px;font-weight:800;}
 .menubar a.active{background:#cfcfcf;}
-h1{margin:0;font-size:22px;font-weight:900;}
-.panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);}
-.hd{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;flex-wrap:wrap;gap:10px;align-items:center;}
+h1{margin:0 0 10px 0;font-size:22px;font-weight:900;}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:14px;}
+.hd{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:10px;}
 .pill{font-size:12px;padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.12);}
-input,select{
-  background:#111;border:1px solid #333;color:var(--text);
-  padding:8px 10px;border-radius:12px;
-}
-.btn{
-  background:rgba(106,167,255,.18);
-  border:1px solid rgba(255,255,255,.14);
-  padding:8px 12px;border-radius:999px;cursor:pointer;font-weight:800;
-}
-.btn.green{background:rgba(40,199,111,.2);}
-.btn.red{background:rgba(255,77,77,.2);}
+input,select{background:#111;border:1px solid #333;color:var(--text);padding:8px 10px;border-radius:12px;}
+.btn{background:rgba(106,167,255,.18);border:1px solid rgba(255,255,255,.14);padding:8px 12px;border-radius:999px;cursor:pointer;font-weight:800;}
 table{width:100%;border-collapse:collapse;}
-thead th{font-size:12px;text-transform:uppercase;color:var(--muted);padding:12px;}
+thead th{font-size:12px;text-transform:uppercase;color:var(--muted);padding:10px;cursor:pointer;}
 tbody td{padding:10px;border-top:1px solid rgba(255,255,255,.05);}
 .due-red{color:var(--danger);font-weight:800;}
 .credit-green{color:var(--success);font-weight:800;}
-.modal{
-  position:fixed;inset:0;background:rgba(0,0,0,.7);
-  display:flex;align-items:center;justify-content:center;
-}
-.modal-box{
-  background:#111;padding:20px;border-radius:18px;width:380px;
-}
-.modal-box h3{margin-top:0}
 </style>
 </head>
 
@@ -90,18 +62,18 @@ tbody td{padding:10px;border-top:1px solid rgba(255,255,255,.05);}
 <div class="hd">
 <div class="pill"><b id="count">0</b> members</div>
 <select id="leagueSelect"></select>
-<button class="btn" onclick="load()">Reload</button>
-<button class="btn green" onclick="exportCSV()">Save CSV</button>
+<input id="search" placeholder="Search bowler...">
+<button class="btn" onclick="exportCSV()">Save CSV</button>
 </div>
 
 <table>
 <thead>
 <tr>
-<th>Bowler</th>
+<th onclick="sortBy('last_name')">Last Name</th>
+<th onclick="sortBy('first_name')">First Name</th>
 <th>Dues Owed</th>
 <th>Upcoming</th>
 <th>Credits</th>
-<th>Action</th>
 </tr>
 </thead>
 <tbody id="tbody"></tbody>
@@ -109,11 +81,10 @@ tbody td{padding:10px;border-top:1px solid rgba(255,255,255,.05);}
 </div>
 </div>
 
-<div id="modal" style="display:none;"></div>
-
 <script>
 let rows=[];
-let currentFile="";
+let sortKey="last_name";
+let sortAsc=true;
 const STORAGE_KEY="vista_selected_league_id";
 
 function parseCSV(text){
@@ -149,83 +120,47 @@ async function loadLeagues(){
 
 async function load(){
   const league=document.getElementById("leagueSelect").value;
-  currentFile=`data/membership_${league}.csv`;
-  const res=await fetch(currentFile);
+  const res=await fetch(`data/membership_${league}.csv`);
   const txt=await res.text();
   rows=parseCSV(txt);
   render();
 }
 
 function render(){
+  const q=document.getElementById("search").value.toLowerCase();
+  let filtered=rows.filter(r=>
+    (r.first_name||"").toLowerCase().includes(q) ||
+    (r.last_name||"").toLowerCase().includes(q)
+  );
+
+  filtered.sort((a,b)=>{
+    let v1=(a[sortKey]||"").toLowerCase();
+    let v2=(b[sortKey]||"").toLowerCase();
+    if(v1<v2) return sortAsc?-1:1;
+    if(v1>v2) return sortAsc?1:-1;
+    return 0;
+  });
+
   const tbody=document.getElementById("tbody");
   tbody.innerHTML="";
-  rows.forEach((r,i)=>{
+  filtered.forEach(r=>{
     const tr=document.createElement("tr");
     tr.innerHTML=`
-      <td>${r.bowler_name}</td>
-      <td contenteditable onblur="update(${i},'dues_owed_to_date',this.innerText)">
-        <span class="${Number(r.dues_owed_to_date)>0?'due-red':''}">
-        $${Number(r.dues_owed_to_date).toFixed(2)}
-        </span>
-      </td>
-      <td contenteditable onblur="update(${i},'upcoming_dues',this.innerText)">
-        $${Number(r.upcoming_dues).toFixed(2)}
-      </td>
-      <td contenteditable onblur="update(${i},'credits',this.innerText)">
-        <span class="${Number(r.credits)>0?'credit-green':''}">
-        $${Number(r.credits).toFixed(2)}
-        </span>
-      </td>
-      <td><button class="btn" onclick="openPayment(${i})">Payment</button></td>
+      <td>${r.last_name||""}</td>
+      <td>${r.first_name||""}</td>
+      <td class="${Number(r.dues_owed_to_date)>0?'due-red':''}">$${Number(r.dues_owed_to_date||0).toFixed(2)}</td>
+      <td>$${Number(r.upcoming_dues||0).toFixed(2)}</td>
+      <td class="${Number(r.credits)>0?'credit-green':''}">$${Number(r.credits||0).toFixed(2)}</td>
     `;
     tbody.appendChild(tr);
   });
-  document.getElementById("count").innerText=rows.length;
+
+  document.getElementById("count").innerText=filtered.length;
 }
 
-function update(i,key,val){
-  rows[i][key]=parseFloat(val.replace("$",""))||0;
-  render();
-}
-
-function openPayment(i){
-  const r=rows[i];
-  const modal=document.getElementById("modal");
-  modal.innerHTML=`
-  <div class="modal">
-  <div class="modal-box">
-  <h3>Apply Payment - ${r.bowler_name}</h3>
-  <input id="amt" type="number" placeholder="Amount" style="width:100%;margin-bottom:10px;">
-  <select id="type" style="width:100%;margin-bottom:10px;">
-    <option value="dues">Current Dues</option>
-    <option value="upcoming">Upcoming Dues</option>
-    <option value="credit">Add Credit</option>
-    <option value="useCredit">Use Credit To Pay Dues</option>
-  </select>
-  <button class="btn green" onclick="applyPayment(${i})">Apply</button>
-  <button class="btn red" onclick="closeModal()">Cancel</button>
-  </div></div>`;
-  modal.style.display="block";
-}
-
-function closeModal(){document.getElementById("modal").style.display="none";}
-
-function applyPayment(i){
-  const amt=parseFloat(document.getElementById("amt").value)||0;
-  const type=document.getElementById("type").value;
-  const r=rows[i];
-
-  if(type==="dues") r.dues_owed_to_date-=amt;
-  if(type==="upcoming") r.upcoming_dues-=amt;
-  if(type==="credit") r.credits+=amt;
-  if(type==="useCredit"){
-    if(r.credits>=amt){
-      r.credits-=amt;
-      r.dues_owed_to_date-=amt;
-    }
-  }
-
-  closeModal();
+function sortBy(key){
+  if(sortKey===key) sortAsc=!sortAsc;
+  else {sortKey=key; sortAsc=true;}
   render();
 }
 
@@ -235,9 +170,11 @@ function exportCSV(){
   const blob=new Blob([headers+"\n"+body],{type:"text/csv"});
   const a=document.createElement("a");
   a.href=URL.createObjectURL(blob);
-  a.download=currentFile.split("/").pop();
+  a.download="membership_export.csv";
   a.click();
 }
+
+document.getElementById("search").addEventListener("input",render);
 
 loadLeagues().then(load);
 </script>
