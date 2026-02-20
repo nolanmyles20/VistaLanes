@@ -1,704 +1,230 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Vista Lanes • Membership</title>
-  <style>
-    :root{
-      --bg:#000;
-      --panel: rgba(255,255,255,.04);
-      --panel2: rgba(255,255,255,.02);
-      --border: rgba(255,255,255,.10);
-      --text:#d8e1ee;
-      --muted:#8ea0b5;
-      --btn:#d9d9d9;
-      --btnText:#111;
-      --btnBorder:#bdbdbd;
-      --activeShadow: inset 0 3px 10px rgba(0,0,0,.35);
-      --shadow: 0 10px 30px rgba(0,0,0,.45);
-      --radius:18px;
-      --accent:#6aa7ff;
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-      background: var(--bg);
-      color: var(--text);
-      min-height:100vh;
-    }
-    .wrap{max-width:1200px;margin:0 auto;padding:14px 14px 60px;}
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Vista Lanes • Membership</title>
 
-    .brandbar{display:flex;justify-content:center;align-items:center;padding:8px 0 8px;}
-    .brandbar img{
-      width:min(340px, 86vw);
-      height:auto;
-      display:block;
-      filter: drop-shadow(0 10px 22px rgba(0,0,0,.55));
-      opacity:.98;
-    }
-
-    .menubar{
-      display:flex;gap:10px;flex-wrap:wrap;justify-content:center;align-items:center;
-      margin: 6px 0 14px;
-    }
-    .menubar a{
-      text-decoration:none;
-      background: var(--btn);
-      color: var(--btnText);
-      border: 1px solid var(--btnBorder);
-      border-radius: 999px;
-      padding: 10px 14px;
-      font-weight: 800;
-      letter-spacing:.2px;
-      box-shadow: 0 3px 0 rgba(255,255,255,.15);
-      transition: .12s ease;
-      user-select:none;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      min-width: 104px;
-    }
-    .menubar a:hover{transform: translateY(-1px);}
-    .menubar a:active{transform: translateY(0px);}
-    .menubar a.active{
-      background: #cfcfcf;
-      box-shadow: var(--activeShadow);
-      transform: translateY(1px);
-      border-color:#a9a9a9;
-    }
-
-    header{
-      display:flex;justify-content:space-between;gap:10px;align-items:flex-end;flex-wrap:wrap;
-      margin: 6px 0 12px;
-    }
-    h1{margin:0;font-size:22px;font-weight:900;letter-spacing:.3px;}
-    .sub{color:var(--muted);font-size:13px;}
-
-    .panel{
-      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
-      border:1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: 0 10px 30px rgba(0,0,0,.45);
-      overflow:hidden;
-    }
-    .panel .hd{
-      padding:12px 14px;
-      display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;
-      border-bottom:1px solid rgba(255,255,255,.08);
-      background: linear-gradient(180deg, rgba(255,255,255,.03), transparent);
-    }
-    .panel .hd .right{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
-
-    input{
-      background: rgba(255,255,255,.03);
-      border:1px solid rgba(255,255,255,.12);
-      color:var(--text);
-      padding:10px 12px;
-      border-radius: 14px;
-      outline:none;
-      transition:.15s ease;
-      max-width:100%;
-      min-width:220px;
-    }
-    input::placeholder{color:rgba(216,225,238,.35)}
-    input:focus{border-color: rgba(106,167,255,.5);box-shadow: 0 0 0 3px rgba(106,167,255,.15);}
-
-    .pill{
-      font-size:12px;
-      padding:6px 10px;border-radius:999px;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.03);
-      color:var(--muted);
-      display:inline-flex;gap:8px;align-items:center;white-space:nowrap;
-    }
-    .pill b{color:var(--text)}
-
-    /* NEW: league dropdown styled like pill */
-    .leagueSelect{
-      font-size:12px;
-      padding:6px 10px;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.03);
-      color: var(--text);
-      outline:none;
-      max-width: 520px;
-    }
-    .leagueSelect option{background:#111;color:#fff;}
-
-    .btn{
-      border:1px solid rgba(255,255,255,.14);
-      background: rgba(106,167,255,.18);
-      color: var(--text);
-      padding:10px 13px;
-      border-radius: 999px;
-      cursor:pointer;
-      transition:.15s ease;
-      display:inline-flex;gap:8px;align-items:center;
-      user-select:none;
-      font-weight:800;
-    }
-    .btn:hover{transform: translateY(-1px);}
-    .btn:active{transform: translateY(0px);}
-
-    .bd{padding:14px;}
-
-    .tableWrap{
-      width:100%;
-      overflow:auto;
-      border-radius:16px;
-      border:1px solid rgba(255,255,255,.08);
-      background: rgba(0,0,0,.10);
-    }
-    table{
-      width:100%;
-      border-collapse:separate;
-      border-spacing:0;
-      min-width: 720px;
-    }
-    thead th{
-      position:sticky;
-      top:0;
-      z-index:2;
-      text-align:left;
-      font-size:12px;
-      letter-spacing:.35px;
-      text-transform:uppercase;
-      color:var(--muted);
-      background: rgba(20,20,20,.98);
-      border-bottom:1px solid rgba(255,255,255,.10);
-      padding:12px 12px;
-      white-space:nowrap;
-    }
-    tbody td{
-      padding:12px 12px;
-      border-bottom:1px solid rgba(255,255,255,.06);
-      color:var(--text);
-      vertical-align:top;
-    }
-    tbody tr:hover td{background: rgba(255,255,255,.03);}
-    .err{margin-top:10px;color:#ffd57a;font-size:13px;line-height:1.4;}
-    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;}
-
-    @media (max-width: 520px){
-      .menubar a{min-width: 96px; padding: 9px 12px;}
-      input{min-width: 180px;}
-    }
-  
-    /* Membership money styling */
-    .money{ font-variant-numeric: tabular-nums; font-weight:900; }
-    .good{ color:#35d07f; }
-    .bad{ color:#ff4d4d; }
-    .warn{ color:#ffd166; }
-    .muted2{ color: rgba(216,225,238,.55); }
-    .payBtn{
-      text-decoration:none;
-      display:inline-flex; gap:8px; align-items:center; justify-content:center;
-      padding:8px 12px; border-radius:999px;
-      border:1px solid rgba(255,255,255,.14);
-      background: rgba(106,167,255,.18);
-      color: var(--text);
-      font-weight:900;
-      cursor:pointer;
-      user-select:none;
-    }
-    .payBtn:hover{transform: translateY(-1px);}
-    .payBtn:active{transform: translateY(0);}
-
-    /* Modal */
-    .modalBackdrop{
-      position:fixed; inset:0;
-      background: rgba(0,0,0,.65);
-      display:none;
-      align-items:center;
-      justify-content:center;
-      padding:16px;
-      z-index:999;
-    }
-    .modal{
-      width:min(760px, 96vw);
-      border-radius:18px;
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(10,10,10,.92);
-      box-shadow: 0 18px 50px rgba(0,0,0,.70);
-      overflow:hidden;
-    }
-    .modalHd{
-      padding:12px 14px;
-      border-bottom:1px solid rgba(255,255,255,.08);
-      display:flex;justify-content:space-between;gap:10px;align-items:center;
-      background: linear-gradient(180deg, rgba(255,255,255,.03), transparent);
-    }
-    .modalHd h3{margin:0;font-size:15px;font-weight:950;letter-spacing:.2px;}
-    .xBtn{
-      width:38px; height:38px;
-      border-radius:12px;
-      border:1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.06);
-      color: var(--text);
-      font-weight:950;
-      cursor:pointer;
-    }
-    .modalBd{ padding:14px; }
-    .formGrid{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:12px;
-    }
-    .field{ display:flex; flex-direction:column; gap:6px; }
-    .field label{ color:var(--muted); font-size:12px; font-weight:950; }
-    .field input, .field select{
-      padding:10px 12px;
-      border-radius:14px;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.04);
-      color: var(--text);
-      font-weight:900;
-      outline:none;
-    }
-    .fieldFull{ grid-column: 1 / -1; }
-    .modalFt{
-      padding:12px 14px;
-      border-top:1px solid rgba(255,255,255,.08);
-      display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap;
-    }
-    .btnPrimary{ background: rgba(106,167,255,.28); }
-    @media (max-width:640px){ .formGrid{ grid-template-columns: 1fr; } }
-</style>
+<link rel="stylesheet" href="styles.css"/>
 </head>
 
 <body>
-  <div class="wrap">
-    <div class="brandbar">
-      <img src="assets/9AB9725D-AD71-4DDC-BE9B-03328F663643.png" alt="Vista Lanes" />
+
+<header>
+  <img src="assets/logo.png" class="logo"/>
+</header>
+
+<nav class="menu">
+  <a href="index.html">Home</a>
+  <a href="bowlers.html">Bowlers</a>
+  <a href="leagues.html">Leagues</a>
+  <a href="teams.html">Teams</a>
+  <a href="lanes.html">Lanes</a>
+  <a href="brackets.html">Brackets</a>
+  <a href="payouts.html">Payouts</a>
+  <a class="active" href="membership.html">Membership</a>
+  <a href="tournaments.html">Tournaments</a>
+</nav>
+
+<main>
+
+<h1>Membership</h1>
+<div class="sub">
+  Loaded from <b id="loadedPath">data/membership_32170.csv</b>
+</div>
+
+<div class="card">
+
+  <div class="toolbar">
+
+    <div class="pill">
+      <span id="count">0</span>
+      <span>members</span>
     </div>
 
-    <nav class="menubar" aria-label="Main menu">
-      <a href="index.html">Home</a>
-      <a href="bowlers.html">Bowlers</a>
-      <a href="leagues.html">Leagues</a>
-      <a href="teams.html">Teams</a>
-      <a href="lanes.html">Lanes</a>
-      <a href="brackets.html">Brackets</a>
-      <a href="payouts.html">Payouts</a>
-      <a class="active" href="membership.html" aria-current="page">Membership</a>
-      <a href="tournaments.html">Tournaments</a>
-    </nav>
+    <select id="leagueSelect"></select>
 
-    <header>
-      <div>
-        <h1>Membership</h1>
-        <div class="sub">Loaded from <span class="mono" id="loadedPath">data/membership_32170.csv</span></div>
-      </div>
-    </header>
+    <input type="text" id="search" placeholder="Search member..."/>
 
-    <div class="panel">
-      <div class="hd">
-        <div class="pill"><b id="count">0</b> members</div>
+    <button class="btn" id="reload">Reload CSV</button>
 
-        <!-- NEW: league dropdown -->
-        <select id="leagueSelect" class="leagueSelect" title="Select league"></select>
-
-        <div class="right">
-          <input id="search" placeholder="Search member…" />
-          <button class="btn" id="reload" type="button">Reload CSV</button>
-          <button class="btn" id="addMember" type="button">➕ Add Member</button>
-          <button class="btn" id="export" type="button">⬇️ Export CSV</button>
-        </div>
-      </div>
-
-      <div class="bd">
-        <div class="tableWrap">
-          <table id="tbl" aria-label="Membership table">
-            <thead>
-              <tr>
-                <th>Bowler</th>
-                <th>Dues Owed</th>
-                <th>Upcoming Dues</th>
-                <th>Credits</th>
-                <th style="text-align:right;">Payment</th>
-              </tr>
-            </thead>
-            <tbody id="tbody"></tbody>
-          </table>
-        </div>
-        <div class="err" id="err" style="display:none"></div>
-      </div>
-    </div>
   </div>
+
+  <div class="tableWrap">
+    <table>
+      <thead>
+        <tr>
+          <th>BOWLER</th>
+          <th>DUES OWED</th>
+          <th>UPCOMING DUES</th>
+          <th>CREDITS</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+
+  <div id="err" class="err" style="display:none"></div>
+
+</div>
+
+</main>
 
 <script>
 (() => {
-  const LEAGUES_PATH = "data/leagues.csv";
-  const DEFAULT_LEAGUE_ID = "32170";
-  const STORAGE_KEY = "vista_selected_league_id"; // same key as bowlers/teams
 
-  const $ = (id) => document.getElementById(id);
-  const escapeHtml = (s)=>String(s ?? "").replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const LEAGUES_PATH = "data/leagues.csv";
+const DEFAULT_LEAGUE_ID = "32170";
+const STORAGE_KEY = "vista_selected_league_id";
 
-  let rows = [];
+const $ = id => document.getElementById(id);
 
-  function splitCSVLine(line){
-    const res=[]; let cur=""; let q=false;
-    for(let i=0;i<line.length;i++){
-      const c=line[i];
-      if(c === '"'){
-        if(q && line[i+1] === '"'){ cur+='"'; i++; }
-        else q=!q;
-      } else if(c === ',' && !q){
-        res.push(cur); cur="";
-      } else cur+=c;
-    }
-    res.push(cur);
-    return res;
+let rows = [];
+
+function splitCSV(line){
+  const res=[]; let cur=""; let q=false;
+  for(let i=0;i<line.length;i++){
+    const c=line[i];
+    if(c === '"'){
+      if(q && line[i+1] === '"'){ cur+='"'; i++; }
+      else q=!q;
+    } else if(c === ',' && !q){
+      res.push(cur); cur="";
+    } else cur+=c;
+  }
+  res.push(cur);
+  return res;
+}
+
+function parseCSV(text){
+  const lines=text.replace(/\r\n/g,"\n").replace(/\r/g,"\n")
+  .split("\n").filter(l=>l.trim()!=="");
+
+  if(!lines.length) return {headers:[], rows:[]};
+
+  const headers=splitCSV(lines[0]).map(h=>h.trim());
+  const out=[];
+
+  for(let i=1;i<lines.length;i++){
+    const cols=splitCSV(lines[i]);
+    const obj={};
+    headers.forEach((h,idx)=>obj[h]=cols[idx]||"");
+    out.push(obj);
   }
 
-  function parseCSV(text){
-    const lines = text.replace(/
-/g,"
-").replace(//g,"
-").split("
-").filter(l=>l.trim()!=="");
-    if(!lines.length) return {headers:[], rows:[]};
-    const header = splitCSVLine(lines[0]).map(h=>h.trim());
-    const out=[];
-    for(let i=1;i<lines.length;i++){
-      const cols = splitCSVLine(lines[i]);
-      const obj = {};
-      header.forEach((h,idx)=> obj[h] = (cols[idx] ?? "").trim());
-      out.push(obj);
-    }
-    return {headers: header, rows: out};
+  return {headers, rows:out};
+}
+
+function getLeague(){
+  return $("leagueSelect").value || DEFAULT_LEAGUE_ID;
+}
+
+function currentPath(){
+  return `data/membership_${getLeague()}.csv`;
+}
+
+function updatePath(){
+  $("loadedPath").textContent=currentPath();
+}
+
+function render(){
+  const q=($("search").value||"").toLowerCase();
+  let filtered=rows.slice();
+
+  if(q){
+    filtered=filtered.filter(r =>
+      JSON.stringify(r).toLowerCase().includes(q)
+    );
   }
 
-  function clampMoney(n){
-    const x = Number(n || 0);
-    if(!isFinite(x)) return 0;
-    return Math.round(x * 100) / 100;
+  $("count").textContent=filtered.length;
+
+  const tbody=$("tbody");
+  tbody.innerHTML="";
+
+  filtered.forEach(r=>{
+    const tr=document.createElement("tr");
+
+    tr.innerHTML=`
+      <td>${r.bowler_name||""}</td>
+      <td>$${Number(r.dues_owed_to_date||0).toFixed(2)}</td>
+      <td>$${Number(r.upcoming_dues||0).toFixed(2)}</td>
+      <td>$${Number(r.credits||0).toFixed(2)}</td>
+    `;
+
+    tbody.appendChild(tr);
+  });
+}
+
+async function load(){
+
+  $("err").style.display="none";
+
+  try{
+    updatePath();
+    const res=await fetch(currentPath(),{cache:"no-store"});
+    if(!res.ok) throw new Error("HTTP "+res.status);
+
+    const text=await res.text();
+    const parsed=parseCSV(text);
+
+    rows=parsed.rows;
+    render();
+
+  }catch(e){
+    rows=[];
+    render();
+    $("err").style.display="block";
+    $("err").textContent=e.message;
   }
-  function fmtMoney(n){ return "$" + clampMoney(n).toFixed(2); }
+}
 
-  function getSelectedLeagueId(){
-    return ($("leagueSelect").value || DEFAULT_LEAGUE_ID).trim() || DEFAULT_LEAGUE_ID;
-  }
-  function currentCsvPath(){
-    const leagueId = getSelectedLeagueId();
-    return `data/membership_${leagueId}.csv`;
-  }
-  function updateLoadedPathLabel(){ $("loadedPath").textContent = currentCsvPath(); }
+async function loadLeagues(){
 
-  function moneyClassForOwed(v){
-    const n = clampMoney(v);
-    if(n > 0.01) return "bad";
-    return "good";
-  }
+  const saved=localStorage.getItem(STORAGE_KEY)||DEFAULT_LEAGUE_ID;
 
-  function render(){
-    const q = ($("search").value || "").trim().toLowerCase();
-    let filtered = rows.slice();
-    if(q) filtered = filtered.filter(r => JSON.stringify(r).toLowerCase().includes(q));
+  try{
+    const res=await fetch(LEAGUES_PATH,{cache:"no-store"});
+    const text=await res.text();
+    const parsed=parseCSV(text);
 
-    $("count").textContent = String(filtered.length);
+    const idIdx=parsed.headers.indexOf("league_id");
+    const nameIdx=parsed.headers.indexOf("name");
 
-    const tbody = $("tbody");
-    tbody.innerHTML = "";
+    const sel=$("leagueSelect");
+    sel.innerHTML="";
 
-    filtered.forEach((r) => {
-      const tr = document.createElement("tr");
-
-      const tdName = document.createElement("td");
-      tdName.innerHTML = escapeHtml(r.bowler_name ?? "");
-      tr.appendChild(tdName);
-
-      const tdOwed = document.createElement("td");
-      tdOwed.className = "money " + moneyClassForOwed(r.dues_owed_to_date);
-      tdOwed.textContent = fmtMoney(r.dues_owed_to_date);
-      tr.appendChild(tdOwed);
-
-      const tdUpcoming = document.createElement("td");
-      tdUpcoming.className = "money warn";
-      tdUpcoming.textContent = fmtMoney(r.upcoming_dues);
-      tr.appendChild(tdUpcoming);
-
-      const tdCredits = document.createElement("td");
-      tdCredits.className = "money " + (clampMoney(r.credits) > 0 ? "good" : "muted2");
-      tdCredits.textContent = fmtMoney(r.credits);
-      tr.appendChild(tdCredits);
-
-      const tdPay = document.createElement("td");
-      tdPay.style.textAlign = "right";
-      const btn = document.createElement("a");
-      btn.href = "#";
-      btn.className = "payBtn";
-      btn.textContent = "💳 Pay";
-      btn.addEventListener("click", (e)=>{
-        e.preventDefault();
-        const fullIdx = rows.indexOf(r);
-        openModal(fullIdx);
-      });
-      tdPay.appendChild(btn);
-      tr.appendChild(tdPay);
-
-      tbody.appendChild(tr);
-    });
-  }
-
-  async function load(){
-    $("err").style.display = "none";
-    try{
-      updateLoadedPathLabel();
-      const path = currentCsvPath();
-      const res = await fetch(path, {cache:"no-store"});
-      if(!res.ok) throw new Error("HTTP " + res.status);
-      const text = await res.text();
-      const parsed = parseCSV(text);
-      if(!parsed.headers.length) throw new Error("CSV appears empty or has no header row.");
-
-      const hLower = parsed.headers.map(h => (h||"").toLowerCase());
-      const idxName = hLower.indexOf("bowler_name");
-      const idxOwed = hLower.indexOf("dues_owed_to_date");
-      const idxUp = hLower.indexOf("upcoming_dues");
-      const idxCred = hLower.indexOf("credits");
-
-      rows = parsed.rows.map(o => ({
-        bowler_name: (idxName >= 0 ? o[parsed.headers[idxName]] : "").trim(),
-        dues_owed_to_date: clampMoney(idxOwed >= 0 ? o[parsed.headers[idxOwed]] : 0),
-        upcoming_dues: clampMoney(idxUp >= 0 ? o[parsed.headers[idxUp]] : 0),
-        credits: clampMoney(idxCred >= 0 ? o[parsed.headers[idxCred]] : 0),
-      })).filter(r => r.bowler_name);
-
-      rows.sort((a,b)=> (a.bowler_name||"").localeCompare(b.bowler_name||""));
-      render();
-    }catch(e){
-      rows = [{bowler_name:`Could not load ${currentCsvPath()}. Make sure it exists in your repo.`, dues_owed_to_date:0, upcoming_dues:0, credits:0}];
-      render();
-      $("err").style.display = "block";
-      $("err").textContent = String(e && e.message ? e.message : e);
-    }
-  }
-
-  function setLeagueOptions(options, selectedId){
-    const sel = $("leagueSelect");
-    sel.innerHTML = "";
-    options.forEach(o => {
-      const opt = document.createElement("option");
-      opt.value = o.league_id;
-      opt.textContent = `${o.league_id} — ${o.name}`;
+    parsed.rows.forEach(r=>{
+      const opt=document.createElement("option");
+      opt.value=r[parsed.headers[idIdx]];
+      opt.textContent=
+        `${r[parsed.headers[idIdx]]} — ${r[parsed.headers[nameIdx]]}`;
       sel.appendChild(opt);
     });
-    const exists = options.some(o => String(o.league_id) === String(selectedId));
-    sel.value = exists ? selectedId : (options[0]?.league_id || DEFAULT_LEAGUE_ID);
+
+    sel.value=saved;
+
+  }catch{
+    const sel=$("leagueSelect");
+    sel.innerHTML=
+      `<option value="${DEFAULT_LEAGUE_ID}">
+        ${DEFAULT_LEAGUE_ID} — Default League
+       </option>`;
   }
 
-  async function loadLeagues(){
-    const saved = localStorage.getItem(STORAGE_KEY) || DEFAULT_LEAGUE_ID;
-    try{
-      const res = await fetch(LEAGUES_PATH, {cache:"no-store"});
-      if(!res.ok) throw new Error("HTTP " + res.status);
-      const text = await res.text();
-      const parsed = parseCSV(text);
-
-      const h = parsed.headers.map(x => x.toLowerCase());
-      const idxId = h.indexOf("league_id");
-      const idxName = h.indexOf("name");
-      if(idxId < 0 || idxName < 0) throw new Error("leagues.csv missing league_id or name headers");
-
-      const options = parsed.rows.map(r => ({
-        league_id: (r[parsed.headers[idxId]] || "").trim(),
-        name: (r[parsed.headers[idxName]] || "").trim()
-      })).filter(o => o.league_id);
-
-      if(!options.length) throw new Error("No leagues found in leagues.csv");
-
-      setLeagueOptions(options, saved);
-    }catch(_e){
-      setLeagueOptions([{league_id: DEFAULT_LEAGUE_ID, name: "Wednesday Mixed League"}], saved);
-    }
-
-    $("leagueSelect").addEventListener("change", () => {
-      localStorage.setItem(STORAGE_KEY, getSelectedLeagueId());
-      $("search").value = "";
-      load();
-    });
-  }
-
-  function csvEscape(val){
-    const s = String(val ?? "");
-    if(/[",
-]/.test(s)) return '"' + s.replace(/"/g,'""') + '"';
-    return s;
-  }
-  function toCSV(){
-    const headers = ["bowler_name","dues_owed_to_date","upcoming_dues","credits"];
-    const head = headers.map(csvEscape).join(",");
-    const body = rows.map(r => [
-      csvEscape(r.bowler_name),
-      csvEscape(clampMoney(r.dues_owed_to_date).toFixed(2)),
-      csvEscape(clampMoney(r.upcoming_dues).toFixed(2)),
-      csvEscape(clampMoney(r.credits).toFixed(2)),
-    ].join(",")).join("
-");
-    return head + "
-" + body + "
-";
-  }
-
-  // Modal HTML
-  const modal = document.createElement("div");
-  modal.innerHTML = `
-<div class="modalBackdrop" id="modalBackdrop" aria-hidden="true">
-  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-    <div class="modalHd">
-      <h3 id="modalTitle">Make Payment</h3>
-      <button class="xBtn" id="closeModalBtn" aria-label="Close">✕</button>
-    </div>
-    <div class="modalBd">
-      <div class="formGrid">
-        <div class="field fieldFull">
-          <label>Member</label>
-          <input id="mBowler" type="text" readonly />
-        </div>
-        <div class="field">
-          <label>Entry Type</label>
-          <select id="mType">
-            <option value="dues">Dues</option>
-            <option value="credit">Credit</option>
-          </select>
-        </div>
-        <div class="field">
-          <label>Amount</label>
-          <input id="mAmount" type="number" step="0.01" min="0" />
-        </div>
-        <div class="field fieldFull" id="methodWrap">
-          <label>Payment Method (for dues)</label>
-          <select id="mMethod">
-            <option value="use_credit">Use Credit (if available)</option>
-            <option value="cash">Cash</option>
-            <option value="card">Card</option>
-          </select>
-          <div class="sub" id="methodNote" style="margin-top:6px;"></div>
-        </div>
-        <div class="field fieldFull">
-          <label>Notes (optional)</label>
-          <input id="mNote" type="text" placeholder="Example: Paid week 3 dues, $5 credit applied" />
-        </div>
-      </div>
-    </div>
-    <div class="modalFt">
-      <button class="btn" id="cancelBtn" type="button">Cancel</button>
-      <button class="btn btnPrimary" id="savePaymentBtn" type="button">Save</button>
-    </div>
-  </div>
-</div>`;
-  document.body.appendChild(modal.firstElementChild);
-
-  let activeIdx = -1;
-
-  function updateMethodVisibility(){
-    $("methodWrap").style.display = ($("mType").value === "dues") ? "block" : "none";
-  }
-  function updateMethodNote(){
-    if(activeIdx < 0) return;
-    const r = rows[activeIdx];
-    const credits = clampMoney(r.credits || 0);
-    if($("mType").value !== "dues"){
-      $("methodNote").textContent = "Adding credit increases the member’s available credit balance.";
-      return;
-    }
-    if($("mMethod").value === "use_credit"){
-      $("methodNote").textContent = credits > 0
-        ? `This member has ${fmtMoney(credits)} credit available. We'll apply as much as needed.`
-        : "This member has $0.00 credit available.";
-    }else if($("mMethod").value === "cash"){
-      $("methodNote").textContent = "Cash payment reduces dues owed.";
-    }else{
-      $("methodNote").textContent = "Card payment reduces dues owed.";
-    }
-  }
-
-  function openModal(idx){
-    activeIdx = idx;
-    const r = rows[idx];
-    $("mBowler").value = r.bowler_name || "";
-    $("mType").value = "dues";
-    $("mAmount").value = Math.max(0, clampMoney(r.dues_owed_to_date)).toFixed(2);
-    $("mMethod").value = "use_credit";
-    $("mNote").value = "";
-    updateMethodVisibility();
-    updateMethodNote();
-    $("modalBackdrop").style.display = "flex";
-    $("modalBackdrop").setAttribute("aria-hidden","false");
-  }
-  function closeModal(){
-    $("modalBackdrop").style.display = "none";
-    $("modalBackdrop").setAttribute("aria-hidden","true");
-    activeIdx = -1;
-  }
-
-  $("closeModalBtn").addEventListener("click", (e)=>{ e.preventDefault(); closeModal(); });
-  $("cancelBtn").addEventListener("click", (e)=>{ e.preventDefault(); closeModal(); });
-  $("modalBackdrop").addEventListener("click", (e)=>{ if(e.target === $("modalBackdrop")) closeModal(); });
-  $("mType").addEventListener("change", ()=>{ updateMethodVisibility(); updateMethodNote(); });
-  $("mMethod").addEventListener("change", updateMethodNote);
-
-  $("savePaymentBtn").addEventListener("click", (e)=>{
-    e.preventDefault();
-    if(activeIdx < 0) return;
-    const r = rows[activeIdx];
-    const type = $("mType").value;
-    const amount = clampMoney($("mAmount").value);
-    if(!(amount > 0)){ alert("Enter an amount greater than 0."); return; }
-
-    if(type === "credit"){
-      r.credits = clampMoney((r.credits||0) + amount);
-    }else{
-      const method = $("mMethod").value;
-      if(method === "use_credit"){
-        const avail = clampMoney(r.credits || 0);
-        const apply = Math.min(avail, amount);
-        r.credits = clampMoney(avail - apply);
-        r.dues_owed_to_date = clampMoney((r.dues_owed_to_date||0) - amount);
-      }else{
-        r.dues_owed_to_date = clampMoney((r.dues_owed_to_date||0) - amount);
-      }
-    }
-    closeModal();
-    render();
+  $("leagueSelect").addEventListener("change",()=>{
+    localStorage.setItem(STORAGE_KEY,getLeague());
+    load();
   });
+}
 
-  $("search").addEventListener("input", render);
-  $("reload").addEventListener("click", load);
-  $("addMember").addEventListener("click", () => {
-    const name = prompt("Enter member (bowler) name:");
-    if(!name) return;
-    const clean = name.trim();
-    if(!clean) return;
-    if(rows.some(x => (x.bowler_name||"").toLowerCase() === clean.toLowerCase())){
-      alert("That member already exists.");
-      return;
-    }
-    rows.push({bowler_name:clean, dues_owed_to_date:0, upcoming_dues:0, credits:0});
-    rows.sort((a,b)=> (a.bowler_name||"").localeCompare(b.bowler_name||""));
-    render();
-  });
-  $("export").addEventListener("click", () => {
-    const leagueId = getSelectedLeagueId();
-    const filename = `membership_${leagueId}.csv`;
-    const blob = new Blob([toCSV()], {type:"text/csv;charset=utf-8"});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-  });
+$("search").addEventListener("input",render);
+$("reload").addEventListener("click",load);
 
-  loadLeagues().then(load);
+loadLeagues().then(load);
+
 })();
 </script>
+
 </body>
 </html>
