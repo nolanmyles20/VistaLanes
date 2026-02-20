@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Vista Lanes • Membership v2.0</title>
+<title>Vista Lanes • Membership v2.1</title>
 
 <style>
 :root{
@@ -30,11 +30,15 @@ h1{margin:0 0 10px 0;font-size:22px;font-weight:900;}
 .pill{font-size:12px;padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.12);}
 input,select{background:#111;border:1px solid #333;color:var(--text);padding:8px 10px;border-radius:12px;}
 .btn{background:rgba(106,167,255,.18);border:1px solid rgba(255,255,255,.14);padding:8px 12px;border-radius:999px;cursor:pointer;font-weight:800;}
+.btn.small{padding:5px 10px;font-size:12px;}
 table{width:100%;border-collapse:collapse;}
 thead th{font-size:12px;text-transform:uppercase;color:var(--muted);padding:10px;cursor:pointer;}
 tbody td{padding:10px;border-top:1px solid rgba(255,255,255,.05);}
 .due-red{color:var(--danger);font-weight:800;}
 .credit-green{color:var(--success);font-weight:800;}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;}
+.modal-box{background:#111;padding:20px;border-radius:18px;width:350px;}
+.modal-box h3{margin-top:0;}
 </style>
 </head>
 
@@ -71,15 +75,18 @@ tbody td{padding:10px;border-top:1px solid rgba(255,255,255,.05);}
 <tr>
 <th onclick="sortBy('last_name')">Last Name</th>
 <th onclick="sortBy('first_name')">First Name</th>
-<th>Dues Owed</th>
-<th>Upcoming</th>
-<th>Credits</th>
+<th onclick="sortBy('dues_owed_to_date')">Dues Owed</th>
+<th onclick="sortBy('upcoming_dues')">Upcoming</th>
+<th onclick="sortBy('credits')">Credits</th>
+<th>Payment</th>
 </tr>
 </thead>
 <tbody id="tbody"></tbody>
 </table>
 </div>
 </div>
+
+<div id="modal" style="display:none;"></div>
 
 <script>
 let rows=[];
@@ -134,8 +141,14 @@ function render(){
   );
 
   filtered.sort((a,b)=>{
-    let v1=(a[sortKey]||"").toLowerCase();
-    let v2=(b[sortKey]||"").toLowerCase();
+    let v1=(a[sortKey]||"");
+    let v2=(b[sortKey]||"");
+    if(!isNaN(v1) && !isNaN(v2)){
+      v1=parseFloat(v1); v2=parseFloat(v2);
+    } else {
+      v1=v1.toString().toLowerCase();
+      v2=v2.toString().toLowerCase();
+    }
     if(v1<v2) return sortAsc?-1:1;
     if(v1>v2) return sortAsc?1:-1;
     return 0;
@@ -143,7 +156,7 @@ function render(){
 
   const tbody=document.getElementById("tbody");
   tbody.innerHTML="";
-  filtered.forEach(r=>{
+  filtered.forEach((r,index)=>{
     const tr=document.createElement("tr");
     tr.innerHTML=`
       <td>${r.last_name||""}</td>
@@ -151,6 +164,7 @@ function render(){
       <td class="${Number(r.dues_owed_to_date)>0?'due-red':''}">$${Number(r.dues_owed_to_date||0).toFixed(2)}</td>
       <td>$${Number(r.upcoming_dues||0).toFixed(2)}</td>
       <td class="${Number(r.credits)>0?'credit-green':''}">$${Number(r.credits||0).toFixed(2)}</td>
+      <td><button class="btn small" onclick="openPayment(${rows.indexOf(r)})">Pay</button></td>
     `;
     tbody.appendChild(tr);
   });
@@ -161,6 +175,45 @@ function render(){
 function sortBy(key){
   if(sortKey===key) sortAsc=!sortAsc;
   else {sortKey=key; sortAsc=true;}
+  render();
+}
+
+function openPayment(i){
+  const r=rows[i];
+  const modal=document.getElementById("modal");
+  modal.innerHTML=`
+  <div class="modal">
+  <div class="modal-box">
+  <h3>${r.first_name} ${r.last_name}</h3>
+  <input id="amt" type="number" placeholder="Amount" style="width:100%;margin-bottom:10px;">
+  <select id="type" style="width:100%;margin-bottom:10px;">
+    <option value="dues">Apply to Current Dues</option>
+    <option value="upcoming">Apply to Upcoming</option>
+    <option value="credit">Add Credit</option>
+    <option value="useCredit">Use Credit to Pay Dues</option>
+  </select>
+  <button class="btn" onclick="applyPayment(${i})">Apply</button>
+  <button class="btn" onclick="closeModal()">Cancel</button>
+  </div></div>`;
+  modal.style.display="block";
+}
+
+function closeModal(){document.getElementById("modal").style.display="none";}
+
+function applyPayment(i){
+  const amt=parseFloat(document.getElementById("amt").value)||0;
+  const type=document.getElementById("type").value;
+  const r=rows[i];
+
+  if(type==="dues") r.dues_owed_to_date=Math.max(0,Number(r.dues_owed_to_date)-amt);
+  if(type==="upcoming") r.upcoming_dues=Math.max(0,Number(r.upcoming_dues)-amt);
+  if(type==="credit") r.credits=Number(r.credits)+amt;
+  if(type==="useCredit" && Number(r.credits)>=amt){
+    r.credits=Number(r.credits)-amt;
+    r.dues_owed_to_date=Math.max(0,Number(r.dues_owed_to_date)-amt);
+  }
+
+  closeModal();
   render();
 }
 
