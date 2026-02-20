@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Vista Lanes • Membership v2.1</title>
+<title>Vista Lanes • Membership v2.2</title>
 
 <style>
 :root{
@@ -12,7 +12,6 @@
   --border: rgba(255,255,255,.10);
   --text:#d8e1ee;
   --muted:#8ea0b5;
-  --accent:#6aa7ff;
   --danger:#ff4d4d;
   --success:#28c76f;
 }
@@ -141,13 +140,13 @@ function render(){
   );
 
   filtered.sort((a,b)=>{
-    let v1=(a[sortKey]||"");
-    let v2=(b[sortKey]||"");
+    let v1=a[sortKey];
+    let v2=b[sortKey];
     if(!isNaN(v1) && !isNaN(v2)){
       v1=parseFloat(v1); v2=parseFloat(v2);
     } else {
-      v1=v1.toString().toLowerCase();
-      v2=v2.toString().toLowerCase();
+      v1=(v1||"").toString().toLowerCase();
+      v2=(v2||"").toString().toLowerCase();
     }
     if(v1<v2) return sortAsc?-1:1;
     if(v1>v2) return sortAsc?1:-1;
@@ -156,7 +155,7 @@ function render(){
 
   const tbody=document.getElementById("tbody");
   tbody.innerHTML="";
-  filtered.forEach((r,index)=>{
+  filtered.forEach((r)=>{
     const tr=document.createElement("tr");
     tr.innerHTML=`
       <td>${r.last_name||""}</td>
@@ -164,7 +163,7 @@ function render(){
       <td class="${Number(r.dues_owed_to_date)>0?'due-red':''}">$${Number(r.dues_owed_to_date||0).toFixed(2)}</td>
       <td>$${Number(r.upcoming_dues||0).toFixed(2)}</td>
       <td class="${Number(r.credits)>0?'credit-green':''}">$${Number(r.credits||0).toFixed(2)}</td>
-      <td><button class="btn small" onclick="openPayment(${rows.indexOf(r)})">Pay</button></td>
+      <td><button class="btn small" onclick="openPayment('${r.first_name}','${r.last_name}')">Pay</button></td>
     `;
     tbody.appendChild(tr);
   });
@@ -178,13 +177,13 @@ function sortBy(key){
   render();
 }
 
-function openPayment(i){
-  const r=rows[i];
+function openPayment(first,last){
+  const r=rows.find(x=>x.first_name===first && x.last_name===last);
   const modal=document.getElementById("modal");
   modal.innerHTML=`
   <div class="modal">
   <div class="modal-box">
-  <h3>${r.first_name} ${r.last_name}</h3>
+  <h3>${first} ${last}</h3>
   <input id="amt" type="number" placeholder="Amount" style="width:100%;margin-bottom:10px;">
   <select id="type" style="width:100%;margin-bottom:10px;">
     <option value="dues">Apply to Current Dues</option>
@@ -192,7 +191,7 @@ function openPayment(i){
     <option value="credit">Add Credit</option>
     <option value="useCredit">Use Credit to Pay Dues</option>
   </select>
-  <button class="btn" onclick="applyPayment(${i})">Apply</button>
+  <button class="btn" onclick="applyPayment('${first}','${last}')">Apply</button>
   <button class="btn" onclick="closeModal()">Cancel</button>
   </div></div>`;
   modal.style.display="block";
@@ -200,10 +199,10 @@ function openPayment(i){
 
 function closeModal(){document.getElementById("modal").style.display="none";}
 
-function applyPayment(i){
+function applyPayment(first,last){
   const amt=parseFloat(document.getElementById("amt").value)||0;
   const type=document.getElementById("type").value;
-  const r=rows[i];
+  const r=rows.find(x=>x.first_name===first && x.last_name===last);
 
   if(type==="dues") r.dues_owed_to_date=Math.max(0,Number(r.dues_owed_to_date)-amt);
   if(type==="upcoming") r.upcoming_dues=Math.max(0,Number(r.upcoming_dues)-amt);
