@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Vista Lanes - Membership</title>
+  <title>Vista Lanes • Membership</title>
   <style>
     :root{
       --bg:#000;
@@ -19,8 +19,6 @@
       --shadow: 0 10px 30px rgba(0,0,0,.45);
       --radius:18px;
       --accent:#6aa7ff;
-      --good:#2aa77a;
-      --warn:#ffd57a;
     }
     *{box-sizing:border-box}
     body{
@@ -32,12 +30,7 @@
     }
     .wrap{max-width:1200px;margin:0 auto;padding:14px 14px 60px;}
 
-    .brandbar{
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      padding:8px 0 8px;
-    }
+    .brandbar{display:flex;justify-content:center;align-items:center;padding:8px 0 8px;}
     .brandbar img{
       width:min(340px, 86vw);
       height:auto;
@@ -47,11 +40,7 @@
     }
 
     .menubar{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      justify-content:center;
-      align-items:center;
+      display:flex;gap:10px;flex-wrap:wrap;justify-content:center;align-items:center;
       margin: 6px 0 14px;
     }
     .menubar a{
@@ -81,11 +70,7 @@
     }
 
     header{
-      display:flex;
-      justify-content:space-between;
-      gap:10px;
-      align-items:flex-end;
-      flex-wrap:wrap;
+      display:flex;justify-content:space-between;gap:10px;align-items:flex-end;flex-wrap:wrap;
       margin: 6px 0 12px;
     }
     h1{margin:0;font-size:22px;font-weight:900;letter-spacing:.3px;}
@@ -95,21 +80,16 @@
       background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
       border:1px solid var(--border);
       border-radius: var(--radius);
-      box-shadow: var(--shadow);
+      box-shadow: 0 10px 30px rgba(0,0,0,.45);
       overflow:hidden;
     }
     .panel .hd{
       padding:12px 14px;
-      display:flex;
-      justify-content:space-between;
-      gap:10px;
-      align-items:center;
-      flex-wrap:wrap;
+      display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;
       border-bottom:1px solid rgba(255,255,255,.08);
       background: linear-gradient(180deg, rgba(255,255,255,.03), transparent);
     }
     .panel .hd .right{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
-    .panel .hd .left{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
 
     input{
       background: rgba(255,255,255,.03);
@@ -127,20 +107,15 @@
 
     .pill{
       font-size:12px;
-      padding:6px 10px;
-      border-radius:999px;
+      padding:6px 10px;border-radius:999px;
       border:1px solid rgba(255,255,255,.12);
       background: rgba(255,255,255,.03);
       color:var(--muted);
-      display:inline-flex;
-      gap:8px;
-      align-items:center;
-      white-space:nowrap;
+      display:inline-flex;gap:8px;align-items:center;white-space:nowrap;
     }
     .pill b{color:var(--text)}
-    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;}
 
-    /* League dropdown styled like pill */
+    /* NEW: league dropdown styled like pill */
     .leagueSelect{
       font-size:12px;
       padding:6px 10px;
@@ -167,15 +142,6 @@
     }
     .btn:hover{transform: translateY(-1px);}
     .btn:active{transform: translateY(0px);}
-
-    .btnSave{
-      background: rgba(106,167,255,.30);
-      border-color: rgba(106,167,255,.55);
-    }
-    .btnExport{
-      background: rgba(255,255,255,.10);
-      border-color: rgba(255,255,255,.20);
-    }
 
     .bd{padding:14px;}
 
@@ -207,133 +173,99 @@
       white-space:nowrap;
     }
     tbody td{
-      padding:10px 12px;
+      padding:12px 12px;
       border-bottom:1px solid rgba(255,255,255,.06);
       color:var(--text);
       vertical-align:top;
     }
     tbody tr:hover td{background: rgba(255,255,255,.03);}
-
-    .nameCell{font-weight:900}
-    .numCell{font-weight:800}
-
-    .cellInput{
-      width:100%;
-      min-width: 120px;
-      padding:8px 10px;
-      border-radius:12px;
-      background: rgba(255,255,255,.02);
-      border:1px solid rgba(255,255,255,.10);
-      color: var(--text);
-      outline:none;
-      transition:.12s ease;
-      font: inherit;
-    }
-    .cellInput:focus{
-      border-color: rgba(106,167,255,.55);
-      box-shadow: 0 0 0 3px rgba(106,167,255,.12);
-      background: rgba(255,255,255,.03);
-    }
-
-    .status{
-      margin-left:6px;
-      font-size:12px;
-      color: var(--muted);
-      padding:6px 10px;
-      border-radius: 999px;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.03);
-      display:none;
-      white-space:nowrap;
-    }
-    .status.ok{color:#a8f3d5;border-color: rgba(42,167,122,.35); background: rgba(42,167,122,.12);}
-    .status.bad{color: #ffd57a; border-color: rgba(255,213,122,.35); background: rgba(255,213,122,.10);}
-
-    .err{
-      margin-top:10px;
-      color:#ffd57a;
-      font-size:13px;
-      line-height:1.4;
-    }
+    .err{margin-top:10px;color:#ffd57a;font-size:13px;line-height:1.4;}
+    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;}
 
     @media (max-width: 520px){
       .menubar a{min-width: 96px; padding: 9px 12px;}
       input{min-width: 180px;}
     }
   
-/* ===== Membership columns ===== */
-.colName{ width:34%; }
-.colOwed{ width:18%; }
-.colUpcoming{ width:18%; }
-.colCredits{ width:18%; }
-.colActions{ width:12%; text-align:right; }
-.money{ font-variant-numeric: tabular-nums; font-weight:950; }
-.good{ color:#35d07f; }
-.bad{ color:#ff4d4d; }
-.warn{ color:#ffd166; }
+    /* Membership money styling */
+    .money{ font-variant-numeric: tabular-nums; font-weight:900; }
+    .good{ color:#35d07f; }
+    .bad{ color:#ff4d4d; }
+    .warn{ color:#ffd166; }
+    .muted2{ color: rgba(216,225,238,.55); }
+    .payBtn{
+      text-decoration:none;
+      display:inline-flex; gap:8px; align-items:center; justify-content:center;
+      padding:8px 12px; border-radius:999px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(106,167,255,.18);
+      color: var(--text);
+      font-weight:900;
+      cursor:pointer;
+      user-select:none;
+    }
+    .payBtn:hover{transform: translateY(-1px);}
+    .payBtn:active{transform: translateY(0);}
 
-/* ===== Modal ===== */
-.modalBackdrop{
-  position:fixed; inset:0;
-  background: rgba(0,0,0,.65);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  padding:16px;
-  z-index:999;
-}
-.modal{
-  width:min(720px, 96vw);
-  border-radius:18px;
-  border:1px solid rgba(255,255,255,.10);
-  background: rgba(10,10,10,.92);
-  box-shadow: 0 18px 50px rgba(0,0,0,.70);
-  overflow:hidden;
-}
-.modalHd{
-  padding:12px 14px;
-  border-bottom:1px solid rgba(255,255,255,.10);
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-}
-.modalHd h3{ margin:0; font-size:15px; font-weight:950; }
-.xBtn{
-  width:38px; height:38px;
-  border-radius:12px;
-  border:1px solid rgba(255,255,255,.14);
-  background: rgba(255,255,255,.06);
-  color: var(--text);
-  font-weight:950;
-  cursor:pointer;
-}
-.modalBd{ padding:14px; }
-.formGrid{
-  display:grid;
-  grid-template-columns: 1fr 1fr;
-  gap:12px;
-}
-.field{ display:flex; flex-direction:column; gap:6px; }
-.field label{ color:var(--muted); font-size:12px; font-weight:950; }
-.field input, .field select{
-  padding:10px 12px;
-  border-radius:12px;
-  border:1px solid rgba(255,255,255,.12);
-  background: rgba(255,255,255,.06);
-  color: var(--text);
-  font-weight:900;
-  outline:none;
-}
-.fieldFull{ grid-column: 1 / -1; }
-.modalFt{
-  padding:12px 14px;
-  border-top:1px solid rgba(255,255,255,.10);
-  display:flex;
-  gap:10px;
-  justify-content:flex-end;
-}
-@media (max-width:640px){ .formGrid{ grid-template-columns: 1fr; } }
+    /* Modal */
+    .modalBackdrop{
+      position:fixed; inset:0;
+      background: rgba(0,0,0,.65);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:16px;
+      z-index:999;
+    }
+    .modal{
+      width:min(760px, 96vw);
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(10,10,10,.92);
+      box-shadow: 0 18px 50px rgba(0,0,0,.70);
+      overflow:hidden;
+    }
+    .modalHd{
+      padding:12px 14px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      display:flex;justify-content:space-between;gap:10px;align-items:center;
+      background: linear-gradient(180deg, rgba(255,255,255,.03), transparent);
+    }
+    .modalHd h3{margin:0;font-size:15px;font-weight:950;letter-spacing:.2px;}
+    .xBtn{
+      width:38px; height:38px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      font-weight:950;
+      cursor:pointer;
+    }
+    .modalBd{ padding:14px; }
+    .formGrid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+    }
+    .field{ display:flex; flex-direction:column; gap:6px; }
+    .field label{ color:var(--muted); font-size:12px; font-weight:950; }
+    .field input, .field select{
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      color: var(--text);
+      font-weight:900;
+      outline:none;
+    }
+    .fieldFull{ grid-column: 1 / -1; }
+    .modalFt{
+      padding:12px 14px;
+      border-top:1px solid rgba(255,255,255,.08);
+      display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap;
+    }
+    .btnPrimary{ background: rgba(106,167,255,.28); }
+    @media (max-width:640px){ .formGrid{ grid-template-columns: 1fr; } }
 </style>
 </head>
 
@@ -345,60 +277,53 @@
 
     <nav class="menubar" aria-label="Main menu">
       <a href="index.html">Home</a>
-      <a class="active" href="bowlers.html" aria-current="page">Membership</a>
+      <a href="bowlers.html">Bowlers</a>
       <a href="leagues.html">Leagues</a>
       <a href="teams.html">Teams</a>
       <a href="lanes.html">Lanes</a>
       <a href="brackets.html">Brackets</a>
       <a href="payouts.html">Payouts</a>
+      <a class="active" href="membership.html" aria-current="page">Membership</a>
       <a href="tournaments.html">Tournaments</a>
     </nav>
 
     <header>
       <div>
         <h1>Membership</h1>
-        <div class="sub">Loaded from <span class="mono" id="loadedPath">data/bowlers_32170.csv</span></div>
+        <div class="sub">Loaded from <span class="mono" id="loadedPath">data/membership_32170.csv</span></div>
       </div>
     </header>
 
     <div class="panel">
       <div class="hd">
-        <div class="left">
-          <div class="pill"><b id="count">0</b> bowlers</div>
+        <div class="pill"><b id="count">0</b> members</div>
 
-          <!-- NEW: league dropdown -->
-          <select id="leagueSelect" class="leagueSelect" title="Select league"></select>
-        </div>
+        <!-- NEW: league dropdown -->
+        <select id="leagueSelect" class="leagueSelect" title="Select league"></select>
 
         <div class="right">
-          <input id="search" placeholder="Search bowler…" />
+          <input id="search" placeholder="Search member…" />
           <button class="btn" id="reload" type="button">Reload CSV</button>
-          <button class="btn btnSave" id="save" type="button" title="Send edits to the server">Save</button>
-          <button class="btn btnExport" id="export" type="button" title="Download a new CSV from your current edits">Export</button>
-          <span class="status" id="status"></span>
+          <button class="btn" id="addMember" type="button">➕ Add Member</button>
+          <button class="btn" id="export" type="button">⬇️ Export CSV</button>
         </div>
       </div>
 
       <div class="bd">
         <div class="tableWrap">
-        <table>
-          <thead>
-            <tr>
-              <th class="colName">Bowler</th>
-              <th class="colOwed">Dues Owed</th>
-              <th class="colUpcoming">Upcoming Dues</th>
-              <th class="colCredits">Credits</th>
-              <th class="colActions">Payment</th>
-            </tr>
-          </thead>
-          <tbody id="rows"></tbody>
-        </table>
-      </div>
-
-      <p class="note" style="margin-top:10px;">
-        Loaded from <b id="fileLabel">data/membership_?.csv</b>. Payments update the table in your browser.
-        Use <b>Export CSV</b> to download the updated membership file and replace it on the Pi.
-      </p>
+          <table id="tbl" aria-label="Membership table">
+            <thead>
+              <tr>
+                <th>Bowler</th>
+                <th>Dues Owed</th>
+                <th>Upcoming Dues</th>
+                <th>Credits</th>
+                <th style="text-align:right;">Payment</th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
         <div class="err" id="err" style="display:none"></div>
       </div>
     </div>
@@ -408,10 +333,12 @@
 (() => {
   const LEAGUES_PATH = "data/leagues.csv";
   const DEFAULT_LEAGUE_ID = "32170";
-  const STORAGE_KEY = "vista_selected_league_id";
+  const STORAGE_KEY = "vista_selected_league_id"; // same key as bowlers/teams
 
-  const COLS = ["bowler_name","dues_owed_to_date","upcoming_dues","credits"];
   const $ = (id) => document.getElementById(id);
+  const escapeHtml = (s)=>String(s ?? "").replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+  let rows = [];
 
   function splitCSVLine(line){
     const res=[]; let cur=""; let q=false;
@@ -451,33 +378,16 @@
     if(!isFinite(x)) return 0;
     return Math.round(x * 100) / 100;
   }
-  function money(n){ return clampMoney(n).toFixed(2); }
+  function fmtMoney(n){ return "$" + clampMoney(n).toFixed(2); }
 
   function getSelectedLeagueId(){
-    const v = $("leagueSelect")?.value || "";
-    return v || DEFAULT_LEAGUE_ID;
+    return ($("leagueSelect").value || DEFAULT_LEAGUE_ID).trim() || DEFAULT_LEAGUE_ID;
   }
-  function membershipPathForLeague(leagueId){
+  function currentCsvPath(){
+    const leagueId = getSelectedLeagueId();
     return `data/membership_${leagueId}.csv`;
   }
-
-  function csvEscape(val){
-    const s = String(val ?? "");
-    if(/[",
-]/.test(s)) return '"' + s.replace(/"/g,'""') + '"';
-    return s;
-  }
-  function toCSV(headers, rows){
-    const head = headers.map(csvEscape).join(",");
-    const body = rows.map(r => headers.map(h => csvEscape(r[h] ?? "")).join(",")).join("
-");
-    return head + "
-" + body + "
-";
-  }
-
-  let data = [];
-  let activeIdx = -1;
+  function updateLoadedPathLabel(){ $("loadedPath").textContent = currentCsvPath(); }
 
   function moneyClassForOwed(v){
     const n = clampMoney(v);
@@ -486,82 +396,86 @@
   }
 
   function render(){
-    const tbody = $("rows");
+    const q = ($("search").value || "").trim().toLowerCase();
+    let filtered = rows.slice();
+    if(q) filtered = filtered.filter(r => JSON.stringify(r).toLowerCase().includes(q));
+
+    $("count").textContent = String(filtered.length);
+
+    const tbody = $("tbody");
     tbody.innerHTML = "";
-    data.forEach((r, idx) => {
+
+    filtered.forEach((r) => {
       const tr = document.createElement("tr");
 
       const tdName = document.createElement("td");
-      tdName.className = "colName";
-      tdName.textContent = r.bowler_name || "";
+      tdName.innerHTML = escapeHtml(r.bowler_name ?? "");
       tr.appendChild(tdName);
 
       const tdOwed = document.createElement("td");
-      tdOwed.className = "colOwed money " + moneyClassForOwed(r.dues_owed_to_date);
-      tdOwed.textContent = `$${money(r.dues_owed_to_date)}`;
+      tdOwed.className = "money " + moneyClassForOwed(r.dues_owed_to_date);
+      tdOwed.textContent = fmtMoney(r.dues_owed_to_date);
       tr.appendChild(tdOwed);
 
       const tdUpcoming = document.createElement("td");
-      tdUpcoming.className = "colUpcoming money warn";
-      tdUpcoming.textContent = `$${money(r.upcoming_dues)}`;
+      tdUpcoming.className = "money warn";
+      tdUpcoming.textContent = fmtMoney(r.upcoming_dues);
       tr.appendChild(tdUpcoming);
 
       const tdCredits = document.createElement("td");
-      tdCredits.className = "colCredits money " + (clampMoney(r.credits) > 0 ? "good" : "muted");
-      tdCredits.textContent = `$${money(r.credits)}`;
+      tdCredits.className = "money " + (clampMoney(r.credits) > 0 ? "good" : "muted2");
+      tdCredits.textContent = fmtMoney(r.credits);
       tr.appendChild(tdCredits);
 
-      const tdAct = document.createElement("td");
-      tdAct.className = "colActions";
-
+      const tdPay = document.createElement("td");
+      tdPay.style.textAlign = "right";
       const btn = document.createElement("a");
       btn.href = "#";
-      btn.className = "smallBtn";
+      btn.className = "payBtn";
       btn.textContent = "💳 Pay";
-      btn.addEventListener("click", (e)=>{ e.preventDefault(); openModal(idx); });
-
-      tdAct.appendChild(btn);
-      tr.appendChild(tdAct);
+      btn.addEventListener("click", (e)=>{
+        e.preventDefault();
+        const fullIdx = rows.indexOf(r);
+        openModal(fullIdx);
+      });
+      tdPay.appendChild(btn);
+      tr.appendChild(tdPay);
 
       tbody.appendChild(tr);
     });
   }
 
-  async function loadMembership(){
-    const leagueId = getSelectedLeagueId();
-    const path = membershipPathForLeague(leagueId);
-    const fileLabel = document.getElementById("fileLabel");
-    if(fileLabel) fileLabel.textContent = path;
-
+  async function load(){
+    $("err").style.display = "none";
     try{
+      updateLoadedPathLabel();
+      const path = currentCsvPath();
       const res = await fetch(path, {cache:"no-store"});
-      if(!res.ok) throw new Error(`HTTP ${res.status} for ${path}`);
+      if(!res.ok) throw new Error("HTTP " + res.status);
       const text = await res.text();
       const parsed = parseCSV(text);
+      if(!parsed.headers.length) throw new Error("CSV appears empty or has no header row.");
 
-      const fileHeaders = parsed.headers.length ? parsed.headers : COLS;
-      const lower = fileHeaders.map(h => (h||"").toLowerCase());
-      const idx = {
-        bowler_name: lower.indexOf("bowler_name"),
-        dues_owed_to_date: lower.indexOf("dues_owed_to_date"),
-        upcoming_dues: lower.indexOf("upcoming_dues"),
-        credits: lower.indexOf("credits"),
-      };
+      const hLower = parsed.headers.map(h => (h||"").toLowerCase());
+      const idxName = hLower.indexOf("bowler_name");
+      const idxOwed = hLower.indexOf("dues_owed_to_date");
+      const idxUp = hLower.indexOf("upcoming_dues");
+      const idxCred = hLower.indexOf("credits");
 
-      data = parsed.rows.map(obj => ({
-        bowler_name: (idx.bowler_name >= 0 ? (obj[fileHeaders[idx.bowler_name]]||"") : "").trim(),
-        dues_owed_to_date: clampMoney(idx.dues_owed_to_date >= 0 ? obj[fileHeaders[idx.dues_owed_to_date]] : 0),
-        upcoming_dues: clampMoney(idx.upcoming_dues >= 0 ? obj[fileHeaders[idx.upcoming_dues]] : 0),
-        credits: clampMoney(idx.credits >= 0 ? obj[fileHeaders[idx.credits]] : 0),
+      rows = parsed.rows.map(o => ({
+        bowler_name: (idxName >= 0 ? o[parsed.headers[idxName]] : "").trim(),
+        dues_owed_to_date: clampMoney(idxOwed >= 0 ? o[parsed.headers[idxOwed]] : 0),
+        upcoming_dues: clampMoney(idxUp >= 0 ? o[parsed.headers[idxUp]] : 0),
+        credits: clampMoney(idxCred >= 0 ? o[parsed.headers[idxCred]] : 0),
       })).filter(r => r.bowler_name);
 
-      data.sort((a,b)=> (a.bowler_name||"").localeCompare(b.bowler_name||""));
+      rows.sort((a,b)=> (a.bowler_name||"").localeCompare(b.bowler_name||""));
       render();
     }catch(e){
-      data = [{bowler_name:`Missing file: ${path}`, dues_owed_to_date:0, upcoming_dues:0, credits:0}];
+      rows = [{bowler_name:`Could not load ${currentCsvPath()}. Make sure it exists in your repo.`, dues_owed_to_date:0, upcoming_dues:0, credits:0}];
       render();
-      alert(`Membership load failed:
-${String(e && e.message ? e.message : e)}`);
+      $("err").style.display = "block";
+      $("err").textContent = String(e && e.message ? e.message : e);
     }
   }
 
@@ -580,171 +494,60 @@ ${String(e && e.message ? e.message : e)}`);
 
   async function loadLeagues(){
     const saved = localStorage.getItem(STORAGE_KEY) || DEFAULT_LEAGUE_ID;
-    const res = await fetch(LEAGUES_PATH, {cache:"no-store"});
-    if(!res.ok) throw new Error("HTTP " + res.status);
-    const text = await res.text();
-    const parsed = parseCSV(text);
+    try{
+      const res = await fetch(LEAGUES_PATH, {cache:"no-store"});
+      if(!res.ok) throw new Error("HTTP " + res.status);
+      const text = await res.text();
+      const parsed = parseCSV(text);
 
-    const h = parsed.headers.map(x => x.toLowerCase());
-    const idxId = h.indexOf("league_id");
-    const idxName = h.indexOf("name");
-    if(idxId < 0 || idxName < 0) throw new Error("leagues.csv missing league_id or name headers");
+      const h = parsed.headers.map(x => x.toLowerCase());
+      const idxId = h.indexOf("league_id");
+      const idxName = h.indexOf("name");
+      if(idxId < 0 || idxName < 0) throw new Error("leagues.csv missing league_id or name headers");
 
-    const options = parsed.rows.map(r => ({
-      league_id: (r[parsed.headers[idxId]] || "").trim(),
-      name: (r[parsed.headers[idxName]] || "").trim()
-    })).filter(o => o.league_id);
+      const options = parsed.rows.map(r => ({
+        league_id: (r[parsed.headers[idxId]] || "").trim(),
+        name: (r[parsed.headers[idxName]] || "").trim()
+      })).filter(o => o.league_id);
 
-    if(!options.length) throw new Error("No leagues found in leagues.csv");
+      if(!options.length) throw new Error("No leagues found in leagues.csv");
 
-    setLeagueOptions(options, saved);
+      setLeagueOptions(options, saved);
+    }catch(_e){
+      setLeagueOptions([{league_id: DEFAULT_LEAGUE_ID, name: "Wednesday Mixed League"}], saved);
+    }
 
     $("leagueSelect").addEventListener("change", () => {
       localStorage.setItem(STORAGE_KEY, getSelectedLeagueId());
-      loadMembership();
+      $("search").value = "";
+      load();
     });
   }
 
-  // Modal logic
-  const modalBackdrop = document.getElementById("modalBackdrop");
-  const closeModalBtn = document.getElementById("closeModalBtn");
-  const cancelBtn = document.getElementById("cancelBtn");
-  const savePaymentBtn = document.getElementById("savePaymentBtn");
-  const mBowler = document.getElementById("mBowler");
-  const mType = document.getElementById("mType");
-  const mAmount = document.getElementById("mAmount");
-  const methodWrap = document.getElementById("methodWrap");
-  const mMethod = document.getElementById("mMethod");
-  const methodNote = document.getElementById("methodNote");
-
-  function openModal(idx){
-    activeIdx = idx;
-    const r = data[idx];
-    mBowler.value = r.bowler_name || "";
-    mType.value = "dues";
-    mAmount.value = Math.max(0, clampMoney(r.dues_owed_to_date || 0)).toFixed(2);
-    mMethod.value = "use_credit";
-    updateMethodVisibility();
-    updateMethodNote();
-    modalBackdrop.style.display = "flex";
-    modalBackdrop.setAttribute("aria-hidden","false");
+  function csvEscape(val){
+    const s = String(val ?? "");
+    if(/[",
+]/.test(s)) return '"' + s.replace(/"/g,'""') + '"';
+    return s;
   }
-  function closeModal(){
-    modalBackdrop.style.display = "none";
-    modalBackdrop.setAttribute("aria-hidden","true");
-    activeIdx = -1;
-  }
-  function updateMethodVisibility(){
-    methodWrap.style.display = (mType.value === "dues") ? "block" : "none";
-  }
-  function updateMethodNote(){
-    if(activeIdx < 0) return;
-    const r = data[activeIdx];
-    const credits = clampMoney(r.credits || 0);
-    if(mType.value !== "dues"){
-      methodNote.textContent = "Adding credit increases the bowler’s available credit balance.";
-      return;
-    }
-    if(mMethod.value === "use_credit"){
-      methodNote.textContent = credits > 0
-        ? `This bowler has $${money(credits)} credit available. We'll apply as much as needed.`
-        : "This bowler has $0.00 credit available.";
-    }else if(mMethod.value === "cash"){
-      methodNote.textContent = "Cash payment reduces dues owed.";
-    }else{
-      methodNote.textContent = "Card payment reduces dues owed.";
-    }
+  function toCSV(){
+    const headers = ["bowler_name","dues_owed_to_date","upcoming_dues","credits"];
+    const head = headers.map(csvEscape).join(",");
+    const body = rows.map(r => [
+      csvEscape(r.bowler_name),
+      csvEscape(clampMoney(r.dues_owed_to_date).toFixed(2)),
+      csvEscape(clampMoney(r.upcoming_dues).toFixed(2)),
+      csvEscape(clampMoney(r.credits).toFixed(2)),
+    ].join(",")).join("
+");
+    return head + "
+" + body + "
+";
   }
 
-  closeModalBtn.addEventListener("click", (e)=>{ e.preventDefault(); closeModal(); });
-  cancelBtn.addEventListener("click", (e)=>{ e.preventDefault(); closeModal(); });
-  modalBackdrop.addEventListener("click", (e)=>{ if(e.target === modalBackdrop) closeModal(); });
-  mType.addEventListener("change", ()=>{ updateMethodVisibility(); updateMethodNote(); });
-  mMethod.addEventListener("change", updateMethodNote);
-
-  savePaymentBtn.addEventListener("click", (e)=>{
-    e.preventDefault();
-    if(activeIdx < 0) return;
-    const r = data[activeIdx];
-    const type = mType.value;
-    const amt = clampMoney(mAmount.value);
-    if(!(amt > 0)){
-      alert("Enter an amount greater than 0.");
-      return;
-    }
-    if(type === "credit"){
-      r.credits = clampMoney((r.credits||0) + amt);
-    }else{
-      if(mMethod.value === "use_credit"){
-        const avail = clampMoney(r.credits || 0);
-        const apply = Math.min(avail, amt);
-        r.credits = clampMoney(avail - apply);
-        r.dues_owed_to_date = clampMoney((r.dues_owed_to_date||0) - amt);
-      }else{
-        r.dues_owed_to_date = clampMoney((r.dues_owed_to_date||0) - amt);
-      }
-    }
-    closeModal();
-    render();
-  });
-
-  // Template buttons
-  const addBtn = document.getElementById("addBowlerBtn");
-  if(addBtn){
-    addBtn.textContent = "➕ Add Member";
-    addBtn.addEventListener("click", (e)=>{
-      e.preventDefault();
-      const name = prompt("Enter bowler name:");
-      if(!name) return;
-      const clean = name.trim();
-      if(!clean) return;
-      if(data.some(x => (x.bowler_name||"").toLowerCase() === clean.toLowerCase())){
-        alert("That bowler already exists in this membership file.");
-        return;
-      }
-      data.push({bowler_name:clean, dues_owed_to_date:0, upcoming_dues:0, credits:0});
-      data.sort((a,b)=> (a.bowler_name||"").localeCompare(b.bowler_name||""));
-      render();
-    });
-  }
-
-  const exportBtn = document.getElementById("exportBtn");
-  if(exportBtn){
-    exportBtn.addEventListener("click", (e)=>{
-      e.preventDefault();
-      const leagueId = getSelectedLeagueId();
-      const filename = `membership_${leagueId}.csv`;
-      const csvText = toCSV(COLS, data.map(r => ({
-        bowler_name: r.bowler_name || "",
-        dues_owed_to_date: money(r.dues_owed_to_date || 0),
-        upcoming_dues: money(r.upcoming_dues || 0),
-        credits: money(r.credits || 0),
-      })));
-      const blob = new Blob([csvText], {type:"text/csv;charset=utf-8"});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-    });
-  }
-
-  // year
-  const y = document.getElementById("year");
-  if(y) y.textContent = new Date().getFullYear();
-
-  loadLeagues().then(loadMembership).catch(e => {
-    alert(`League load failed:
-${String(e && e.message ? e.message : e)}`);
-    loadMembership();
-  });
-})();
-</script>
-
-<!-- PAYMENT MODAL -->
+  // Modal HTML
+  const modal = document.createElement("div");
+  modal.innerHTML = `
 <div class="modalBackdrop" id="modalBackdrop" aria-hidden="true">
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
     <div class="modalHd">
@@ -753,12 +556,10 @@ ${String(e && e.message ? e.message : e)}`);
     </div>
     <div class="modalBd">
       <div class="formGrid">
-
         <div class="field fieldFull">
-          <label>Bowler</label>
+          <label>Member</label>
           <input id="mBowler" type="text" readonly />
         </div>
-
         <div class="field">
           <label>Entry Type</label>
           <select id="mType">
@@ -766,12 +567,10 @@ ${String(e && e.message ? e.message : e)}`);
             <option value="credit">Credit</option>
           </select>
         </div>
-
         <div class="field">
           <label>Amount</label>
           <input id="mAmount" type="number" step="0.01" min="0" />
         </div>
-
         <div class="field fieldFull" id="methodWrap">
           <label>Payment Method (for dues)</label>
           <select id="mMethod">
@@ -779,22 +578,127 @@ ${String(e && e.message ? e.message : e)}`);
             <option value="cash">Cash</option>
             <option value="card">Card</option>
           </select>
-          <p class="note" id="methodNote" style="margin-top:6px;"></p>
+          <div class="sub" id="methodNote" style="margin-top:6px;"></div>
         </div>
-
         <div class="field fieldFull">
           <label>Notes (optional)</label>
           <input id="mNote" type="text" placeholder="Example: Paid week 3 dues, $5 credit applied" />
         </div>
-
       </div>
     </div>
     <div class="modalFt">
-      <a class="btn" href="#" id="cancelBtn">Cancel</a>
-      <a class="btn btnPrimary" href="#" id="savePaymentBtn">Save</a>
+      <button class="btn" id="cancelBtn" type="button">Cancel</button>
+      <button class="btn btnPrimary" id="savePaymentBtn" type="button">Save</button>
     </div>
   </div>
-</div>
+</div>`;
+  document.body.appendChild(modal.firstElementChild);
 
+  let activeIdx = -1;
+
+  function updateMethodVisibility(){
+    $("methodWrap").style.display = ($("mType").value === "dues") ? "block" : "none";
+  }
+  function updateMethodNote(){
+    if(activeIdx < 0) return;
+    const r = rows[activeIdx];
+    const credits = clampMoney(r.credits || 0);
+    if($("mType").value !== "dues"){
+      $("methodNote").textContent = "Adding credit increases the member’s available credit balance.";
+      return;
+    }
+    if($("mMethod").value === "use_credit"){
+      $("methodNote").textContent = credits > 0
+        ? `This member has ${fmtMoney(credits)} credit available. We'll apply as much as needed.`
+        : "This member has $0.00 credit available.";
+    }else if($("mMethod").value === "cash"){
+      $("methodNote").textContent = "Cash payment reduces dues owed.";
+    }else{
+      $("methodNote").textContent = "Card payment reduces dues owed.";
+    }
+  }
+
+  function openModal(idx){
+    activeIdx = idx;
+    const r = rows[idx];
+    $("mBowler").value = r.bowler_name || "";
+    $("mType").value = "dues";
+    $("mAmount").value = Math.max(0, clampMoney(r.dues_owed_to_date)).toFixed(2);
+    $("mMethod").value = "use_credit";
+    $("mNote").value = "";
+    updateMethodVisibility();
+    updateMethodNote();
+    $("modalBackdrop").style.display = "flex";
+    $("modalBackdrop").setAttribute("aria-hidden","false");
+  }
+  function closeModal(){
+    $("modalBackdrop").style.display = "none";
+    $("modalBackdrop").setAttribute("aria-hidden","true");
+    activeIdx = -1;
+  }
+
+  $("closeModalBtn").addEventListener("click", (e)=>{ e.preventDefault(); closeModal(); });
+  $("cancelBtn").addEventListener("click", (e)=>{ e.preventDefault(); closeModal(); });
+  $("modalBackdrop").addEventListener("click", (e)=>{ if(e.target === $("modalBackdrop")) closeModal(); });
+  $("mType").addEventListener("change", ()=>{ updateMethodVisibility(); updateMethodNote(); });
+  $("mMethod").addEventListener("change", updateMethodNote);
+
+  $("savePaymentBtn").addEventListener("click", (e)=>{
+    e.preventDefault();
+    if(activeIdx < 0) return;
+    const r = rows[activeIdx];
+    const type = $("mType").value;
+    const amount = clampMoney($("mAmount").value);
+    if(!(amount > 0)){ alert("Enter an amount greater than 0."); return; }
+
+    if(type === "credit"){
+      r.credits = clampMoney((r.credits||0) + amount);
+    }else{
+      const method = $("mMethod").value;
+      if(method === "use_credit"){
+        const avail = clampMoney(r.credits || 0);
+        const apply = Math.min(avail, amount);
+        r.credits = clampMoney(avail - apply);
+        r.dues_owed_to_date = clampMoney((r.dues_owed_to_date||0) - amount);
+      }else{
+        r.dues_owed_to_date = clampMoney((r.dues_owed_to_date||0) - amount);
+      }
+    }
+    closeModal();
+    render();
+  });
+
+  $("search").addEventListener("input", render);
+  $("reload").addEventListener("click", load);
+  $("addMember").addEventListener("click", () => {
+    const name = prompt("Enter member (bowler) name:");
+    if(!name) return;
+    const clean = name.trim();
+    if(!clean) return;
+    if(rows.some(x => (x.bowler_name||"").toLowerCase() === clean.toLowerCase())){
+      alert("That member already exists.");
+      return;
+    }
+    rows.push({bowler_name:clean, dues_owed_to_date:0, upcoming_dues:0, credits:0});
+    rows.sort((a,b)=> (a.bowler_name||"").localeCompare(b.bowler_name||""));
+    render();
+  });
+  $("export").addEventListener("click", () => {
+    const leagueId = getSelectedLeagueId();
+    const filename = `membership_${leagueId}.csv`;
+    const blob = new Blob([toCSV()], {type:"text/csv;charset=utf-8"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  });
+
+  loadLeagues().then(load);
+})();
+</script>
 </body>
 </html>
